@@ -1,0 +1,23 @@
+# Render Blueprint: деплой в один клик после подключения GitHub-репозитория.
+# https://render.com → New → Blueprint → выбрать этот репозиторий.
+services:
+  - type: web
+    name: ml-simulator
+    runtime: docker
+    plan: starter          # постоянный диск требует платного плана (~$7/мес)
+    healthCheckPath: /api/me
+    disk:
+      name: ml-simulator-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: DATA_DIR
+        value: /data
+      - key: APP_URL
+        sync: false        # задать вручную: https://<имя-сервиса>.onrender.com
+      - key: STRIPE_SECRET_KEY
+        sync: false        # задать вручную в Render Dashboard (секрет)
+      - key: STRIPE_PRICE_ID
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false

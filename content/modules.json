@@ -1,0 +1,278 @@
+[
+  {
+    "id": "m01",
+    "order": 1,
+    "title": "Первый день в Datacore",
+    "subtitle": "Онбординг: что такое ML на самом деле, жизненный цикл проекта и роли в команде",
+    "level": "Junior",
+    "tags": [
+      "основы",
+      "ML lifecycle",
+      "команда"
+    ]
+  },
+  {
+    "id": "m02",
+    "order": 2,
+    "title": "Первая задача: разведочный анализ данных",
+    "subtitle": "Python, Pandas и EDA: тимлид просит отчёт по данным продаж к пятнице",
+    "level": "Junior",
+    "tags": [
+      "Python",
+      "Pandas",
+      "EDA"
+    ]
+  },
+  {
+    "id": "m03",
+    "order": 3,
+    "title": "Маркетинг спорит: помогла ли скидка?",
+    "subtitle": "Статистика и визуализация: распределения, гипотезы и A/B-тест промо-акции",
+    "level": "Junior",
+    "tags": [
+      "статистика",
+      "A/B-тест",
+      "визуализация"
+    ]
+  },
+  {
+    "id": "m04",
+    "order": 4,
+    "title": "Прогноз стоимости доставки",
+    "subtitle": "Линейная регрессия: первая модель, градиентный спуск и интерпретация коэффициентов",
+    "level": "Junior",
+    "tags": [
+      "регрессия",
+      "sklearn",
+      "MAE/RMSE"
+    ]
+  },
+  {
+    "id": "m05",
+    "order": 5,
+    "title": "Клиенты уходят: модель оттока",
+    "subtitle": "Логистическая регрессия и классификация: предсказываем churn до того, как клиент ушёл",
+    "level": "Junior",
+    "tags": [
+      "классификация",
+      "churn",
+      "логистическая регрессия"
+    ]
+  },
+  {
+    "id": "m06",
+    "order": 6,
+    "title": "Модель с точностью 99%, которая не работает",
+    "subtitle": "Метрики качества: precision, recall, ROC-AUC и цена ошибки в антифроде",
+    "level": "Junior",
+    "tags": [
+      "метрики",
+      "precision/recall",
+      "ROC-AUC"
+    ]
+  },
+  {
+    "id": "m07",
+    "order": 7,
+    "title": "Кредитный скоринг: данные решают всё",
+    "subtitle": "Feature engineering: агрегаты, кодирование категорий, работа с пропусками",
+    "level": "Junior+",
+    "tags": [
+      "признаки",
+      "encoding",
+      "скоринг"
+    ]
+  },
+  {
+    "id": "m08",
+    "order": 8,
+    "title": "Churn v2: бустинг против леса",
+    "subtitle": "Деревья решений, Random Forest и градиентный бустинг (XGBoost/LightGBM/CatBoost)",
+    "level": "Junior+",
+    "tags": [
+      "ансамбли",
+      "бустинг",
+      "деревья"
+    ]
+  },
+  {
+    "id": "m09",
+    "order": 9,
+    "title": "Инцидент: модель развалилась в проде",
+    "subtitle": "Валидация, переобучение и утечки данных — разбор реального фейла",
+    "level": "Junior+",
+    "tags": [
+      "валидация",
+      "data leakage",
+      "overfitting"
+    ]
+  },
+  {
+    "id": "m10",
+    "order": 10,
+    "title": "Выжать ещё 2% качества",
+    "subtitle": "Подбор гиперпараметров: grid search, random search и Optuna",
+    "level": "Junior+",
+    "tags": [
+      "гиперпараметры",
+      "Optuna",
+      "тюнинг"
+    ]
+  },
+  {
+    "id": "m11",
+    "order": 11,
+    "title": "Фрод: 1 мошенник на 1000 честных",
+    "subtitle": "Несбалансированные классы: веса, сэмплирование, подбор порога",
+    "level": "Middle-track",
+    "tags": [
+      "дисбаланс",
+      "фрод",
+      "threshold"
+    ]
+  },
+  {
+    "id": "m12",
+    "order": 12,
+    "title": "Кто наши клиенты на самом деле?",
+    "subtitle": "Кластеризация и unsupervised learning: сегментация клиентской базы",
+    "level": "Middle-track",
+    "tags": [
+      "кластеризация",
+      "K-Means",
+      "сегментация"
+    ]
+  },
+  {
+    "id": "m13",
+    "order": 13,
+    "title": "«С этим товаром покупают»: рекомендации",
+    "subtitle": "Рекомендательные системы: коллаборативная фильтрация и метрики ранжирования",
+    "level": "Middle-track",
+    "tags": [
+      "RecSys",
+      "коллаборативная фильтрация",
+      "NDCG"
+    ]
+  },
+  {
+    "id": "m14",
+    "order": 14,
+    "title": "Склад затоварен: прогноз спроса",
+    "subtitle": "Временные ряды: тренд, сезонность, лаговые признаки и честная валидация",
+    "level": "Middle-track",
+    "tags": [
+      "time series",
+      "прогноз",
+      "лаги"
+    ]
+  },
+  {
+    "id": "m15",
+    "order": 15,
+    "title": "Поддержка тонет в тикетах",
+    "subtitle": "NLP: от TF-IDF до трансформеров — автоматическая классификация обращений",
+    "level": "Middle-track",
+    "tags": [
+      "NLP",
+      "TF-IDF",
+      "трансформеры"
+    ]
+  },
+  {
+    "id": "m16",
+    "order": 16,
+    "title": "Знакомство с нейросетями",
+    "subtitle": "Deep learning: нейрон, слои, backpropagation и первая сеть на PyTorch",
+    "level": "Middle-track",
+    "tags": [
+      "нейросети",
+      "PyTorch",
+      "backprop"
+    ]
+  },
+  {
+    "id": "m17",
+    "order": 17,
+    "title": "Брак на конвейере: компьютерное зрение",
+    "subtitle": "CV: свёрточные сети, transfer learning и контроль качества на производстве",
+    "level": "Middle-track",
+    "tags": [
+      "CV",
+      "CNN",
+      "transfer learning"
+    ]
+  },
+  {
+    "id": "m18",
+    "order": 18,
+    "title": "Собеседование наоборот: ML System Design",
+    "subtitle": "Проектируем ML-систему end-to-end: от бизнес-метрики до архитектуры",
+    "level": "Middle",
+    "tags": [
+      "system design",
+      "архитектура",
+      "бизнес-метрики"
+    ]
+  },
+  {
+    "id": "m19",
+    "order": 19,
+    "title": "Модель готова. А теперь — в прод",
+    "subtitle": "MLOps: API-сервис, Docker, мониторинг, дрейф данных и переобучение",
+    "level": "Middle",
+    "tags": [
+      "MLOps",
+      "деплой",
+      "мониторинг"
+    ]
+  },
+  {
+    "id": "m20",
+    "order": 20,
+    "title": "Финал: защита проекта перед CTO",
+    "subtitle": "Сквозной проект + итоговый экзамен: вы готовы к позиции Middle ML Engineer",
+    "level": "Middle",
+    "tags": [
+      "капстоун",
+      "экзамен",
+      "сертификат"
+    ]
+  },
+  {
+    "id": "m21",
+    "order": 21,
+    "title": "Advanced · Прежде чем писать код: Design Doc",
+    "subtitle": "По книге «ML System Design»: problem space, цена ошибки, структура и ревью дизайн-дока",
+    "level": "Middle+",
+    "tags": [
+      "design doc",
+      "problem space",
+      "книга Babushkin/Kravchenko"
+    ]
+  },
+  {
+    "id": "m22",
+    "order": 22,
+    "title": "Advanced · Метрики, данные, валидация, бейзлайны",
+    "subtitle": "Иерархия метрик, sample-wise learning curve, adversarial-валидация и лестница бейзлайнов",
+    "level": "Middle+",
+    "tags": [
+      "иерархия метрик",
+      "adversarial validation",
+      "бейзлайны"
+    ]
+  },
+  {
+    "id": "m23",
+    "order": 23,
+    "title": "Advanced · Интеграция, A/B, мониторинг, владение",
+    "subtitle": "Training vs inference пайплайны, debrief, типы дрейфа, fallback-иерархия и bus factor",
+    "level": "Middle+",
+    "tags": [
+      "мониторинг",
+      "дрейф",
+      "ownership"
+    ]
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "name": "ml-career-simulator",
+  "version": "1.0.0",
+  "description": "Симулятор карьеры ML-инженера: от джуниора до мидла через реальные рабочие кейсы",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "marked": "^12.0.2",
+    "stripe": "^22.3.1"
+  }
+}
