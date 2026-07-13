@@ -31,9 +31,36 @@ const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const CONTENT_DIR = path.join(__dirname, 'content');
 
-const MODULES = JSON.parse(fs.readFileSync(path.join(CONTENT_DIR, 'modules.json'), 'utf8'));
-const QUIZZES = JSON.parse(fs.readFileSync(path.join(CONTENT_DIR, 'quizzes.json'), 'utf8'));
-const INTERVIEWS = JSON.parse(fs.readFileSync(path.join(CONTENT_DIR, 'interviews.json'), 'utf8'));
+// ---------------------------------------------------------------- локали
+// Контент лежит в content/<locale>/: modules.json, quizzes.json,
+// interviews.json и m01.md … m23.md. Русский — основной; если английского
+// файла модуля нет, отдаём русский (фолбэк).
+const LOCALES = ['ru', 'en'];
+const DEFAULT_LOCALE = 'ru';
+const CONTENT = {};
+for (const loc of LOCALES) {
+  const dir = path.join(CONTENT_DIR, loc);
+  CONTENT[loc] = {
+    modules: JSON.parse(fs.readFileSync(path.join(dir, 'modules.json'), 'utf8')),
+    quizzes: JSON.parse(fs.readFileSync(path.join(dir, 'quizzes.json'), 'utf8')),
+    interviews: JSON.parse(fs.readFileSync(path.join(dir, 'interviews.json'), 'utf8')),
+  };
+}
+const MODULES = CONTENT[DEFAULT_LOCALE].modules;   // структура/порядок общие для локалей
+
+function getLang(req) {
+  const q = String(req.query.lang || '');
+  if (LOCALES.includes(q)) return q;
+  const c = parseCookies(req).lang;
+  return LOCALES.includes(c) ? c : DEFAULT_LOCALE;
+}
+function localeModules(lang) { return CONTENT[lang].modules; }
+function localeQuizzes(lang) { return CONTENT[lang].quizzes; }
+function localeInterviews(lang) { return CONTENT[lang].interviews; }
+function moduleMarkdownPath(lang, id) {
+  const p = path.join(CONTENT_DIR, lang, `${id}.md`);
+  return fs.existsSync(p) ? p : path.join(CONTENT_DIR, DEFAULT_LOCALE, `${id}.md`);
+}
 
 const FREE_MODULES = 2;          // первые N модулей бесплатны
 const PASS_SCORE = 0.7;          // порог прохождения квиза
@@ -293,8 +320,9 @@ function moduleAccess(user, mod) {
 app.get('/api/modules', (req, res) => {
   const ctx = currentUser(req);
   const user = ctx ? ctx.user : null;
+  const mods = localeModules(getLang(req));
   res.json({
-    modules: MODULES.map((m) => ({
+    modules: mods.map((m) => ({
       id: m.id, order: m.order, title: m.title, subtitle: m.subtitle,
       level: m.level, tags: m.tags, free: m.order <= FREE_MODULES,
       unlocked: moduleAccess(user, m),
@@ -304,14 +332,14 @@ app.get('/api/modules', (req, res) => {
 });
 
 app.get('/api/module/:id', requireAuth, (req, res) => {
-  const mod = MODULES.find((m) => m.id === req.params.id);
+  const lang = getLang(req);
+  const mod = localeModules(lang).find((m) => m.id === req.params.id);
   if (!mod) return res.status(404).json({ error: 'Модуль не найден' });
   if (!moduleAccess(req.ctx.user, mod)) {
     return res.status(402).json({ error: 'Модуль доступен по подписке', needSubscription: true });
   }
-  const mdPath = path.join(CONTENT_DIR, `${mod.id}.md`);
-  const markdown = fs.readFileSync(mdPath, 'utf8');
-  const quiz = (QUIZZES[mod.id] || []).map((q, i) => ({ index: i, question: q.question, options: q.options }));
+  const markdown = fs.readFileSync(moduleMarkdownPath(lang, mod.id), 'utf8');
+  const quiz = (localeQuizzes(lang)[mod.id] || []).map((q, i) => ({ index: i, question: q.question, options: q.options }));
   res.json({
     module: { id: mod.id, order: mod.order, title: mod.title, subtitle: mod.subtitle, level: mod.level, tags: mod.tags },
     html: marked.parse(markdown),
@@ -321,11 +349,14 @@ app.get('/api/module/:id', requireAuth, (req, res) => {
 
 // ---------------------------------------------------------------- квизы
 app.post('/api/quiz/:id', requireAuth, (req, res) => {
+  const lang = getLang(req);
   const mod = MODULES.find((m) => m.id === req.params.id);
   if (!mod) return res.status(404).json({ error: 'Модуль не найден' });
   if (!moduleAccess(req.ctx.user, mod)) return res.status(402).json({ error: 'Модуль доступен по подписке' });
 
-  const quiz = QUIZZES[mod.id] || [];
+  // порядок вопросов/вариантов и правильные индексы одинаковы во всех локалях;
+  // локаль влияет только на текст объяснений
+  const quiz = localeQuizzes(lang)[mod.id] || [];
   const answers = (req.body || {}).answers;
   if (!Array.isArray(answers) || answers.length !== quiz.length) {
     return res.status(400).json({ error: 'Ответьте на все вопросы' });
@@ -354,24 +385,26 @@ app.post('/api/quiz/:id', requireAuth, (req, res) => {
 // ---------------------------------------------------------------- собеседования
 app.get('/api/interviews', requireAuth, (req, res) => {
   const user = req.ctx.user;
+  const interviews = localeInterviews(getLang(req));
   res.json({
-    tracks: INTERVIEWS.tracks.map((t) => ({
+    tracks: interviews.tracks.map((t) => ({
       id: t.id, title: t.title, icon: t.icon, description: t.description,
-      free: t.free, count: (INTERVIEWS.questions[t.id] || []).length,
+      free: t.free, count: (interviews.questions[t.id] || []).length,
       unlocked: t.free || !!user.subscribed
     }))
   });
 });
 
 app.get('/api/interview/:track', requireAuth, (req, res) => {
-  const track = INTERVIEWS.tracks.find((t) => t.id === req.params.track);
+  const interviews = localeInterviews(getLang(req));
+  const track = interviews.tracks.find((t) => t.id === req.params.track);
   if (!track) return res.status(404).json({ error: 'Трек не найден' });
   if (!track.free && !req.ctx.user.subscribed) {
     return res.status(402).json({ error: 'Трек доступен по подписке', needSubscription: true });
   }
   res.json({
     track: { id: track.id, title: track.title, icon: track.icon, advice: track.advice },
-    questions: INTERVIEWS.questions[track.id] || []
+    questions: interviews.questions[track.id] || []
   });
 });
 

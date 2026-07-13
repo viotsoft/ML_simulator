@@ -6,6 +6,7 @@
   <title>ML Career Simulator — станьте Middle ML-инженером через реальные рабочие кейсы</title>
   <meta name="description" content="Игровой симулятор карьеры ML-инженера: 20 модулей с реальными бизнес-кейсами, от первого дня джуниора до защиты проекта на позицию middle. Первые 2 модуля бесплатно.">
   <link rel="stylesheet" href="/css/style.css">
+  <script>localStorage.setItem('lang','ru');document.cookie='lang=ru; Path=/; Max-Age=31536000; SameSite=Lax';</script>
 </head>
 <body>
 
@@ -16,6 +17,7 @@
       <a href="#how">Как это работает</a>
       <a href="#program">Программа</a>
       <a href="#pricing">Тарифы</a>
+      <a href="/en.html" title="English version">EN</a>
       <a href="/app.html" class="btn btn-primary" style="padding:9px 20px">Войти</a>
     </div>
   </nav>
@@ -35,6 +37,24 @@
   </div>
   <div class="note">Первые 2 модуля — бесплатно, без карты. Дальше — $20/мес.</div>
 </section>
+
+<section class="section container" id="promo" style="padding-top:20px">
+  <h2>Как это выглядит — за 100 секунд</h2>
+  <p class="section-sub">Один день из жизни в симуляторе: задача от тимлида, код, инцидент в проде, собеседование и сертификат.</p>
+  <div class="promo-player" id="promoPlayer" data-lang="ru">
+    <div class="promo-stage"></div>
+    <div class="promo-caption"></div>
+    <div class="promo-overlay">
+      <button class="promo-overlay-btn" type="button"></button>
+    </div>
+    <div class="promo-bar">
+      <div class="promo-track"><div class="promo-progress"></div></div>
+      <div class="promo-time">0:00</div>
+      <button class="promo-mute" type="button" title="Звук">🔊</button>
+    </div>
+  </div>
+</section>
+<script src="/js/promo.js" defer></script>
 
 <section class="section container" id="for-whom">
   <h2>Для кого этот симулятор</h2>

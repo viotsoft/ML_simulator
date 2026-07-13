@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ML Career Simulator — become a Middle ML engineer through real work cases</title>
+  <meta name="description" content="A gamified ML engineer career simulator: 23 modules with real business cases, from a junior's first day to defending a project for a middle position. First 2 modules free.">
+  <link rel="stylesheet" href="/css/style.css">
+  <script>localStorage.setItem('lang','en');document.cookie='lang=en; Path=/; Max-Age=31536000; SameSite=Lax';</script>
+</head>
+<body>
+
+<header class="container">
+  <nav class="nav">
+    <div class="logo">ML<span>Simulator</span></div>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#program">Curriculum</a>
+      <a href="#pricing">Pricing</a>
+      <a href="/" title="Русская версия">RU</a>
+      <a href="/app.html" class="btn btn-primary" style="padding:9px 20px">Sign in</a>
+    </div>
+  </nav>
+</header>
+
+<section class="hero container">
+  <div class="eyebrow">CAREER SIMULATOR · FROM JUNIOR TO MIDDLE</div>
+  <h1>Your first job as an <em>ML engineer</em> starts here</h1>
+  <p class="sub">
+    Not another lecture course, but a simulator: you get "hired" by the Datacore company
+    and solve 23 real business problems — from your first EDA report to deploying a model
+    to production and defending a project before the CTO.
+  </p>
+  <div class="cta-row">
+    <a href="/app.html" class="btn btn-primary btn-lg">Start for free</a>
+    <a href="#program" class="btn btn-ghost btn-lg">See the curriculum</a>
+  </div>
+  <div class="note">The first 2 modules are free, no card required. Then — $20/month.</div>
+</section>
+
+<section class="section container" id="promo" style="padding-top:20px">
+  <h2>What it looks like — in 100 seconds</h2>
+  <p class="section-sub">One day inside the simulator: a task from the team lead, code, a production incident, an interview and the certificate.</p>
+  <div class="promo-player" id="promoPlayer" data-lang="en">
+    <div class="promo-stage"></div>
+    <div class="promo-caption"></div>
+    <div class="promo-overlay">
+      <button class="promo-overlay-btn" type="button"></button>
+    </div>
+    <div class="promo-bar">
+      <div class="promo-track"><div class="promo-progress"></div></div>
+      <div class="promo-time">0:00</div>
+      <button class="promo-mute" type="button" title="Sound">🔊</button>
+    </div>
+  </div>
+</section>
+<script src="/js/promo.js" defer></script>
+
+<section class="section container" id="for-whom">
+  <h2>Who this simulator is for</h2>
+  <p class="section-sub">We close the gap between "finished a course" and "can do the job": we teach work situations, not algorithms in a vacuum.</p>
+  <div class="grid grid-3">
+    <div class="card">
+      <span class="icon">🎓</span>
+      <h3>Course graduates</h3>
+      <p>You finished Andrew Ng or a bootcamp, but interviews ask about real cases, data leaks and business-driven metrics. Here you'll gain that experience.</p>
+    </div>
+    <div class="card">
+      <span class="icon">💼</span>
+      <h3>First-year juniors</h3>
+      <p>You're already on a team but feel the gaps: validation, imbalance, deployment, drift. The simulator is eighteen months of work experience, compressed.</p>
+    </div>
+    <div class="card">
+      <span class="icon">🔄</span>
+      <h3>Switchers from engineering and analytics</h3>
+      <p>You know Python — what's missing is ML thinking: framing the problem, choosing the metric, and shipping a model to production. That's exactly what we train.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section container" id="how">
+  <h2>How it works</h2>
+  <p class="section-sub">Every module is a work week at Datacore: a marketplace with a fintech product where you've been "hired" as a junior.</p>
+  <div class="grid grid-2">
+    <div class="card step">
+      <div class="step-num">1</div>
+      <div>
+        <h3>You receive a task from the team</h3>
+        <p>Team lead Lena, senior Igor and PM Max set tasks the way it happens in real life: "the warehouse is overstocked", "the model fell apart in production", "marketing argues about discounts".</p>
+      </div>
+    </div>
+    <div class="card step">
+      <div class="step-num">2</div>
+      <div>
+        <h3>You study the theory for the task</h3>
+        <p>Theory comes exactly at the task's scope, based on the best courses (Andrew Ng's ML and Deep Learning Specializations) — but translated into the language of work situations, with visual diagrams.</p>
+      </div>
+    </div>
+    <div class="card step">
+      <div class="step-num">3</div>
+      <div>
+        <h3>You solve the practice with a walkthrough</h3>
+        <p>Real Python/sklearn/PyTorch code, typical pitfalls and a "senior's" code review: what's wrong with the split, where the leak hides, why the metric lies.</p>
+      </div>
+    </div>
+    <div class="card step">
+      <div class="step-num">4</div>
+      <div>
+        <h3>You pass the quiz and grow your grade</h3>
+        <p>5–10 test questions with every answer explained. 70%+ passes the module. Complete all 20 core modules — and receive the Middle-track ML Engineer certificate.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section container" id="program">
+  <h2>The curriculum: 23 modules</h2>
+  <p class="section-sub">From the first day at the office to defending a project before the CTO. The level rises gradually: Junior → Junior+ → Middle-track → Middle → Middle+.</p>
+  <div class="syllabus">
+    <div class="syl-item"><span class="syl-num">01</span> First day: what ML is, the lifecycle, team roles <span class="free-tag">FREE</span></div>
+    <div class="syl-item"><span class="syl-num">02</span> Python and Pandas: your first EDA report on sales data <span class="free-tag">FREE</span></div>
+    <div class="syl-item"><span class="syl-num">03</span> Statistics and A/B tests: did the discount help? <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">04</span> Linear regression: predicting delivery cost <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">05</span> Classification: a customer churn model <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">06</span> Quality metrics: why 99% accuracy is a failure <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">07</span> Feature engineering: credit scoring <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">08</span> Trees and ensembles: boosting vs the forest <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">09</span> A production incident: validation and data leaks <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">10</span> Hyperparameter tuning: Optuna without fanaticism <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">11</span> Anti-fraud: 1:1000 imbalanced classes <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">12</span> Clustering: customer base segmentation <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">13</span> Recommender systems: "frequently bought together" <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">14</span> Time series: demand forecasting for the warehouse <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">15</span> NLP: auto-classification of support tickets <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">16</span> Neural networks: PyTorch, backprop, overfitting live <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">17</span> Computer vision: defect control on the conveyor <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">18</span> ML System Design: designing the whole system <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">19</span> MLOps: deployment, monitoring, data drift <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">20</span> Finale: defending the project before the CTO + certificate <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">21</span> Advanced · The Design Doc: problem space, error costs, reviews <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">22</span> Advanced · Metric hierarchy, adversarial validation, baselines <span class="pro-tag">PRO</span></div>
+    <div class="syl-item"><span class="syl-num">23</span> Advanced · System A/B, drift types, fallbacks, ownership <span class="pro-tag">PRO</span></div>
+  </div>
+  <p style="text-align:center;color:var(--muted);font-size:14px;margin-top:22px">
+    Modules 21–23 are a bonus track based on the book <b>"Machine Learning System Design"</b> (Babushkin, Kravchenko, Manning).
+    Every module includes visual diagrams: from gradient descent to recommendation architectures.
+  </p>
+</section>
+
+<section class="section container" id="interviews">
+  <h2>🎤 The interview simulator</h2>
+  <p class="section-sub">A separate practice section: answer the question out loud — open the model answer — compare. That's how people prepare for real interviews.</p>
+  <div class="grid grid-3">
+    <div class="card">
+      <span class="icon">🌱</span>
+      <h3>Junior ML Engineer</h3>
+      <p>12 screening and first-technical questions: ML basics, metrics, overfitting, validation. Free after registration.</p>
+    </div>
+    <div class="card">
+      <span class="icon">⚙️</span>
+      <h3>Middle ML Engineer</h3>
+      <p>12 production questions: leaks, imbalance, A/B tests, drift, deployment. Everything separating "took a course" from "ran live systems".</p>
+    </div>
+    <div class="card">
+      <span class="icon">🏗</span>
+      <h3>ML System Design</h3>
+      <p>8 full design-interview tasks — recommendations, anti-fraud, demand forecasting, search, ETA, scoring, moderation, LLM support — with framework-guided model answers.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section container" id="pricing">
+  <h2>Pricing</h2>
+  <p class="section-sub">Start for free. Cancel the subscription anytime — your progress is kept.</p>
+  <div class="pricing">
+    <div class="price-card">
+      <div class="plan">Starter</div>
+      <div class="price">$0</div>
+      <ul>
+        <li>Modules 1–2 in full</li>
+        <li>The Junior interview track (12 questions)</li>
+        <li>Quizzes with answer explanations</li>
+        <li>Progress saving</li>
+        <li>No credit card</li>
+      </ul>
+      <a href="/app.html" class="btn btn-ghost" style="width:100%">Start for free</a>
+    </div>
+    <div class="price-card featured">
+      <div class="plan" style="color:var(--accent)">PRO</div>
+      <div class="price">$20<small>/month</small></div>
+      <ul>
+        <li>All 23 modules, including the Advanced ML System Design track</li>
+        <li>120 quiz questions with explanations</li>
+        <li>The interview simulator: Junior, Middle, System Design</li>
+        <li>The capstone project and the final exam</li>
+        <li>The Middle-track ML Engineer certificate</li>
+        <li>New modules — at no extra cost</li>
+      </ul>
+      <a href="/app.html" class="btn btn-primary" style="width:100%">Subscribe</a>
+    </div>
+  </div>
+</section>
+
+<section class="section container" id="faq">
+  <h2>FAQ</h2>
+  <div class="faq" style="max-width:720px;margin:40px auto 0">
+    <details>
+      <summary>Do I need programming experience?</summary>
+      <p>Basic Python — yes (variables, functions, loops). Pandas, sklearn and PyTorch are introduced gradually inside the modules. If Python is new to you, take any one-week intensive in parallel.</p>
+    </details>
+    <details>
+      <summary>How is this different from Coursera courses?</summary>
+      <p>Courses teach theory by topic. We teach work situations: "the model fell apart in production — find out why", "marketing demands a rollout — prove it's wrong". The theory inside rests on the classic curricula (Andrew Ng and others), but the structure is a career, not a textbook's table of contents.</p>
+    </details>
+    <details>
+      <summary>How long does it take?</summary>
+      <p>A module takes 45 minutes to 3 hours. At a pace of "2 modules a week" the whole path to the certificate takes 10–12 weeks.</p>
+    </details>
+    <details>
+      <summary>What certificate do I get?</summary>
+      <p>A personal "Middle-track ML Engineer" certificate with a unique ID, issued after completing the 20 core modules and the final exam. You can print it and add it to LinkedIn. But the main value is the capstone project, which becomes the core of your portfolio.</p>
+    </details>
+    <details>
+      <summary>Can I cancel the subscription?</summary>
+      <p>Yes, anytime. PRO access remains until the end of the paid period, and your progress and certificate are kept forever.</p>
+    </details>
+  </div>
+</section>
+
+<section class="section container" style="text-align:center">
+  <h2>Land your first ML job — today</h2>
+  <p class="section-sub">Registration takes 30 seconds. The first two modules are waiting for you, free.</p>
+  <a href="/app.html" class="btn btn-primary btn-lg">Start the simulator →</a>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    ML Career Simulator © 2026 · Questions: support@mlsimulator.dev
+  </div>
+</footer>
+
+</body>
+</html>

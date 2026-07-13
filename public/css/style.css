@@ -306,6 +306,18 @@ a:hover { text-decoration: underline; }
   .certificate { position: absolute; left: 0; top: 0; width: 100%; border-color: #b39237; }
 }
 
+/* переключатель языка */
+.lang-switch {
+  display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+}
+.lang-switch button {
+  padding: 6px 12px; border: none; background: transparent; color: var(--muted);
+  font-size: 12.5px; font-weight: 700; cursor: pointer; letter-spacing: .03em;
+}
+.lang-switch button + button { border-left: 1px solid var(--border); }
+.lang-switch button.active { background: var(--accent-strong); color: #fff; }
+.lang-switch button:not(.active):hover { color: var(--text); }
+
 /* section tabs */
 .section-tabs { display: flex; gap: 10px; margin-bottom: 26px; }
 .section-tabs button {
@@ -347,6 +359,151 @@ a:hover { text-decoration: underline; }
 .md-content figure.viz figcaption {
   margin-top: 10px; font-size: 13px; color: var(--muted); text-align: center; line-height: 1.5;
 }
+
+/* ================= промо-ролик ================= */
+.promo-player {
+  position: relative; max-width: 860px; margin: 0 auto;
+  aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden;
+  background: radial-gradient(120% 140% at 20% 0%, #131a36 0%, var(--bg-soft) 55%, #0d1330 100%);
+  border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,.45);
+  user-select: none;
+}
+.promo-stage { position: absolute; inset: 0 0 46px 0; cursor: pointer; }
+.promo-scene { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 4% 6%; }
+.promo-caption {
+  position: absolute; left: 0; right: 0; bottom: 46px; text-align: center;
+  padding: 8px 16px; font-size: clamp(12px, 1.8vw, 15px); color: #cdd6ee;
+  background: linear-gradient(transparent, rgba(11,16,32,.85));
+  pointer-events: none;
+}
+.promo-bar {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 46px;
+  display: flex; align-items: center; gap: 14px; padding: 0 16px;
+  background: rgba(11,16,32,.9); border-top: 1px solid var(--border);
+}
+.promo-track { flex: 1; height: 6px; border-radius: 999px; background: var(--bg); overflow: hidden; cursor: pointer; }
+.promo-progress { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent-strong), var(--green)); border-radius: 999px; }
+.promo-time { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.promo-mute {
+  border: 1px solid var(--border); background: transparent; border-radius: 8px;
+  padding: 4px 9px; font-size: 14px; cursor: pointer; line-height: 1;
+  transition: border-color .12s;
+}
+.promo-mute:hover { border-color: var(--accent); }
+.promo-overlay {
+  position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center;
+  background: rgba(11,16,32,.55); backdrop-filter: blur(3px); cursor: pointer;
+  transition: opacity .25s ease;
+}
+.promo-overlay.hidden { opacity: 0; pointer-events: none; }
+.promo-overlay-btn {
+  padding: 16px 34px; border-radius: 999px; border: none; cursor: pointer;
+  background: var(--accent-strong); color: #fff; font-size: clamp(15px, 2.2vw, 19px); font-weight: 700;
+  box-shadow: 0 10px 40px rgba(79,110,247,.5); animation: promoPulse 2.2s ease-in-out infinite;
+}
+@keyframes promoPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+/* появление элементов сцен */
+@keyframes scIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes scPop { 0% { transform: scale(.6); opacity: 0; } 70% { transform: scale(1.06); opacity: 1; } 100% { transform: scale(1); } }
+
+/* сцена 1: хук */
+.sc-hook { text-align: center; }
+.sc-hook-line {
+  font-size: clamp(20px, 4.2vw, 40px); font-weight: 800; letter-spacing: -0.02em;
+  line-height: 1.25; opacity: 0; animation: scIn .7s ease forwards;
+}
+.sc-hook-line:nth-child(2) { color: var(--accent); }
+.sc-hook-line:nth-child(3) { font-size: clamp(15px, 2.6vw, 24px); color: var(--muted); font-weight: 600; margin-top: 14px; }
+
+/* сцена 2: чат */
+.sc-chat { width: min(560px, 92%); }
+.sc-chat-head { font-size: 13px; color: var(--muted); margin-bottom: 14px; font-weight: 700; }
+.sc-bubble {
+  display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 4px 14px 14px 14px;
+  padding: 11px 14px; font-size: clamp(12px, 1.9vw, 15px); color: #dde3f5;
+  opacity: 0; animation: scIn .5s ease forwards;
+}
+.sc-ava {
+  flex: 0 0 26px; height: 26px; border-radius: 50%; background: var(--accent-strong);
+  color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+}
+.sc-typing { color: var(--muted); letter-spacing: 3px; opacity: 0; animation: scIn .4s ease forwards, promoPulse 1.2s ease-in-out infinite; width: max-content; }
+
+/* сцена 3: код */
+.sc-code { width: min(600px, 94%); background: #0d1330; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; font-family: "SF Mono", ui-monospace, Menlo, monospace; }
+.sc-code-head { display: flex; align-items: center; gap: 6px; padding: 10px 14px; background: var(--bg-soft); border-bottom: 1px solid var(--border); }
+.sc-code-head .dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot.r { background: #f87171; } .dot.y { background: #fbbf24; } .dot.g { background: #34d399; }
+.sc-code-title { margin-left: 8px; font-size: 12px; color: var(--muted); font-family: var(--font); }
+.sc-code-line {
+  padding: 6px 14px; font-size: clamp(11px, 1.7vw, 13.5px); color: #c7d4f5; white-space: pre;
+  opacity: 0; animation: scIn .4s ease forwards;
+}
+.sc-code-line .ln { color: #3d4a7a; margin-right: 14px; }
+.sc-insight {
+  margin: 10px 14px 14px; padding: 10px 14px; border-radius: 9px; font-family: var(--font);
+  background: rgba(52,211,153,.12); border: 1px solid #34d399; color: #a7e6cd;
+  font-size: clamp(12px, 1.8vw, 14px); font-weight: 600; opacity: 0; animation: scPop .5s ease forwards;
+}
+
+/* сцена 4: инцидент */
+.sc-alert { width: min(600px, 94%); text-align: center; }
+.sc-alert-banner {
+  display: inline-block; padding: 8px 20px; border-radius: 9px; margin-bottom: 12px;
+  background: rgba(248,113,113,.14); border: 1px solid #f87171; color: #f8a5a5;
+  font-weight: 700; font-size: clamp(12px, 2vw, 15px); animation: promoPulse 1.4s ease-in-out 3;
+}
+.sc-alert-chart { width: 100%; background: rgba(13,19,48,.7); border: 1px solid var(--border); border-radius: 12px; }
+.sc-line-bad { fill: none; stroke: #f87171; stroke-width: 3; stroke-dasharray: 800; stroke-dashoffset: 800; animation: scDraw 3.5s ease forwards .4s; }
+.sc-line-good { fill: none; stroke: #34d399; stroke-width: 3; stroke-dasharray: 400; stroke-dashoffset: 400; animation: scDraw 2.5s ease forwards 9.7s; }
+@keyframes scDraw { to { stroke-dashoffset: 0; } }
+.sc-alert-found, .sc-alert-fixed {
+  margin-top: 12px; font-weight: 700; font-size: clamp(13px, 2vw, 16px);
+  opacity: 0; animation: scPop .5s ease forwards;
+}
+.sc-alert-found { color: var(--amber); }
+.sc-alert-fixed { color: var(--green); }
+
+/* сцена 5: рост */
+.sc-growth { width: min(560px, 92%); text-align: center; }
+.sc-grade { font-size: clamp(22px, 4vw, 34px); font-weight: 800; margin-bottom: 16px; }
+.sc-grade.pop { animation: scPop .5s ease; }
+.sc-gbar { height: 12px; border-radius: 999px; background: var(--bg); overflow: hidden; margin-bottom: 22px; }
+.sc-gfill { height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, var(--accent-strong), var(--green)); animation: scFill 13s linear forwards; }
+@keyframes scFill { to { width: 100%; } }
+.sc-mods { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.sc-mod {
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 12px; font-size: clamp(11px, 1.8vw, 14px); font-weight: 600; text-align: left;
+  opacity: 0; animation: scIn .5s ease forwards;
+}
+
+/* сцена 6: интервью */
+.sc-iv { width: min(560px, 92%); }
+.sc-iv-q, .sc-iv-think, .sc-iv-a {
+  border-radius: 12px; padding: 14px 18px; margin-bottom: 12px;
+  font-size: clamp(12.5px, 2vw, 15.5px); opacity: 0; animation: scIn .5s ease forwards;
+}
+.sc-iv-q { background: var(--card); border: 1px solid var(--accent); font-weight: 700; }
+.sc-iv-think { background: transparent; color: var(--muted); border: 1px dashed var(--border); }
+.sc-iv-a { background: rgba(52,211,153,.1); border: 1px solid #34d399; color: #cfeee0; }
+
+/* сцена 7: сертификат + CTA */
+.sc-cert { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.sc-cert-card {
+  background: #fdfbf5; color: #1a1a2e; border: 6px double #b39237; border-radius: 8px;
+  padding: 4% 7%; text-align: center; animation: scPop .8s ease forwards, scCertOut .8s ease forwards 6.4s;
+}
+@keyframes scCertOut { to { opacity: 0; transform: scale(.85) translateY(-16px); } }
+.sc-cert-eyebrow { font-size: clamp(8px, 1.2vw, 11px); letter-spacing: .3em; color: #b39237; font-weight: 700; }
+.sc-cert-name { font-size: clamp(18px, 3.2vw, 30px); font-weight: 800; margin: 10px 0 4px; }
+.sc-cert-track { font-size: clamp(11px, 1.8vw, 15px); color: #44445c; }
+.sc-final { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; opacity: 0; animation: scIn .8s ease forwards; text-align: center; padding: 0 6%; }
+.sc-final-title { font-size: clamp(20px, 3.6vw, 34px); font-weight: 800; letter-spacing: -0.02em; }
+.sc-final-sub { color: var(--muted); font-size: clamp(12px, 2vw, 16px); }
+.sc-final-cta { animation: promoPulse 2s ease-in-out infinite; }
 
 .toast {
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
