@@ -10,9 +10,11 @@ COPY server.js ./
 COPY content ./content
 COPY public ./public
 
-# данные пользователей — на постоянный диск (том), путь задаётся DATA_DIR
+# Данные пользователей — на постоянный диск, путь задаётся DATA_DIR.
+# Сам том подключается платформой (Railway Volumes / Render Disks и т.п.),
+# поэтому Docker-директива VOLUME здесь не используется: Railway отклоняет
+# сборку с ней ("use Railway Volumes" вместо стандартного Docker VOLUME).
 ENV DATA_DIR=/data
-VOLUME ["/data"]
 
 EXPOSE 3000
 CMD ["node", "server.js"]
