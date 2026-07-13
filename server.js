@@ -425,6 +425,59 @@ app.get('/api/certificate', requireAuth, (req, res) => {
   });
 });
 
+// ---------------------------------------------------------------- админка
+// Смотровая площадка «кто зарегистрировался»: защищена HTTP Basic Auth по
+// паролю из переменной окружения ADMIN_PASSWORD. Если она не задана, весь
+// раздел /admin отключён (404) — так безопаснее, чем пускать всех по умолчанию.
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
+
+function requireAdmin(req, res, next) {
+  if (!ADMIN_PASSWORD) return res.status(404).end();
+
+  const header = req.headers.authorization || '';
+  const [scheme, encoded] = header.split(' ');
+  const supplied = scheme === 'Basic' && encoded
+    ? Buffer.from(encoded, 'base64').toString('utf8').split(':')[1] || ''
+    : '';
+
+  const a = Buffer.from(supplied);
+  const b = Buffer.from(ADMIN_PASSWORD);
+  const ok = a.length === b.length && crypto.timingSafeEqual(a, b);
+  if (!ok) {
+    res.set('WWW-Authenticate', 'Basic realm="ML Simulator Admin"');
+    return res.status(401).end();
+  }
+  next();
+}
+
+app.get('/admin', requireAdmin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+// Только безопасные поля — без salt/hash паролей и без токенов сессий.
+app.get('/api/admin/users', requireAdmin, (req, res) => {
+  const db = loadDB();
+  const users = Object.values(db.users).map((u) => {
+    const passed = Object.values(u.progress || {}).filter((p) => p.passed).length;
+    return {
+      name: u.name,
+      email: u.email,
+      createdAt: u.createdAt || null,
+      subscribed: !!u.subscribed,
+      subscribedAt: u.subscribedAt || null,
+      passedCount: passed,
+      certificateReady: passed >= CERT_REQUIRED,
+    };
+  }).sort((x, y) => new Date(y.createdAt || 0) - new Date(x.createdAt || 0));
+
+  res.json({
+    total: users.length,
+    subscribed: users.filter((u) => u.subscribed).length,
+    certified: users.filter((u) => u.certificateReady).length,
+    users,
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`ML Career Simulator запущен: http://localhost:${PORT}`);
 });
