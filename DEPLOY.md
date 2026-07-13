@@ -1,8 +1,9 @@
 # Деплой ML Career Simulator
 
 Проект — один Node.js-сервис с файловым хранилищем, поэтому хостингу нужен **постоянный диск**.
-Рекомендуемый путь: **GitHub → Render** (есть `render.yaml` — деплой почти в один клик).
-Альтернативы: Railway, Fly.io — Dockerfile универсальный.
+Живой деплой на Railway: **https://ml-simulator-app-production.up.railway.app**
+(проект `ml-simulator-app` в аккаунте Railway, привязан к GitHub `viotsoft/ML_simulator`, ветка `main`).
+Ниже — инструкция и для Railway, и для запасного варианта на Render.
 
 ---
 
@@ -62,12 +63,28 @@ gh repo create ml-career-simulator --private --source=. --push
 
 ---
 
-## Альтернатива: Railway
+## Railway (текущий деплой)
 
-1. https://railway.app → New Project → Deploy from GitHub repo.
-2. Railway соберёт Dockerfile автоматически.
-3. Add Volume → mount path `/data`.
-4. Variables: те же `APP_URL`, `STRIPE_*`, `DATA_DIR=/data`.
+Через CLI (`brew install railway`) или дашборд https://railway.app:
+
+1. **New Project → Deploy from GitHub repo** → выбрать `viotsoft/ML_simulator`, ветка `main`.
+   Railway сам находит `Dockerfile` и собирает образ.
+2. **Add Volume** на сервисе → mount path `/data`.
+3. **Settings → Networking → Generate Domain**. ⚠️ Railway создаёт домен с портом по
+   умолчанию (обычно 3000), а контейнер слушает порт из переменной `PORT`, которую
+   Railway подставляет сама (в нашем случае — 8080). Если после деплоя домен отвечает
+   `502 Application failed to respond` — открой домен и поменяй **Target Port** на тот,
+   что в логах контейнера (`railway logs --deployment`, строка вида
+   `... запущен: http://localhost:XXXX`).
+4. Variables: `APP_URL` = сгенерированный домен, плюс при необходимости `STRIPE_*`
+   (без них — демо-режим оплаты). `DATA_DIR=/data` уже зашит в Dockerfile.
+5. **Готовые вебхуки Stripe** — тот же адрес: `<домен>/api/stripe/webhook`.
+
+**Известная ловушка сборки:** Railway отклоняет Dockerfile с директивой `VOLUME` —
+падает без единой строчки лога сборки («scheduling build» и тишина). Постоянное
+хранилище подключается только через Railway Volumes (шаг 2 выше), поэтому в
+`Dockerfile` этого проекта директивы `VOLUME` нет — только `ENV DATA_DIR=/data`.
+Если увидишь глухой fail без логов на своём форке — проверь Dockerfile на `VOLUME`.
 
 ## Альтернатива: Fly.io
 
