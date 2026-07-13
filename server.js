@@ -25,7 +25,33 @@ const STRIPE_PRICE_ID = process.env.STRIPE_PRICE_ID || '';
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
 const APP_URL = (process.env.APP_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
 const stripe = STRIPE_SECRET_KEY ? require('stripe')(STRIPE_SECRET_KEY) : null;
-const PAYMENTS_MODE = stripe && STRIPE_PRICE_ID ? 'stripe' : 'demo';
+
+// ---------------------------------------------------------------- WayForPay
+// Украинский эквайер: работает для мерчантов из Украины (ФОП/ООО), принимает
+// карты со всего мира. Без ключей ниже — тоже демо-режим. Для боевого режима:
+//   WFP_MERCHANT_ACCOUNT  — merchantAccount (идентификатор магазина)
+//   WFP_MERCHANT_SECRET   — secretKey (подпись HMAC-MD5 виджета и вебхука)
+//   WFP_MERCHANT_PASSWORD — merchantPassword (отдельный секрет для regularApi:
+//                            управление подпиской — приостановка/отмена)
+//   WFP_DOMAIN            — домен сайта, зарегистрированный в кабинете WayForPay
+// Публичные тестовые реквизиты для песочницы (см. DEPLOY.md): merchantAccount
+// test_merch_n1 / secret flk3409refn54t54t*FNJRET — ничего платить не нужно.
+const WFP_MERCHANT_ACCOUNT = process.env.WFP_MERCHANT_ACCOUNT || '';
+const WFP_MERCHANT_SECRET = process.env.WFP_MERCHANT_SECRET || '';
+const WFP_MERCHANT_PASSWORD = process.env.WFP_MERCHANT_PASSWORD || '';
+const WFP_DOMAIN = process.env.WFP_DOMAIN || '';
+const PRICE_USD = '20.00';
+
+function wfpSign(parts) {
+  return crypto.createHmac('md5', WFP_MERCHANT_SECRET).update(parts.join(';')).digest('hex');
+}
+
+// Приоритет: если заданы реквизиты WayForPay — используем их (это боевой
+// вариант для украинского мерчанта); иначе — Stripe, если он настроен;
+// иначе — демо-режим без реальных платежей.
+const PAYMENTS_MODE = WFP_MERCHANT_ACCOUNT && WFP_MERCHANT_SECRET ? 'wayforpay'
+  : stripe && STRIPE_PRICE_ID ? 'stripe'
+  : 'demo';
 
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
@@ -241,8 +267,7 @@ function publicUser(u) {
 }
 
 // ---------------------------------------------------------------- подписка
-// Stripe-режим: создаём Checkout Session и отправляем пользователя на оплату.
-// Демо-режим (ключи не заданы): подписка включается сразу, без списания.
+// Режим определяется PAYMENTS_MODE: demo (без ключей) / wayforpay / stripe.
 app.post('/api/subscribe', requireAuth, async (req, res) => {
   const { db, user } = req.ctx;
 
@@ -251,6 +276,52 @@ app.post('/api/subscribe', requireAuth, async (req, res) => {
     user.subscribedAt = new Date().toISOString();
     saveDB(db);
     return res.json({ ok: true, mode: 'demo', user: publicUser(user) });
+  }
+
+  // WayForPay: отдаём фронту подписанные параметры для JS-виджета
+  // (сама оплата проходит во всплывающем окне WayForPay, без редиректа).
+  if (PAYMENTS_MODE === 'wayforpay') {
+    const orderReference = `sub-${Date.now()}-${crypto.randomBytes(6).toString('hex')}`;
+    const orderDate = Math.floor(Date.now() / 1000);
+    const currency = 'USD';
+    const productName = 'ML Simulator PRO — месячная подписка';
+
+    const merchantSignature = wfpSign([
+      WFP_MERCHANT_ACCOUNT, WFP_DOMAIN, orderReference, String(orderDate),
+      PRICE_USD, currency, productName, '1', PRICE_USD,
+    ]);
+
+    const next = new Date();
+    next.setMonth(next.getMonth() + 1);
+    const dateNext = `${String(next.getDate()).padStart(2, '0')}.${String(next.getMonth() + 1).padStart(2, '0')}.${next.getFullYear()}`;
+
+    db.wfpOrders = db.wfpOrders || {};
+    db.wfpOrders[orderReference] = user.email;
+    saveDB(db);
+
+    return res.json({
+      ok: true,
+      mode: 'wayforpay',
+      widget: {
+        merchantAccount: WFP_MERCHANT_ACCOUNT,
+        merchantDomainName: WFP_DOMAIN,
+        merchantSignature,
+        authorizationType: 'SimpleSignature',
+        orderReference,
+        orderDate,
+        amount: PRICE_USD,
+        currency,
+        productName,
+        productPrice: PRICE_USD,
+        productCount: '1',
+        clientEmail: user.email,
+        clientFirstName: user.name,
+        language: 'RU',
+        regularMode: 'monthly',
+        dateNext,
+        serviceUrl: `${APP_URL}/api/wayforpay/webhook`,
+      },
+    });
   }
 
   try {
@@ -308,6 +379,78 @@ app.post('/api/billing-portal', requireAuth, async (req, res) => {
   } catch (err) {
     console.error('Stripe portal error:', err.message);
     res.status(502).json({ error: 'Не удалось открыть портал подписки' });
+  }
+});
+
+// WayForPay: вебхук (serviceUrl) — сюда прилетает и первый платёж, и каждое
+// последующее автосписание по regularMode. Проверяем подпись, активируем
+// подписку и отвечаем в формате, который ждёт WayForPay (иначе он повторит
+// вызов). Порядок полей подписи — из офиц. документации wiki.wayforpay.com.
+app.post('/api/wayforpay/webhook', (req, res) => {
+  const b = req.body || {};
+  if (PAYMENTS_MODE !== 'wayforpay') return res.status(404).end();
+
+  const expected = wfpSign([
+    b.merchantAccount, b.orderReference, String(b.amount), b.currency,
+    String(b.authCode || ''), b.cardPan || '', b.transactionStatus, String(b.reasonCode || ''),
+  ]);
+  if (expected !== b.merchantSignature) {
+    console.error('WayForPay webhook: неверная подпись', b.orderReference);
+    return res.status(400).json({ error: 'invalid signature' });
+  }
+
+  if (b.transactionStatus === 'Approved') {
+    const db = loadDB();
+    const email = db.wfpOrders && db.wfpOrders[b.orderReference];
+    const user = email && db.users[email];
+    if (user) {
+      user.subscribed = true;
+      user.subscribedAt = user.subscribedAt || new Date().toISOString();
+      user.wfpOrderReference = b.orderReference; // нужен для отмены подписки
+      saveDB(db);
+      console.log(`WayForPay: подписка активирована для ${email}`);
+    }
+  } else if (['Declined', 'Expired', 'Refunded', 'Voided'].includes(b.transactionStatus)) {
+    // регулярный платёж не прошёл (карта не сработала и т.п.) — не глушим,
+    // просто логируем; повторную попытку WayForPay делает сам по расписанию
+    console.log(`WayForPay: статус ${b.transactionStatus} по заказу ${b.orderReference}`);
+  }
+
+  const time = Math.floor(Date.now() / 1000);
+  res.json({
+    orderReference: b.orderReference,
+    status: 'accept',
+    time,
+    signature: wfpSign([b.orderReference, 'accept', String(time)]),
+  });
+});
+
+// Отмена регулярного платежа WayForPay — аналог Stripe Billing Portal,
+// только без хостед-страницы: дёргаем их API управления подпиской напрямую.
+app.post('/api/wayforpay/cancel', requireAuth, async (req, res) => {
+  const { db, user } = req.ctx;
+  if (PAYMENTS_MODE !== 'wayforpay' || !user.wfpOrderReference) {
+    return res.status(400).json({ error: 'Нет активной подписки WayForPay для отмены' });
+  }
+  try {
+    const resp = await fetch('https://api.wayforpay.com/regularApi', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        requestType: 'REMOVE',
+        merchantAccount: WFP_MERCHANT_ACCOUNT,
+        merchantPassword: WFP_MERCHANT_PASSWORD,
+        orderReference: user.wfpOrderReference,
+      }),
+    });
+    const data = await resp.json().catch(() => ({}));
+    user.subscribed = false;
+    user.unsubscribedAt = new Date().toISOString();
+    saveDB(db);
+    res.json({ ok: true, user: publicUser(user), wfpReason: data.REASON || data.reason || null });
+  } catch (err) {
+    console.error('WayForPay cancel error:', err.message);
+    res.status(502).json({ error: 'Не удалось отменить подписку. Попробуйте позже.' });
   }
 });
 

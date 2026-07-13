@@ -44,8 +44,14 @@ const I18N = {
     paywallWait: 'Секунду…',
     paywallBack: '← Вернуться к модулям',
     paywallStripeNote: 'Оплата картой через Stripe Checkout — безопасная страница оплаты Stripe. Отменить подписку можно в один клик из личного кабинета.',
-    paywallDemoNote: 'Демо-режим: оплата активируется мгновенно без списания средств. Для боевого режима задайте Stripe-ключи (см. README).',
+    paywallWayforpayNote: 'Оплата через WayForPay — украинский платёжный сервис, принимает карты со всего мира. Окно оплаты откроется прямо на странице. Отменить подписку можно кнопкой «Подписка» в шапке.',
+    paywallDemoNote: 'Демо-режим: оплата активируется мгновенно без списания средств. Для боевого режима задайте ключи Stripe или WayForPay (см. README).',
     subOkToast: 'Подписка PRO активна — все модули открыты!',
+    wfpConfirming: 'Оплата подтверждается…',
+    wfpDeclined: 'Оплата не прошла. Попробуйте другую карту.',
+    wfpPending: 'Платёж обрабатывается банком, обычно это занимает секунды.',
+    cancelConfirm: 'Отменить подписку PRO? Доступ к платным модулям закроется.',
+    cancelOkToast: 'Подписка отменена.',
     backModules: '← Все модули',
     quizTitle: (n) => `📝 Квиз модуля ${n}`,
     quizSub: 'Порог прохождения — 70%. Каждый ответ будет объяснён после проверки. Пересдавать можно сколько угодно.',
@@ -115,8 +121,14 @@ const I18N = {
     paywallWait: 'One second…',
     paywallBack: '← Back to modules',
     paywallStripeNote: 'Card payments via Stripe Checkout — Stripe’s secure payment page. Cancel your subscription in one click from your account.',
-    paywallDemoNote: 'Demo mode: the subscription activates instantly with no charge. Set the Stripe keys to enable live payments (see README).',
+    paywallWayforpayNote: 'Payment via WayForPay — a Ukrainian payment service that accepts cards from anywhere in the world. The payment window opens right on this page. Cancel anytime with the "Subscription" button in the header.',
+    paywallDemoNote: 'Demo mode: the subscription activates instantly with no charge. Set the Stripe or WayForPay keys to enable live payments (see README).',
     subOkToast: 'PRO subscription is active — all modules are unlocked!',
+    wfpConfirming: 'Confirming payment…',
+    wfpDeclined: 'Payment failed. Please try another card.',
+    wfpPending: 'Your bank is processing the payment — usually just a few seconds.',
+    cancelConfirm: 'Cancel your PRO subscription? Access to paid modules will end.',
+    cancelOkToast: 'Subscription cancelled.',
     backModules: '← All modules',
     quizTitle: (n) => `📝 Module ${n} quiz`,
     quizSub: 'Passing threshold — 70%. Every answer is explained after checking. Unlimited retakes.',
@@ -209,7 +221,7 @@ function renderUserPanel() {
     bindLangSwitch(userPanel);
     return;
   }
-  const canManage = u.subscribed && state.paymentsMode === 'stripe';
+  const canManage = u.subscribed && (state.paymentsMode === 'stripe' || state.paymentsMode === 'wayforpay');
   userPanel.innerHTML = `
     ${langSwitchHTML()}
     <span class="badge ${u.subscribed ? 'badge-pro' : 'badge-free'}">${u.subscribed ? 'PRO' : 'FREE'}</span>
@@ -225,9 +237,21 @@ function renderUserPanel() {
   };
   const billingBtn = document.getElementById('billingBtn');
   if (billingBtn) billingBtn.onclick = async () => {
+    if (state.paymentsMode === 'stripe') {
+      try {
+        const { url } = await api('/api/billing-portal', { method: 'POST' });
+        window.location.href = url;   // Stripe Billing Portal
+      } catch (e) { toast(e.message); }
+      return;
+    }
+    // WayForPay: нет хостед-портала — отменяем напрямую через наш API
+    if (!confirm(t('cancelConfirm'))) return;
     try {
-      const { url } = await api('/api/billing-portal', { method: 'POST' });
-      window.location.href = url;   // Stripe Billing Portal
+      const data = await api('/api/wayforpay/cancel', { method: 'POST' });
+      state.user = data.user;
+      renderUserPanel();
+      toast(t('cancelOkToast'));
+      if (view.querySelector('.module-list') || view.querySelector('.paywall')) renderDashboard();
     } catch (e) { toast(e.message); }
   };
 }
@@ -412,8 +436,40 @@ async function renderInterviewTrack(id) {
   window.scrollTo(0, 0);
 }
 
+// ---------------------------------------------------------------- WayForPay-виджет
+// Скрипт грузим один раз и переиспользуем; окно оплаты открывается прямо
+// на странице (без ухода на внешний сайт), как Stripe Elements.
+let wfpScriptPromise = null;
+function loadWfpScript() {
+  if (window.Wayforpay) return Promise.resolve();
+  if (!wfpScriptPromise) {
+    wfpScriptPromise = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://secure.wayforpay.com/server/pay-widget.js';
+      s.onload = resolve;
+      s.onerror = () => reject(new Error('WayForPay script failed to load'));
+      document.head.appendChild(s);
+    });
+  }
+  return wfpScriptPromise;
+}
+
+// После onApproved от виджета ждём, пока вебхук на сервере пометит
+// подписку активной (обычно доли секунды) — коротко опрашиваем /api/me.
+async function pollSubscribed(maxTries = 8, delayMs = 1200) {
+  for (let i = 0; i < maxTries; i++) {
+    const { user } = await api('/api/me');
+    if (user && user.subscribed) return user;
+    await new Promise((r) => setTimeout(r, delayMs));
+  }
+  return null;
+}
+
 // ---------------------------------------------------------------- пейвол
 function renderPaywall() {
+  const note = state.paymentsMode === 'stripe' ? t('paywallStripeNote')
+    : state.paymentsMode === 'wayforpay' ? t('paywallWayforpayNote')
+    : t('paywallDemoNote');
   view.innerHTML = `
     <div class="paywall">
       <div class="lock">🔒</div>
@@ -424,26 +480,54 @@ function renderPaywall() {
       <p style="margin-top:18px;font-size:13px">
         <a href="#" id="backDash">${t('paywallBack')}</a>
       </p>
-      <p style="font-size:12px;color:var(--muted)">${state.paymentsMode === 'stripe' ? t('paywallStripeNote') : t('paywallDemoNote')}</p>
+      <p style="font-size:12px;color:var(--muted)">${note}</p>
     </div>`;
-  document.getElementById('paySub').onclick = async () => {
-    const btn = document.getElementById('paySub');
-    btn.disabled = true;
-    btn.textContent = t('paywallWait');
+  const paySub = document.getElementById('paySub');
+  const resetBtn = () => { paySub.disabled = false; paySub.textContent = t('paywallBtn'); };
+
+  paySub.onclick = async () => {
+    paySub.disabled = true;
+    paySub.textContent = t('paywallWait');
     try {
       const data = await api('/api/subscribe', { method: 'POST' });
+
       if (data.checkoutUrl) {
         window.location.href = data.checkoutUrl;   // → Stripe Checkout
         return;
       }
+
+      if (data.widget) {                            // → WayForPay-виджет
+        await loadWfpScript();
+        const wfp = new window.Wayforpay();
+        paySub.textContent = t('paywallBtn');
+        paySub.disabled = false;
+        wfp.run(
+          data.widget,
+          async () => {                               // onApproved
+            toast(t('wfpConfirming'));
+            const user = await pollSubscribed();
+            if (user) {
+              state.user = user;
+              renderUserPanel();
+              toast(t('subOkToast'));
+              renderDashboard();
+            } else {
+              toast(t('wfpPending'));
+            }
+          },
+          () => toast(t('wfpDeclined')),              // onDeclined
+          () => toast(t('wfpPending')),                // onPending
+        );
+        return;
+      }
+
       state.user = data.user;                       // демо-режим
       renderUserPanel();
       toast(t('subOkToast'));
       renderDashboard();
     } catch (e) {
       toast(e.message);
-      btn.disabled = false;
-      btn.textContent = t('paywallBtn');
+      resetBtn();
     }
   };
   document.getElementById('backDash').onclick = (e) => { e.preventDefault(); renderDashboard(); };
