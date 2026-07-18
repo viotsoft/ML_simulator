@@ -241,7 +241,7 @@ async function main() {
   if (!OFFLINE) await require('./tls-fix').ensureTls();
   const state = loadState();
   const posts = [];
-  const startDate = new Date(Date.now() + 24 * 3600 * 1000); // с завтрашнего дня
+  const startDate = new Date(); // первый пост — сегодня, дальше по одному в день
 
   for (let i = 0; i < POSTS; i++) {
     const rubric = RUBRICS[(state.cursor + i) % RUBRICS.length];
