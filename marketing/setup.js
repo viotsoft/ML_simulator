@@ -12,6 +12,7 @@
 const { execFileSync, spawnSync } = require('child_process');
 const readline = require('readline/promises');
 const { facebook, linkedin, tiktok, openBrowser } = require('./auth-helper');
+const { ensureTls } = require('./tls-fix');
 
 const CHECK_ONLY = process.argv.includes('--check');
 
@@ -121,6 +122,7 @@ async function stepTiktok(rl, repo) {
 
 async function main() {
   console.log('=== Мастер настройки SMM-конвейера ML Career Simulator ===\n');
+  await ensureTls();
   const envOk = check();
   if (CHECK_ONLY) process.exit(envOk ? 0 : 1);
 

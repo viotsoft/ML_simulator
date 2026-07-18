@@ -232,6 +232,7 @@ function warnLinkedinExpiry() {
 const publishers = { facebook: publishFacebook, linkedin: publishLinkedin, tiktok: publishTiktok };
 
 async function main() {
+  if (!DRY_RUN) await require('./tls-fix').ensureTls();
   const queue = loadQueue();
   if (!queue.length) {
     console.log('Очередь пуста — сначала node marketing/generate.js');

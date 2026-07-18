@@ -238,6 +238,7 @@ function trackedLink(platform, postId) {
 }
 
 async function main() {
+  if (!OFFLINE) await require('./tls-fix').ensureTls();
   const state = loadState();
   const posts = [];
   const startDate = new Date(Date.now() + 24 * 3600 * 1000); // с завтрашнего дня

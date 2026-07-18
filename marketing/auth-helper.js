@@ -155,6 +155,7 @@ async function main() {
     console.log('Использование: node marketing/auth-helper.js facebook | linkedin | tiktok');
     process.exit(1);
   }
+  await require('./tls-fix').ensureTls();
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   try {
     const secrets = await FLOWS[which](rl);
