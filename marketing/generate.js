@@ -183,7 +183,7 @@ async function callClaude(prompt) {
     },
     body: JSON.stringify({
       model: MODEL,
-      max_tokens: 1500,
+      max_tokens: 4000,
       messages: [{ role: 'user', content: prompt }],
     }),
   });
@@ -247,7 +247,19 @@ async function main() {
     const rubric = RUBRICS[(state.cursor + i) % RUBRICS.length];
     const src = pickSource(rubric, state);
     process.stderr.write(`[${i + 1}/${POSTS}] ${rubric}...\n`);
-    const gen = OFFLINE ? offlinePost(rubric, src) : await callClaude(buildPrompt(rubric, src));
+    let gen;
+    if (OFFLINE) {
+      gen = offlinePost(rubric, src);
+    } else {
+      // обрезанный/невалидный JSON от модели — просто пробуем ещё раз
+      for (let attempt = 1; ; attempt++) {
+        try { gen = await callClaude(buildPrompt(rubric, src)); break; }
+        catch (e) {
+          if (attempt >= 3) throw e;
+          process.stderr.write(`  попытка ${attempt} не удалась (${e.message.slice(0, 80)}), повтор...\n`);
+        }
+      }
+    }
 
     const date = new Date(startDate.getTime() + i * 24 * 3600 * 1000).toISOString().slice(0, 10);
     const id = `${date}-${rubric}-${crypto.randomBytes(3).toString('hex')}`;
