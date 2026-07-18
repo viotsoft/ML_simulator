@@ -67,13 +67,27 @@ async function facebook(rl) {
     {}, 'обмен на долгоживущий токен'
   );
   const pages = await getJSON(`https://graph.facebook.com/v23.0/me/accounts?access_token=${long.access_token}`, {}, 'список страниц');
-  if (!pages.data.length) throw new Error('У этого аккаунта нет страниц. Создайте Facebook-страницу и повторите.');
 
-  console.log('\nВаши страницы:');
-  pages.data.forEach((p, i) => console.log(`  ${i + 1}) ${p.name} (id ${p.id})`));
-  const n = Number(await rl.question('Номер страницы для постинга: ')) - 1;
-  const page = pages.data[n];
-  if (!page) throw new Error('Неверный номер');
+  let page;
+  if (pages.data.length) {
+    console.log('\nВаши страницы:');
+    pages.data.forEach((p, i) => console.log(`  ${i + 1}) ${p.name} (id ${p.id})`));
+    const n = Number(await rl.question('Номер страницы для постинга: ')) - 1;
+    page = pages.data[n];
+    if (!page) throw new Error('Неверный номер');
+  } else {
+    // Диагностика: от чьего имени токен и какие права реально выданы
+    const me = await getJSON(`https://graph.facebook.com/v23.0/me?fields=id,name&access_token=${long.access_token}`, {}, 'me');
+    const perms = await getJSON(`https://graph.facebook.com/v23.0/me/permissions?access_token=${long.access_token}`, {}, 'права');
+    console.log(`\n/me/accounts пуст. Токен выдан пользователю: ${me.name} (id ${me.id})`);
+    console.log('Выданные права:', perms.data.map((p) => `${p.permission}=${p.status}`).join(', '));
+    console.log('\nЕсли вы точно админ страницы — введите её ID вручную (виден в диалоге Meta или в настройках страницы).');
+    const pid = (await rl.question('ID страницы (Enter — прервать): ')).trim();
+    if (!pid) throw new Error('У этого аккаунта нет страниц. Проверьте, что в диалоге Meta выбрана страница (Edit settings → Pages).');
+    page = await getJSON(`https://graph.facebook.com/v23.0/${pid}?fields=id,name,access_token&access_token=${long.access_token}`, {}, 'страница по ID');
+    if (!page.access_token) throw new Error('Страница найдена, но токен не выдан — в диалоге Meta не отмечена эта страница.');
+    console.log(`✓ ${page.name} (id ${page.id})`);
+  }
 
   console.log('\n(Page-токен, полученный из долгоживущего user-токена, не истекает.)');
 
