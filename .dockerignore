@@ -1,6 +1,7 @@
 node_modules
 data
-marketing
+marketing/node_modules
+marketing/queue
 .github
 .git
 .claude

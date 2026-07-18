@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ML Career Simulator — маркетинг</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="admin-shell">
+  <div class="admin-header">
+    <h1>📣 Маркетинг</h1>
+    <div>
+      <a href="/admin" class="btn btn-ghost" style="padding:9px 18px;font-size:14px">👥 Пользователи</a>
+      <a href="/app.html" class="btn btn-ghost" style="padding:9px 18px;font-size:14px">← В приложение</a>
+    </div>
+  </div>
+
+  <div id="jobBanner" class="mk-job" hidden>
+    <div class="mk-job-title"><span class="mk-spin">⏳</span> <span id="jobTitle">Выполняется…</span></div>
+    <pre id="jobLog"></pre>
+  </div>
+
+  <div class="mk-tabs" id="tabs">
+    <button data-tab="queue" class="active">📋 Очередь</button>
+    <button data-tab="create">✨ Создать</button>
+    <button data-tab="networks">🔌 Подключения</button>
+    <button data-tab="settings">⚙️ Настройки</button>
+    <button data-tab="stats">📊 Статистика</button>
+  </div>
+
+  <section id="tab-queue" class="mk-tab"></section>
+  <section id="tab-create" class="mk-tab" hidden></section>
+  <section id="tab-networks" class="mk-tab" hidden></section>
+  <section id="tab-settings" class="mk-tab" hidden></section>
+  <section id="tab-stats" class="mk-tab" hidden></section>
+</div>
+
+<script src="/js/admin-marketing.js"></script>
+</body>
+</html>

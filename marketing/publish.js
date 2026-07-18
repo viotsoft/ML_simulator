@@ -1,36 +1,58 @@
 #!/usr/bin/env node
-// Публикация постов из marketing/queue/ в Facebook (страница) и LinkedIn (профиль).
-// Запускается ежедневно из GitHub Actions; берёт самый старый неопубликованный
-// пост с наступившей датой, публикует и помечает published.* (идемпотентно).
+// Публикация постов из очереди в соцсети: Facebook (страница, посты и Reels),
+// Instagram (посты и Reels), LinkedIn (профиль), TikTok, Threads, X.
+// Используется сервером (планировщик и админ-панель) и как CLI:
 //
-//   node marketing/publish.js [--platform facebook|linkedin|tiktok] [--dry-run]
+//   node marketing/publish.js [--platform <net>] [--dry-run]
 //
-// Секреты (env): FB_PAGE_ID, FB_PAGE_TOKEN, LINKEDIN_TOKEN, LINKEDIN_PERSON_URN,
-//   TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET, TIKTOK_REFRESH_TOKEN
-// Платформы без секретов пропускаются (можно включать по одной).
+// Креды — из панели (credentials.json), env-переменные — запасной путь.
+// Платформы без кредов пропускаются (можно включать по одной).
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+const store = require('./credentials');
 
-const QUEUE_DIR = path.join(__dirname, 'queue');
-const STATE_FILE = path.join(__dirname, 'state.json');
+const { QUEUE_DIR, PUB_DIR } = store;
 const LINKEDIN_VERSION = process.env.LINKEDIN_VERSION || '202506';
+const APP_URL = process.env.APP_URL || 'https://ml-simulator-app-production.up.railway.app';
 
-const args = process.argv.slice(2);
-const DRY_RUN = args.includes('--dry-run');
-const only = args.includes('--platform') ? args[args.indexOf('--platform') + 1] : null;
 // instagram идёт после facebook: картинку для него берём из FB-поста (публичный CDN)
-const PLATFORMS = only ? [only] : ['facebook', 'instagram', 'linkedin', 'tiktok'];
-
-const REQUIRED_ENV = {
-  facebook: ['FB_PAGE_ID', 'FB_PAGE_TOKEN'],
-  instagram: ['FB_PAGE_TOKEN', 'IG_USER_ID'],
-  linkedin: ['LINKEDIN_TOKEN', 'LINKEDIN_PERSON_URN'],
-  tiktok: ['TIKTOK_CLIENT_KEY', 'TIKTOK_CLIENT_SECRET', 'TIKTOK_REFRESH_TOKEN'],
-};
+const PLATFORMS = ['facebook', 'instagram', 'linkedin', 'tiktok', 'threads', 'x'];
 
 function configured(platform) {
-  return (REQUIRED_ENV[platform] || []).every((k) => process.env[k]);
+  return !!store.platformCreds(platform);
+}
+
+// Статус подключений для панели
+function platformStatus() {
+  const config = store.loadConfig();
+  const out = {};
+  for (const p of PLATFORMS) {
+    const creds = store.platformCreds(p);
+    out[p] = {
+      configured: !!creds,
+      enabled: config.enabled[p] !== false,
+      detail: creds ? connectionDetail(p, creds) : null,
+    };
+  }
+  return out;
+}
+
+function connectionDetail(p, creds) {
+  const days = (iso) => (iso ? Math.max(0, Math.round((new Date(iso) - Date.now()) / 86400000)) : null);
+  switch (p) {
+    case 'facebook': return { account: creds.pageName || creds.pageId };
+    case 'instagram': return { account: creds.igUsername || creds.igUserId };
+    case 'linkedin': {
+      const issued = creds.issuedAt ? Math.floor((Date.now() - new Date(creds.issuedAt)) / 86400000) : null;
+      return { account: creds.personUrn, tokenDaysLeft: issued === null ? null : Math.max(0, 60 - issued) };
+    }
+    case 'tiktok': return { account: 'TikTok' };
+    case 'threads': return { account: creds.username || creds.userId, tokenDaysLeft: days(creds.expiresAt) };
+    case 'x': return { account: creds.username || 'X' };
+    default: return {};
+  }
 }
 
 function today() {
@@ -60,19 +82,29 @@ async function apiCheck(res, what) {
   return res;
 }
 
+// Публичный URL для медиа очереди (нужен Threads): копия файла под случайным
+// именем в PUB_DIR, отдаётся сервером по /m/<имя> без авторизации.
+function publicMediaUrl(file) {
+  const src = path.join(QUEUE_DIR, file);
+  const name = crypto.createHash('sha256').update(fs.readFileSync(src)).digest('hex').slice(0, 24) + path.extname(file);
+  const dst = path.join(PUB_DIR, name);
+  if (!fs.existsSync(dst)) fs.copyFileSync(src, dst);
+  return `${APP_URL}/m/${name}`;
+}
+
 // ---------- Facebook: фото + текст на страницу (или Reels, если format:'reel') ----------
 
-async function publishFacebook(post, imagePath) {
-  const pageId = process.env.FB_PAGE_ID;
-  const token = process.env.FB_PAGE_TOKEN;
-  if (!pageId || !token) throw new Error('FB_PAGE_ID / FB_PAGE_TOKEN не заданы');
+async function publishFacebook(post) {
+  const creds = store.platformCreds('facebook');
+  if (!creds) throw new Error('Facebook не подключён');
+  const { pageId, pageToken: token } = creds;
 
   if (post.format === 'reel' && post.video) return publishFacebookReel(post, pageId, token);
 
   const form = new FormData();
   form.append('message', post.texts.facebook);
   form.append('access_token', token);
-  form.append('source', new Blob([fs.readFileSync(imagePath)], { type: 'image/png' }), post.image);
+  form.append('source', new Blob([fs.readFileSync(path.join(QUEUE_DIR, post.image))], { type: 'image/png' }), post.image);
 
   const res = await apiCheck(
     await fetch(`https://graph.facebook.com/v23.0/${pageId}/photos`, { method: 'POST', body: form }),
@@ -113,10 +145,37 @@ async function publishFacebookReel(post, pageId, token) {
   return { id: start.video_id, reel: true };
 }
 
-// Instagram Reels: resumable-загрузка (публичный URL не нужен) + ожидание обработки
-async function publishInstagramReel(post) {
-  const token = process.env.FB_PAGE_TOKEN;
-  const igUser = process.env.IG_USER_ID;
+// ---------- Instagram: тем же Meta-приложением ----------
+// Посты: картинка из FB-поста (Content Publishing API принимает только публичный
+// image_url, CDN Facebook подходит) — поэтому Instagram идёт ПОСЛЕ Facebook.
+// Reels: resumable-загрузка напрямую.
+
+async function igWaitContainer(containerId, token, tries = 40) {
+  for (let i = 0; i < tries; i++) {
+    const st = await (await apiCheck(
+      await fetch(`https://graph.facebook.com/v23.0/${containerId}?fields=status_code&access_token=${token}`),
+      'Instagram container status'
+    )).json();
+    if (st.status_code === 'FINISHED') return;
+    if (st.status_code === 'ERROR') throw new Error('Instagram не смог обработать медиа (status ERROR)');
+    await new Promise((r) => setTimeout(r, 3000));
+  }
+}
+
+async function igPublish(igUser, containerId, token) {
+  const pub = await (await apiCheck(
+    await fetch(`https://graph.facebook.com/v23.0/${igUser}/media_publish`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ creation_id: containerId, access_token: token }),
+    }),
+    'Instagram media_publish'
+  )).json();
+  return pub.id;
+}
+
+async function publishInstagramReel(post, creds) {
+  const { pageToken: token, igUserId: igUser } = creds;
   const video = fs.readFileSync(path.join(QUEUE_DIR, post.video));
 
   const container = await (await apiCheck(
@@ -142,36 +201,16 @@ async function publishInstagramReel(post) {
     'IG Reels upload'
   );
 
-  // обработка видео занимает десятки секунд
-  for (let i = 0; i < 40; i++) {
-    const st = await (await apiCheck(
-      await fetch(`https://graph.facebook.com/v23.0/${container.id}?fields=status_code&access_token=${token}`),
-      'IG Reels status'
-    )).json();
-    if (st.status_code === 'FINISHED') break;
-    if (st.status_code === 'ERROR') throw new Error('Instagram не смог обработать видео (status ERROR)');
-    await new Promise((r) => setTimeout(r, 3000));
-  }
-
-  const pub = await (await apiCheck(
-    await fetch(`https://graph.facebook.com/v23.0/${igUser}/media_publish`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ creation_id: container.id, access_token: token }),
-    }),
-    'IG Reels publish'
-  )).json();
-  return { id: pub.id, reel: true };
+  await igWaitContainer(container.id, token);
+  return { id: await igPublish(igUser, container.id, token), reel: true };
 }
 
-// ---------- Instagram: тем же Meta-приложением, картинка — из FB-поста ----------
-// Content Publishing API принимает только публичный image_url, поэтому Instagram
-// публикуется ПОСЛЕ Facebook: берём CDN-ссылку уже загруженной туда карточки.
-
 async function publishInstagram(post) {
-  if (post.format === 'reel' && post.video) return publishInstagramReel(post);
-  const token = process.env.FB_PAGE_TOKEN;
-  const igUser = process.env.IG_USER_ID;
+  const creds = store.platformCreds('instagram');
+  if (!creds) throw new Error('Instagram не подключён');
+  if (post.format === 'reel' && post.video) return publishInstagramReel(post, creds);
+
+  const { pageToken: token, igUserId: igUser } = creds;
   const fb = post.published.facebook;
   if (!fb || !(fb.photoId || fb.id)) throw new Error('сначала пост должен выйти в Facebook (источник картинки)');
 
@@ -204,48 +243,27 @@ async function publishInstagram(post) {
     'Instagram /media'
   )).json();
 
-  // Контейнер обрабатывается асинхронно — публиковать можно только со статусом FINISHED
-  for (let i = 0; i < 15; i++) {
-    const st = await (await apiCheck(
-      await fetch(`https://graph.facebook.com/v23.0/${container.id}?fields=status_code&access_token=${token}`),
-      'Instagram container status'
-    )).json();
-    if (st.status_code === 'FINISHED') break;
-    if (st.status_code === 'ERROR') throw new Error('Instagram не смог обработать картинку (status ERROR)');
-    await new Promise((r) => setTimeout(r, 2000));
-  }
-
-  const pub = await (await apiCheck(
-    await fetch(`https://graph.facebook.com/v23.0/${igUser}/media_publish`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ creation_id: container.id, access_token: token }),
-    }),
-    'Instagram /media_publish'
-  )).json();
-  return pub.id;
+  await igWaitContainer(container.id, token, 15);
+  return igPublish(igUser, container.id, token);
 }
 
 // ---------- LinkedIn: загрузка картинки + пост от имени профиля ----------
 
-function liHeaders(extra = {}) {
-  return {
-    Authorization: `Bearer ${process.env.LINKEDIN_TOKEN}`,
+async function publishLinkedin(post) {
+  const creds = store.platformCreds('linkedin');
+  if (!creds) throw new Error('LinkedIn не подключён');
+  const liHeaders = (extra = {}) => ({
+    Authorization: `Bearer ${creds.accessToken}`,
     'LinkedIn-Version': LINKEDIN_VERSION,
     'X-Restli-Protocol-Version': '2.0.0',
     ...extra,
-  };
-}
-
-async function publishLinkedin(post, imagePath) {
-  const author = process.env.LINKEDIN_PERSON_URN; // urn:li:person:XXXX
-  if (!process.env.LINKEDIN_TOKEN || !author) throw new Error('LINKEDIN_TOKEN / LINKEDIN_PERSON_URN не заданы');
+  });
 
   const init = await apiCheck(
     await fetch('https://api.linkedin.com/rest/images?action=initializeUpload', {
       method: 'POST',
       headers: liHeaders({ 'content-type': 'application/json' }),
-      body: JSON.stringify({ initializeUploadRequest: { owner: author } }),
+      body: JSON.stringify({ initializeUploadRequest: { owner: creds.personUrn } }),
     }),
     'LinkedIn initializeUpload'
   );
@@ -254,8 +272,8 @@ async function publishLinkedin(post, imagePath) {
   await apiCheck(
     await fetch(value.uploadUrl, {
       method: 'PUT',
-      headers: { Authorization: `Bearer ${process.env.LINKEDIN_TOKEN}` },
-      body: fs.readFileSync(imagePath),
+      headers: { Authorization: `Bearer ${creds.accessToken}` },
+      body: fs.readFileSync(path.join(QUEUE_DIR, post.image)),
     }),
     'LinkedIn image PUT'
   );
@@ -265,7 +283,7 @@ async function publishLinkedin(post, imagePath) {
       method: 'POST',
       headers: liHeaders({ 'content-type': 'application/json' }),
       body: JSON.stringify({
-        author,
+        author: creds.personUrn,
         commentary: post.texts.linkedin,
         visibility: 'PUBLIC',
         distribution: { feedDistribution: 'MAIN_FEED', targetEntities: [], thirdPartyDistributionChannels: [] },
@@ -281,27 +299,27 @@ async function publishLinkedin(post, imagePath) {
 
 // ---------- TikTok: Direct Post (FILE_UPLOAD) ----------
 // Access-токен живёт 24 часа — обновляем при каждом запуске по refresh-токену
-// (тот живёт 365 дней). До прохождения аудита приложения TikTok разрешает
-// только SELF_ONLY — берём максимально открытый уровень из creator_info.
+// (тот живёт 365 дней; при ротации сохраняем новый). До аудита приложения TikTok
+// разрешает только SELF_ONLY — берём максимально открытый уровень из creator_info.
 
-async function tiktokAccessToken() {
+async function tiktokAccessToken(creds) {
   const res = await apiCheck(
     await fetch('https://open.tiktokapis.com/v2/oauth/token/', {
       method: 'POST',
       headers: { 'content-type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
-        client_key: process.env.TIKTOK_CLIENT_KEY,
-        client_secret: process.env.TIKTOK_CLIENT_SECRET,
+        client_key: creds.clientKey,
+        client_secret: creds.clientSecret,
         grant_type: 'refresh_token',
-        refresh_token: process.env.TIKTOK_REFRESH_TOKEN,
+        refresh_token: creds.refreshToken,
       }),
     }),
     'TikTok oauth/token'
   );
   const data = await res.json();
   if (!data.access_token) throw new Error(`TikTok oauth/token: ${JSON.stringify(data)}`);
-  if (data.refresh_token && data.refresh_token !== process.env.TIKTOK_REFRESH_TOKEN) {
-    console.warn('::warning::TikTok выдал НОВЫЙ refresh-токен — обновите секрет TIKTOK_REFRESH_TOKEN');
+  if (data.refresh_token && data.refresh_token !== creds.refreshToken) {
+    store.updateTokens('tiktok', { refreshToken: data.refresh_token });
   }
   return data.access_token;
 }
@@ -321,7 +339,9 @@ async function tiktokJSON(url, token, body, what) {
 }
 
 async function publishTiktok(post) {
-  const token = await tiktokAccessToken();
+  const creds = store.platformCreds('tiktok');
+  if (!creds) throw new Error('TikTok не подключён');
+  const token = await tiktokAccessToken(creds);
 
   const creator = await tiktokJSON(
     'https://open.tiktokapis.com/v2/post/publish/creator_info/query/', token, {}, 'TikTok creator_info');
@@ -329,11 +349,10 @@ async function publishTiktok(post) {
   const privacy = levels.includes('PUBLIC_TO_EVERYONE') ? 'PUBLIC_TO_EVERYONE'
     : levels.includes('EVERYONE') ? 'EVERYONE' : 'SELF_ONLY';
   if (privacy === 'SELF_ONLY') {
-    console.warn('::warning::TikTok-приложение ещё не прошло аудит — видео публикуется приватно (SELF_ONLY)');
+    console.warn('TikTok-приложение ещё не прошло аудит — видео публикуется приватно (SELF_ONLY)');
   }
 
-  const videoPath = path.join(QUEUE_DIR, post.video);
-  const video = fs.readFileSync(videoPath);
+  const video = fs.readFileSync(path.join(QUEUE_DIR, post.video));
   const init = await tiktokJSON('https://open.tiktokapis.com/v2/post/publish/video/init/', token, {
     post_info: {
       title: post.texts.tiktok || post.card.headline,
@@ -364,69 +383,231 @@ async function publishTiktok(post) {
   return init.publish_id;
 }
 
-// Токен LinkedIn живёт 60 дней — предупреждаем заранее (дата из state.json)
-function warnLinkedinExpiry() {
-  try {
-    const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
-    const issued = state.linkedin && state.linkedin.issuedAt;
-    if (!issued) return;
-    const days = Math.floor((Date.now() - new Date(issued)) / 86400000);
-    if (days >= 50) {
-      console.warn(`::warning::LinkedIn-токену ${days} дней (лимит 60). Перевыпустите: node marketing/auth-helper.js`);
-    }
-  } catch {}
+// ---------- Threads: контейнер (TEXT/IMAGE/VIDEO) → publish ----------
+// Медиа нужен публичный URL — отдаём свой файл через /m/<hash>.
+
+async function publishThreads(post) {
+  const creds = store.platformCreds('threads');
+  if (!creds) throw new Error('Threads не подключён');
+  const { accessToken: token, userId } = creds;
+
+  const body = { access_token: token, text: post.texts.threads || post.texts.facebook };
+  if (post.format === 'reel' && post.video) {
+    body.media_type = 'VIDEO';
+    body.video_url = publicMediaUrl(post.video);
+  } else if (post.image && fs.existsSync(path.join(QUEUE_DIR, post.image))) {
+    body.media_type = 'IMAGE';
+    body.image_url = publicMediaUrl(post.image);
+  } else {
+    body.media_type = 'TEXT';
+  }
+
+  const container = await (await apiCheck(
+    await fetch(`https://graph.threads.net/v1.0/${userId}/threads`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    }),
+    'Threads container'
+  )).json();
+
+  // видео обрабатывается асинхронно; картинки обычно мгновенно
+  for (let i = 0; i < 30; i++) {
+    const st = await (await apiCheck(
+      await fetch(`https://graph.threads.net/v1.0/${container.id}?fields=status&access_token=${token}`),
+      'Threads container status'
+    )).json();
+    if (!st.status || st.status === 'FINISHED') break;
+    if (st.status === 'ERROR') throw new Error('Threads не смог обработать медиа');
+    await new Promise((r) => setTimeout(r, 3000));
+  }
+
+  const pub = await (await apiCheck(
+    await fetch(`https://graph.threads.net/v1.0/${userId}/threads_publish`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ creation_id: container.id, access_token: token }),
+    }),
+    'Threads publish'
+  )).json();
+  return pub.id;
 }
 
-const publishers = { facebook: publishFacebook, instagram: publishInstagram, linkedin: publishLinkedin, tiktok: publishTiktok };
+// ---------- X: OAuth2 PKCE, refresh-токены ротируются при каждом обновлении ----------
 
-async function main() {
-  if (!DRY_RUN) await require('./tls-fix').ensureTls();
+async function xAccessToken(creds) {
+  // живой access-токен ещё действует минимум 5 минут — используем его
+  if (creds.accessToken && creds.expiresAt && new Date(creds.expiresAt) - Date.now() > 300000) {
+    return creds.accessToken;
+  }
+  const headers = { 'content-type': 'application/x-www-form-urlencoded' };
+  if (creds.clientSecret) {
+    headers.Authorization = 'Basic ' + Buffer.from(`${creds.clientId}:${creds.clientSecret}`).toString('base64');
+  }
+  const res = await apiCheck(
+    await fetch('https://api.x.com/2/oauth2/token', {
+      method: 'POST',
+      headers,
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: creds.refreshToken,
+        client_id: creds.clientId,
+      }),
+    }),
+    'X oauth2/token'
+  );
+  const data = await res.json();
+  if (!data.access_token) throw new Error(`X oauth2/token: ${JSON.stringify(data)}`);
+  // X ротирует refresh-токен при каждом обновлении — обязательно сохраняем
+  store.updateTokens('x', {
+    accessToken: data.access_token,
+    refreshToken: data.refresh_token || creds.refreshToken,
+    expiresAt: new Date(Date.now() + (data.expires_in || 7200) * 1000).toISOString(),
+  });
+  return data.access_token;
+}
+
+async function publishX(post) {
+  const creds = store.platformCreds('x');
+  if (!creds) throw new Error('X не подключён');
+  const token = await xAccessToken(creds);
+
+  const payload = { text: post.texts.x || post.texts.facebook.slice(0, 270) };
+
+  // Картинка — best effort: v2 media upload доступен не на всех тарифах
+  try {
+    if (post.image && fs.existsSync(path.join(QUEUE_DIR, post.image))) {
+      const form = new FormData();
+      form.append('media', new Blob([fs.readFileSync(path.join(QUEUE_DIR, post.image))], { type: 'image/png' }), post.image);
+      form.append('media_category', 'tweet_image');
+      const up = await fetch('https://api.x.com/2/media/upload', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: form,
+      });
+      if (up.ok) {
+        const m = await up.json();
+        const mediaId = (m.data && (m.data.id || m.data.media_key)) || m.media_id_string;
+        if (mediaId) payload.media = { media_ids: [String(mediaId)] };
+      }
+    }
+  } catch { /* твит уйдёт без картинки */ }
+
+  const res = await apiCheck(
+    await fetch('https://api.x.com/2/tweets', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+      body: JSON.stringify(payload),
+    }),
+    'X /2/tweets'
+  );
+  const data = await res.json();
+  return data.data && data.data.id;
+}
+
+const publishers = {
+  facebook: publishFacebook,
+  instagram: publishInstagram,
+  linkedin: publishLinkedin,
+  tiktok: publishTiktok,
+  threads: publishThreads,
+  x: publishX,
+};
+
+// ---------- оркестрация ----------
+
+// Опубликовать «пост дня» на все настроенные платформы (или заданные).
+// Возвращает [{platform, status: 'published'|'skipped'|'error', postId?, id?, message?}]
+async function publishDue({ platforms = PLATFORMS, dryRun = false, log = console.log } = {}) {
+  const config = store.loadConfig();
   const queue = loadQueue();
-  if (!queue.length) {
-    console.log('Очередь пуста — сначала node marketing/generate.js');
-    return;
-  }
-  warnLinkedinExpiry();
-
-  if (!DRY_RUN && !PLATFORMS.some(configured)) {
-    console.error(`Ни одна платформа не настроена. Нужны секреты: ${JSON.stringify(REQUIRED_ENV)}`);
-    process.exit(1);
-  }
-
-  let failed = false;
-  for (const platform of PLATFORMS) {
-    const item = nextFor(queue, platform);
+  const results = [];
+  for (const platform of platforms) {
+    const item = queue.length ? nextFor(queue, platform) : null;
     if (!item) {
-      console.log(`[${platform}] нечего публиковать (всё опубликовано или даты не наступили)`);
+      results.push({ platform, status: 'skipped', message: 'нечего публиковать' });
       continue;
     }
-    const imagePath = path.join(QUEUE_DIR, item.post.image);
-    if (DRY_RUN) {
-      console.log(`[${platform}] DRY-RUN — был бы опубликован ${item.post.id}:`);
-      console.log(item.post.texts[platform] || '(будет использован facebook-текст с utm_source=instagram)');
-      const media = platform === 'tiktok' ? path.join(QUEUE_DIR, item.post.video) : imagePath;
-      console.log(`  media: ${media} (${fs.existsSync(media) ? 'есть' : 'НЕТ ФАЙЛА!'})`);
+    if (config.enabled[platform] === false) {
+      results.push({ platform, status: 'skipped', message: 'сеть выключена в настройках' });
       continue;
     }
     if (!configured(platform)) {
-      console.log(`[${platform}] пропущен — секреты не заданы (${REQUIRED_ENV[platform].join(', ')})`);
+      results.push({ platform, status: 'skipped', message: 'не подключена' });
+      continue;
+    }
+    if (dryRun) {
+      results.push({ platform, status: 'dry-run', postId: item.post.id });
       continue;
     }
     try {
-      const result = await publishers[platform](item.post, imagePath);
+      const result = await publishers[platform](item.post);
       const rec = typeof result === 'object' ? result : { id: result };
       item.post.published[platform] = { at: new Date().toISOString(), ...rec };
       fs.writeFileSync(item.file, JSON.stringify(item.post, null, 2));
-      console.log(`[${platform}] ✓ опубликован ${item.post.id} → ${rec.id}`);
+      log(`[${platform}] ✓ опубликован ${item.post.id} → ${rec.id}`);
+      results.push({ platform, status: 'published', postId: item.post.id, id: rec.id });
     } catch (e) {
-      failed = true;
-      console.error(`[${platform}] ✗ ${e.message}`);
+      log(`[${platform}] ✗ ${e.message}`);
+      results.push({ platform, status: 'error', postId: item.post.id, message: e.message });
     }
   }
-  if (failed) process.exit(1);
+  return results;
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+// Опубликовать конкретный пост немедленно (кнопка в панели)
+async function publishOne(postId, { platforms = PLATFORMS, log = console.log } = {}) {
+  const file = path.join(QUEUE_DIR, `${postId}.json`);
+  if (!fs.existsSync(file)) throw new Error(`Пост ${postId} не найден`);
+  const post = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const config = store.loadConfig();
+  const results = [];
+  for (const platform of platforms) {
+    if (post.published[platform]) {
+      results.push({ platform, status: 'skipped', message: 'уже опубликован' });
+      continue;
+    }
+    if (config.enabled[platform] === false || !configured(platform)) {
+      results.push({ platform, status: 'skipped', message: 'не подключена/выключена' });
+      continue;
+    }
+    if (platform === 'tiktok' && !(post.video && fs.existsSync(path.join(QUEUE_DIR, post.video)))) {
+      results.push({ platform, status: 'skipped', message: 'нет видео' });
+      continue;
+    }
+    try {
+      const result = await publishers[platform](post);
+      const rec = typeof result === 'object' ? result : { id: result };
+      post.published[platform] = { at: new Date().toISOString(), ...rec };
+      fs.writeFileSync(file, JSON.stringify(post, null, 2));
+      log(`[${platform}] ✓ ${post.id} → ${rec.id}`);
+      results.push({ platform, status: 'published', id: rec.id });
+    } catch (e) {
+      log(`[${platform}] ✗ ${e.message}`);
+      results.push({ platform, status: 'error', message: e.message });
+    }
+  }
+  return results;
+}
+
+module.exports = { publishDue, publishOne, platformStatus, configured, PLATFORMS, loadQueue };
+
+// ---------- CLI ----------
+
+if (require.main === module) {
+  const args = process.argv.slice(2);
+  const DRY_RUN = args.includes('--dry-run');
+  const only = args.includes('--platform') ? [args[args.indexOf('--platform') + 1]] : undefined;
+
+  (async () => {
+    if (!DRY_RUN) await require('./tls-fix').ensureTls();
+    const results = await publishDue({ platforms: only, dryRun: DRY_RUN });
+    for (const r of results) {
+      console.log(`[${r.platform}] ${r.status}${r.postId ? ' ' + r.postId : ''}${r.message ? ' — ' + r.message : ''}`);
+    }
+    if (results.some((r) => r.status === 'error')) process.exit(1);
+  })().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}

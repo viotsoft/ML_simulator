@@ -1,170 +1,76 @@
-# SMM-автоматизация: генерация и постинг контента
+# SMM-автоматизация: панель управления маркетингом
 
-Полностью автоматический промоушен курса в соцсетях **прямыми API платформ** (без платных
-сервисов-агрегаторов). Контент — на английском, из реальных материалов курса.
+Весь конвейер живёт **внутри приложения** и управляется через веб-панель:
 
-## Как это работает
+**https://ml-simulator-app-production.up.railway.app/admin/marketing**
+(вход — тот же Basic Auth, что у `/admin`: любой логин + `ADMIN_PASSWORD`)
 
-```
-Понедельник 06:00 UTC (GitHub Actions, marketing-generate.yml):
-  generate.js → Claude API → 7 постов (5 рубрик) + PNG-карточки
-              → коммит в marketing/queue/
+## Что умеет панель
 
-Ежедневно 14:00 UTC (marketing-publish.yml):
-  publish.js → пост дня → Facebook-страница + LinkedIn-профиль + TikTok
-             → пометка "опубликовано" → коммит
-```
+- **Очередь** — все посты с превью карточек/видео, статусами по сетям; правка
+  текстов и дат, удаление, «Опубликовать сейчас» в один клик.
+- **Создать** — генерация спец-поста (тема из банка 50 тем или своя, аудитория,
+  формат пост/Reels) и пачки на неделю. Тексты пишет Claude из реальных
+  материалов курса, карточки и видео с музыкой рендерятся автоматически.
+- **Подключения** — кнопки Connect для Facebook (+Instagram), LinkedIn, TikTok,
+  Threads, X: OAuth прямо на сайте, без терминала и localhost.
+- **Настройки** — время автопубликации (по умолчанию 14:00 UTC ежедневно),
+  день автогенерации (понедельник), размер пачки, ключ Anthropic.
+- **Статистика** — регистрации по utm-источникам и по конкретным постам.
 
-Для TikTok генератор дополнительно собирает вертикальное видео 1080×1920
-(3 слайда с zoom-эффектом + синтезированный саундтрек — та же прогрессия
-Am–F–C–G, что в промо-ролике на лендинге). Платформы включаются независимо:
-без секретов платформа просто пропускается.
+Планировщик встроен в сервер: ежедневная публикация и еженедельная генерация
+происходят сами; повторов не бывает (маркеры в config.json на диске).
 
-Рубрики (ротация, без повторов, состояние в `marketing/state.json`):
-1. **Interview question of the day** — вопрос из тренажёра собеседований + сжатый разбор;
-2. **Quiz challenge** — вопрос квиза, «ответ в комментариях» (драйвит engagement);
-3. **60-second lesson** — практический вывод из модуля курса;
-4. **A day at Datacore** — мини-история из сюжета курса;
-5. **Product** — прямой промо-пост (1 из 5).
+## Как подключить сеть (общая схема)
 
-Каждый пост ведёт на `en.html` со своими utm-метками; источник каждой регистрации
-виден в `/admin` (колонка «Источник»).
+1. Создайте dev-приложение на портале сети (подсказки — прямо в карточке сети
+   в панели, там же — готовый Redirect/Callback URL для вставки).
+2. Вставьте App/Client ID и Secret в карточку сети → «Сохранить ключи».
+3. Нажмите «Подключить» → подтвердите вход в открывшейся вкладке → готово.
 
-## Быстрая настройка: одна команда
+Особенности:
+- **Facebook + Instagram** — одно приложение Meta (Create App → Business).
+  Instagram подключается автоматически, если IG Business-аккаунт привязан
+  к странице. В диалоге Meta отмечайте галочками и страницу, и IG-аккаунт
+  (кнопка «Edit settings», если диалог предлагает «Reconnect»).
+- **LinkedIn** — Products: «Share on LinkedIn» + «Sign In with LinkedIn»
+  (оба self-serve). Токен живёт 60 дней — панель покажет остаток; продление =
+  повторный клик «Подключить».
+- **TikTok** — Login Kit + Content Posting API; сразу подайте приложение на
+  аудит: до него видео публикуются приватно (SELF_ONLY), после — автоматически
+  станут публичными. Refresh-токен живёт год.
+- **Threads** — продукт «Threads API» в том же портале Meta (отдельные
+  Client ID/Secret). Токен продлевается автоматически.
+- **X** — developer.x.com → App → User authentication settings: OAuth 2.0,
+  Type «Web App», Callback URL из панели. Бесплатного тарифа хватает
+  (~500 постов/мес при нашем 1/день). Refresh-токены ротируются автоматически.
 
-```bash
-node marketing/setup.js
-```
+«Link in bio»: в TikTok и Instagram ссылки в постах некликабельны — поставьте
+в bio аккаунтов ссылку вида
+`https://ml-simulator-app-production.up.railway.app/en.html?utm_source=instagram&utm_medium=bio`
+(для TikTok — `utm_source=tiktok`), тогда регистрации будут видны в статистике.
 
-Мастер сам: авторизует GitHub CLI, проведёт по OAuth каждой платформы и **сам
-запишет все секреты в GitHub** (`gh secret set`) — ничего не нужно копировать
-руками. Вам остаётся только создать dev-приложения на порталах платформ (мастер
-открывает нужные страницы и говорит, что нажать) и подтвердить входы. Любой шаг
-можно пропустить и вернуться позже — мастер перезапускается сколько угодно.
-Проверка окружения без настройки: `node marketing/setup.js --check`.
+## Хранение и деплой
 
-Ниже — те же шаги подробно (если хотите делать вручную или что-то пошло не так).
+- Очередь, токены сетей и настройки — на постоянном диске Railway
+  (`/data/marketing/…`); деплой их не трогает.
+- При первом запуске очередь мигрирует из `marketing/queue/` репозитория.
+- Видео рендерит ffmpeg (ставится в Docker-образ), карточки — sharp.
+- GitHub Actions для маркетинга удалены — публикует сам сервер.
 
-## Разовая настройка (~30 минут)
-
-### 1. Facebook (модерация НЕ нужна)
-
-Постим на **свою** страницу — для этого достаточно приложения в dev-режиме,
-App Review не требуется.
-
-1. https://developers.facebook.com → **Create App** → тип Business.
-2. Вы должны быть админом и приложения, и Facebook-страницы.
-3. Локально: `node marketing/auth-helper.js facebook` — откроется браузер,
-   помощник получит **бессрочный** Page Access Token и напечатает
-   `FB_PAGE_ID` и `FB_PAGE_TOKEN`.
-
-### 2. LinkedIn (модерация НЕ нужна)
-
-Постим в **личный профиль** через self-serve продукт «Share on LinkedIn».
-(Постинг на страницу компании требует отдельной партнёрской модерации — не используем.)
-
-1. https://developer.linkedin.com → **Create app** (привяжется к любой вашей LinkedIn Page).
-2. Вкладка **Products** → добавить **Share on LinkedIn** и
-   **Sign In with LinkedIn using OpenID Connect** (оба одобряются мгновенно).
-3. Вкладка **Auth** → Redirect URLs → добавить `http://localhost:8899/cb`.
-4. Локально: `node marketing/auth-helper.js linkedin` → напечатает
-   `LINKEDIN_TOKEN` и `LINKEDIN_PERSON_URN`.
-
-⚠️ Токен LinkedIn живёт **60 дней**. За 10 дней до истечения `publish.js` начнёт
-писать warning в логи Actions — просто перезапустите helper и обновите секрет.
-
-### 3. TikTok (аккаунт: https://www.tiktok.com/@user7761017650203)
-
-Код готов; для публичных постов нужен аудит приложения TikTok (1–2 недели) —
-**подайте заявку сразу**, до аудита видео публикуются приватно (SELF_ONLY),
-после — публикатор сам переключится на публичные.
-
-1. https://developers.tiktok.com → **Manage apps → Connect an app**.
-2. Добавьте продукты **Login Kit** и **Content Posting API**; включите Direct Post.
-3. В Login Kit → Redirect URI:
-   `https://ml-simulator-app-production.up.railway.app/api/tiktok/callback`
-   (localhost TikTok не принимает; эта страница на сайте просто покажет код).
-4. Отправьте приложение на **ревью/аудит** (в форме honestly опишите: «automated
-   posting of my own educational ML content to my own account»).
-5. Локально: `node marketing/auth-helper.js tiktok` → напечатает
-   `TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET`, `TIKTOK_REFRESH_TOKEN`.
-6. **Ссылка в bio**: TikTok не даёт кликабельных ссылок в описании видео, поэтому
-   CTA в постах — «Link in bio». Поставьте в bio аккаунта:
-   `https://ml-simulator-app-production.up.railway.app/en.html?utm_source=tiktok&utm_medium=bio`
-   — тогда регистрации из TikTok будут видны в `/admin`.
-
-Refresh-токен живёт 365 дней (access-токен публикатор обновляет сам каждый запуск).
-
-### 4. Anthropic API (генерация текстов)
-
-https://console.anthropic.com → API keys → создать ключ.
-Расход: 7 постов/неделю ≈ **$1–3 в месяц**.
-
-### 5. Секреты в GitHub
-
-`node marketing/setup.js` записывает всё сам. Вручную: репозиторий →
-**Settings → Secrets and variables → Actions → New repository secret**:
-
-| Секрет | Откуда |
-| --- | --- |
-| `ANTHROPIC_API_KEY` | console.anthropic.com |
-| `FB_PAGE_ID` | auth-helper facebook |
-| `FB_PAGE_TOKEN` | auth-helper facebook |
-| `LINKEDIN_TOKEN` | auth-helper linkedin (обновлять раз в ~55 дней) |
-| `LINKEDIN_PERSON_URN` | auth-helper linkedin |
-| `TIKTOK_CLIENT_KEY` | auth-helper tiktok |
-| `TIKTOK_CLIENT_SECRET` | auth-helper tiktok |
-| `TIKTOK_REFRESH_TOKEN` | auth-helper tiktok (обновлять раз в ~год) |
-
-Платформы независимы: можно начать только с Facebook + LinkedIn и добавить
-TikTok-секреты позже — публикатор просто пропускает ненастроенные платформы.
-
-### 6. Первый запуск
-
-GitHub → **Actions** → `marketing-generate` → **Run workflow** (создаст очередь),
-затем `marketing-publish` → **Run workflow** (опубликует первый пост).
-Дальше всё идёт по расписанию само.
-
-## Локальные команды
+## CLI (запасной путь, локально)
 
 ```bash
-npm install --prefix marketing            # один раз (sharp для карточек)
-node marketing/generate.js --dry-run      # посмотреть тексты без записи (нужен ANTHROPIC_API_KEY)
-node marketing/generate.js --offline      # шаблонная пачка без API — проверить конвейер
-node marketing/publish.js --dry-run       # что будет опубликовано сегодня
-node marketing/publish.js --platform facebook   # опубликовать только в FB
+node marketing/generate.js --offline --posts 3   # тестовая пачка без API
+node marketing/publish.js --dry-run              # что будет опубликовано
+node marketing/setup.js                          # старый терминальный мастер OAuth
 ```
 
-Очередь — обычные файлы в `marketing/queue/` (JSON + PNG + MP4): любой пост можно
-отредактировать руками или удалить до публикации. Для сборки TikTok-видео локально
-нужен `ffmpeg` (`brew install ffmpeg`; в GitHub Actions уже есть) — без него посты
-генерируются без видео и TikTok их пропускает.
+Скрипты используют те же модули, что и панель; очередь по умолчанию —
+`data/marketing/queue` (переопределяется `MARKETING_DIR`).
 
-## Instagram: параллельно с Facebook
+## Банк тем
 
-Код готов; отдельного приложения не нужно — работает то же Meta-приложение и тот же
-Page-токен, без модерации. Instagram публикуется сразу после Facebook, картинка
-берётся из уже опубликованного FB-поста (Content Publishing API принимает только
-публичный image_url — CDN Facebook как раз такой).
-
-Шаги подключения:
-1. В приложении Instagram: **Настройки → Тип аккаунта → перейти на Business**
-   (или Creator) — бесплатно, 2 минуты.
-2. Привязать IG-аккаунт к вашей Facebook-странице: в IG — Настройки → Центр
-   аккаунтов → добавить Facebook-страницу (или на странице FB: Settings →
-   Linked accounts → Instagram → Connect).
-3. Перезапустить шаг Facebook: `node marketing/setup.js` → на шаге Facebook `y`
-   (те же App ID/Secret). Токен перевыпустится уже с Instagram-правами, мастер сам
-   найдёт привязанный аккаунт и запишет секрет `IG_USER_ID`.
-
-Без `IG_USER_ID` платформа просто пропускается. Лимит Instagram API — до 50
-публикаций в сутки, у нас 1/день — с запасом.
-
-## Замечания
-
-- Коммиты очереди помечаются `[skip railway]`, чтобы не пересобирать прод впустую;
-  `marketing/` и `.github/` добавлены в `.dockerignore` — в образ Railway не попадают.
-- Приложение Meta может вечно жить в dev-режиме: для постинга на собственную
-  страницу этого достаточно.
-- Тексты генерирует `claude-sonnet-5` строго из материалов курса (модули, квизы,
-  вопросы собеседований) — модель проинструктирована не выдумывать факты о продукте.
+`marketing/topics.json` — 50 тем под три аудитории (новички / свитчеры /
+бизнес-контекст). Панель показывает их в «Создать» с пометкой использованных;
+дописывайте свои темы прямо в файл — генератор подхватит.

@@ -1,20 +1,20 @@
 #!/usr/bin/env node
 // Генератор EN-постов для соцсетей из реальных материалов курса (content/en).
-// Раз в неделю создаёт пачку постов в marketing/queue/ + PNG-карточки.
+// Используется сервером (админ-панель, планировщик) и как CLI:
 //
-//   node marketing/generate.js [--posts 7] [--offline] [--dry-run]
+//   node marketing/generate.js [--posts 7] [--offline] [--dry-run] [--videos-only]
 //
 // --offline  — без Claude API (шаблонные тексты; для теста конвейера)
 // --dry-run  — напечатать посты, ничего не записывать
-// Нужен ANTHROPIC_API_KEY (кроме --offline).
+// Ключ Anthropic — из панели (credentials.json) или env ANTHROPIC_API_KEY.
 
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const store = require('./credentials');
 
 const ROOT = path.join(__dirname, '..');
-const QUEUE_DIR = path.join(__dirname, 'queue');
-const STATE_FILE = path.join(__dirname, 'state.json');
+const { QUEUE_DIR, STATE_FILE } = store;
 const APP_URL = process.env.APP_URL || 'https://ml-simulator-app-production.up.railway.app';
 const MODEL = process.env.MARKETING_MODEL || 'claude-sonnet-5';
 
@@ -22,12 +22,6 @@ const MODEL = process.env.MARKETING_MODEL || 'claude-sonnet-5';
 // 'audience' — темы из marketing/topics.json под три аудитории
 // (новички / свитчеры из разработки / бизнес-контекст).
 const RUBRICS = ['interview', 'quiz', 'audience', 'lesson', 'story', 'product'];
-
-const args = process.argv.slice(2);
-const OFFLINE = args.includes('--offline');
-const DRY_RUN = args.includes('--dry-run');
-const VIDEOS_ONLY = args.includes('--videos-only'); // досборка mp4 для готовой очереди
-const POSTS = Number(args[args.indexOf('--posts') + 1]) || 7;
 
 // ---------- контент курса ----------
 
@@ -76,8 +70,13 @@ function loadState() {
   try {
     return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
   } catch {
-    return { cursor: 0, used: { quiz: [], interview: [], lesson: [], story: [], product: [] } };
+    return { cursor: 0, used: {} };
   }
+}
+
+function saveState(state) {
+  store.ensureDirs();
+  fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
 }
 
 function pickRotating(pool, usedKeys, keyFn) {
@@ -126,11 +125,13 @@ Rules:
 - facebook text: up to 500 chars, casual. linkedin text: up to 1200 chars, professional but human, short paragraphs, 3-5 hashtags at the end (e.g. #MachineLearning #MLEngineer #DataScience).
 - tiktok text: a video caption up to 150 chars, punchy, 3-4 hashtags (#ml #machinelearning #techcareer), NO links and NO {{LINK}} — end with "Link in bio".
 - instagram text: up to 400 chars, hook first line, 5-8 hashtags at the end, NO links and NO {{LINK}} (links are not clickable there) — end with "Link in bio".
+- x text: a tweet up to 240 chars INCLUDING one {{LINK}}, punchy, 1-2 hashtags max.
+- threads text: up to 450 chars, conversational, ends with {{LINK}}, 0-2 hashtags.
 - The card is a square image: kicker (small label, up to 30 chars), headline (up to 60 chars, the hook), lines (2-4 bullet strings, up to 55 chars each), footer is fixed by the system.
 - Never invent facts about the course beyond what is given.
 
 Return ONLY valid JSON, no markdown fences:
-{"facebook": "...", "linkedin": "...", "tiktok": "...", "instagram": "...", "card": {"kicker": "...", "headline": "...", "lines": ["...", "..."]}}`;
+{"facebook": "...", "linkedin": "...", "tiktok": "...", "instagram": "...", "x": "...", "threads": "...", "card": {"kicker": "...", "headline": "...", "lines": ["...", "..."]}}`;
 
 const AUDIENCE_VOICE = {
   beginner: `Audience: complete beginners who dream of starting ML but feel intimidated.
@@ -147,9 +148,9 @@ function buildPrompt(rubric, src) {
       return `${COMMON_RULES}
 
 Rubric: audience-targeted post.
-${AUDIENCE_VOICE[src.audience]}
+${AUDIENCE_VOICE[src.audience] || AUDIENCE_VOICE.beginner}
 Topic: ${src.topic}
-Angle to take: ${src.angle}
+Angle to take: ${src.angle || 'pick the strongest practical angle yourself'}
 
 Post format: open with a hook that names the reader's situation, deliver one genuinely useful insight on the topic (not a teaser — real value), then bridge naturally to the CTA with {{LINK}}. Card: the topic as headline, 2-3 key points as lines.`;
     case 'interview':
@@ -197,8 +198,8 @@ Post format: lead with the learner's pain (tutorials don't get you hired, theory
 // ---------- Claude API ----------
 
 async function callClaude(prompt) {
-  const key = process.env.ANTHROPIC_API_KEY;
-  if (!key) throw new Error('ANTHROPIC_API_KEY не задан (или используйте --offline)');
+  const key = store.anthropicKey();
+  if (!key) throw new Error('Ключ Anthropic не задан — добавьте его в Настройках панели (или ANTHROPIC_API_KEY)');
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -219,14 +220,25 @@ async function callClaude(prompt) {
   return JSON.parse(jsonText);
 }
 
+async function callClaudeRetry(prompt, log = () => {}) {
+  // обрезанный/невалидный JSON от модели — просто пробуем ещё раз
+  for (let attempt = 1; ; attempt++) {
+    try { return await callClaude(prompt); }
+    catch (e) {
+      if (attempt >= 3) throw e;
+      log(`  попытка ${attempt} не удалась (${e.message.slice(0, 80)}), повтор...`);
+    }
+  }
+}
+
 // Шаблонные посты без API — только чтобы проверить конвейер end-to-end
 function offlinePost(rubric, src) {
   const map = {
     audience: () => ({
-      facebook: `${src.topic}\n\n(${src.angle})\n\nStart free: {{LINK}}`,
-      linkedin: `${src.topic}\n\n${src.angle}\n\nStart free: {{LINK}}\n\n#MachineLearning #MLEngineer #CareerGrowth`,
+      facebook: `${src.topic}\n\n(${src.angle || ''})\n\nStart free: {{LINK}}`,
+      linkedin: `${src.topic}\n\n${src.angle || ''}\n\nStart free: {{LINK}}\n\n#MachineLearning #MLEngineer #CareerGrowth`,
       tiktok: `${src.topic.slice(0, 100)} #ml #machinelearning #techcareer — Link in bio`,
-      card: { kicker: src.audience === 'switcher' ? 'FOR ENGINEERS' : src.audience === 'business' ? 'ML × BUSINESS' : 'START IN ML', headline: src.topic.slice(0, 60), lines: [src.angle.slice(0, 55)] },
+      card: { kicker: src.audience === 'switcher' ? 'FOR ENGINEERS' : src.audience === 'business' ? 'ML × BUSINESS' : 'START IN ML', headline: src.topic.slice(0, 60), lines: [(src.angle || '').slice(0, 55)] },
     }),
     interview: () => ({
       facebook: `ML interview question: ${src.q}\n\nCould you answer it out loud? Practice the full mock interview (free Junior track): {{LINK}}`,
@@ -268,8 +280,108 @@ function trackedLink(platform, postId) {
   return `${APP_URL}/en.html?utm_source=${platform}&utm_medium=social&utm_campaign=organic&utm_content=${postId}`;
 }
 
-// Собрать недостающие видео для уже сгенерированных постов (например, если
-// при генерации не было ffmpeg)
+function stripLink(text) {
+  return (text || '').replace(/\s*\{\{LINK\}\}\s*/g, ' ').trim();
+}
+
+function assemblePost(rubric, gen, date, extra = {}) {
+  const id = `${date}-${rubric}-${crypto.randomBytes(3).toString('hex')}`;
+  return {
+    id,
+    scheduledFor: date,
+    rubric,
+    ...extra,
+    texts: {
+      facebook: gen.facebook.replace('{{LINK}}', trackedLink('facebook', id)),
+      linkedin: gen.linkedin.replace('{{LINK}}', trackedLink('linkedin', id)),
+      // TikTok и Instagram не дают кликабельных ссылок — CTA "Link in bio"
+      tiktok: stripLink(gen.tiktok),
+      instagram: stripLink(gen.instagram || gen.tiktok),
+      x: (gen.x || `${(gen.card && gen.card.headline) || ''} {{LINK}}`).replace('{{LINK}}', trackedLink('x', id)).trim(),
+      threads: (gen.threads || gen.facebook).replace('{{LINK}}', trackedLink('threads', id)),
+    },
+    card: { ...gen.card, footer: 'ml-simulator · start free' },
+    image: `${id}.png`,
+    video: `${id}.mp4`,
+    published: {},
+  };
+}
+
+// Карточка обязательна; видео — best effort (без ffmpeg пост валиден для
+// сетей без видео, TikTok его пропустит)
+async function renderMedia(post, log = () => {}) {
+  store.ensureDirs();
+  const { renderCard } = require('./render-card');
+  await renderCard(post.card, path.join(QUEUE_DIR, post.image));
+  try {
+    const { makeVideo } = require('./make-video');
+    await makeVideo(post, path.join(QUEUE_DIR, post.video));
+  } catch (e) {
+    log(`  видео не собрано (${e.message.split('\n')[0]})`);
+    delete post.video;
+  }
+}
+
+function savePost(post) {
+  store.ensureDirs();
+  fs.writeFileSync(path.join(QUEUE_DIR, `${post.id}.json`), JSON.stringify(post, null, 2));
+}
+
+// Еженедельная пачка: count постов начиная с сегодня, reels штук — в формате рилс
+async function generateBatch(count = 7, { offline = false, reels = 0, log = console.log } = {}) {
+  if (!offline) await require('./tls-fix').ensureTls();
+  const state = loadState();
+  const posts = [];
+  const startDate = new Date();
+
+  for (let i = 0; i < count; i++) {
+    const rubric = RUBRICS[(state.cursor + i) % RUBRICS.length];
+    const src = pickSource(rubric, state);
+    log(`[${i + 1}/${count}] ${rubric}...`);
+    const gen = offline ? offlinePost(rubric, src) : await callClaudeRetry(buildPrompt(rubric, src), log);
+    const date = new Date(startDate.getTime() + i * 24 * 3600 * 1000).toISOString().slice(0, 10);
+    posts.push(assemblePost(rubric, gen, date));
+  }
+  state.cursor = (state.cursor + count) % RUBRICS.length;
+
+  // reels штук распределяем равномерно по пачке
+  for (let r = 0; r < Math.min(reels, posts.length); r++) {
+    posts[Math.floor((r + 0.5) * posts.length / Math.min(reels, posts.length))].format = 'reel';
+  }
+
+  for (const p of posts) {
+    await renderMedia(p, log);
+    savePost(p);
+    log(`✓ ${p.id}`);
+  }
+  saveState(state);
+  return posts;
+}
+
+// Спец-пост из панели: тема из банка (topicId) или своя (customTopic)
+async function generateSpecial({ topicId, customTopic, audience = 'beginner', format = 'post', offline = false, log = console.log } = {}) {
+  if (!offline) await require('./tls-fix').ensureTls();
+  const state = loadState();
+  let src;
+  if (topicId) {
+    src = topics.find((t) => t.id === topicId);
+    if (!src) throw new Error(`Тема ${topicId} не найдена`);
+    (state.used.audience = state.used.audience || []).push(topicId);
+  } else if (customTopic) {
+    src = { topic: customTopic, audience, angle: '' };
+  } else {
+    src = pickSource('audience', state);
+  }
+  const gen = offline ? offlinePost('audience', src) : await callClaudeRetry(buildPrompt('audience', src), log);
+  const date = new Date().toISOString().slice(0, 10);
+  const post = assemblePost('audience', gen, date, format === 'reel' ? { format: 'reel' } : {});
+  await renderMedia(post, log);
+  savePost(post);
+  saveState(state);
+  return post;
+}
+
+// Собрать недостающие видео для уже сгенерированных постов
 async function videosOnly() {
   const { makeVideo } = require('./make-video');
   for (const f of fs.readdirSync(QUEUE_DIR).filter((f) => f.endsWith('.json'))) {
@@ -282,82 +394,38 @@ async function videosOnly() {
   }
 }
 
-async function main() {
-  if (VIDEOS_ONLY) return videosOnly();
-  if (!OFFLINE) await require('./tls-fix').ensureTls();
-  const state = loadState();
-  const posts = [];
-  const startDate = new Date(); // первый пост — сегодня, дальше по одному в день
+module.exports = { generateBatch, generateSpecial, topics, RUBRICS };
 
-  for (let i = 0; i < POSTS; i++) {
-    const rubric = RUBRICS[(state.cursor + i) % RUBRICS.length];
-    const src = pickSource(rubric, state);
-    process.stderr.write(`[${i + 1}/${POSTS}] ${rubric}...\n`);
-    let gen;
-    if (OFFLINE) {
-      gen = offlinePost(rubric, src);
-    } else {
-      // обрезанный/невалидный JSON от модели — просто пробуем ещё раз
-      for (let attempt = 1; ; attempt++) {
-        try { gen = await callClaude(buildPrompt(rubric, src)); break; }
-        catch (e) {
-          if (attempt >= 3) throw e;
-          process.stderr.write(`  попытка ${attempt} не удалась (${e.message.slice(0, 80)}), повтор...\n`);
-        }
+// ---------- CLI ----------
+
+if (require.main === module) {
+  const args = process.argv.slice(2);
+  const OFFLINE = args.includes('--offline');
+  const DRY_RUN = args.includes('--dry-run');
+  const POSTS = Number(args[args.indexOf('--posts') + 1]) || 7;
+
+  (async () => {
+    if (args.includes('--videos-only')) return videosOnly();
+    if (DRY_RUN) {
+      // dry-run: сгенерировать и напечатать, ничего не записывая
+      const state = loadState();
+      for (let i = 0; i < POSTS; i++) {
+        const rubric = RUBRICS[(state.cursor + i) % RUBRICS.length];
+        const src = pickSource(rubric, state);
+        const gen = OFFLINE ? offlinePost(rubric, src) : await callClaudeRetry(buildPrompt(rubric, src), console.error);
+        const date = new Date().toISOString().slice(0, 10);
+        const p = assemblePost(rubric, gen, date);
+        console.log(`\n===== ${p.id} =====`);
+        console.log(`--- facebook ---\n${p.texts.facebook}`);
+        console.log(`--- linkedin ---\n${p.texts.linkedin}`);
+        console.log(`--- card --- ${JSON.stringify(p.card)}`);
       }
+      return;
     }
-
-    const date = new Date(startDate.getTime() + i * 24 * 3600 * 1000).toISOString().slice(0, 10);
-    const id = `${date}-${rubric}-${crypto.randomBytes(3).toString('hex')}`;
-    posts.push({
-      id,
-      scheduledFor: date,
-      rubric,
-      texts: {
-        facebook: gen.facebook.replace('{{LINK}}', trackedLink('facebook', id)),
-        linkedin: gen.linkedin.replace('{{LINK}}', trackedLink('linkedin', id)),
-        // TikTok и Instagram не дают кликабельных ссылок — CTA "Link in bio"
-        tiktok: (gen.tiktok || '').replace(/\s*\{\{LINK\}\}\s*/g, ' ').trim(),
-        instagram: (gen.instagram || gen.tiktok || '').replace(/\s*\{\{LINK\}\}\s*/g, ' ').trim(),
-      },
-      card: { ...gen.card, footer: 'ml-simulator · start free' },
-      image: `${id}.png`,
-      video: `${id}.mp4`,
-      published: {},
-    });
-  }
-  state.cursor = (state.cursor + POSTS) % RUBRICS.length;
-
-  if (DRY_RUN) {
-    for (const p of posts) {
-      console.log(`\n===== ${p.id} =====`);
-      console.log(`--- facebook ---\n${p.texts.facebook}`);
-      console.log(`--- linkedin ---\n${p.texts.linkedin}`);
-      console.log(`--- card --- ${JSON.stringify(p.card)}`);
-    }
-    return;
-  }
-
-  fs.mkdirSync(QUEUE_DIR, { recursive: true });
-  const { renderCard } = require('./render-card');
-  const { makeVideo } = require('./make-video');
-  for (const p of posts) {
-    await renderCard(p.card, path.join(QUEUE_DIR, p.image));
-    try {
-      await makeVideo(p, path.join(QUEUE_DIR, p.video));
-    } catch (e) {
-      // без ffmpeg пост остаётся валидным для FB/LinkedIn, TikTok его пропустит
-      console.warn(`  видео не собрано (${e.message.split('\n')[0]}) — пост без TikTok`);
-      delete p.video;
-    }
-    fs.writeFileSync(path.join(QUEUE_DIR, `${p.id}.json`), JSON.stringify(p, null, 2));
-    console.log(`✓ ${p.id}`);
-  }
-  fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
-  console.log(`\nГотово: ${posts.length} постов в marketing/queue/`);
+    const posts = await generateBatch(POSTS, { offline: OFFLINE });
+    console.log(`\nГотово: ${posts.length} постов в ${QUEUE_DIR}`);
+  })().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
 }
-
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});

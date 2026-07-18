@@ -650,6 +650,10 @@ app.get('/api/admin/users', requireAdmin, (req, res) => {
   });
 });
 
+// ---------------------------------------------------------------- маркетинговая панель
+// Очередь постов, генерация, публикация и OAuth-подключения соцсетей: /admin/marketing
+require('./marketing/panel').mount(app, { requireAdmin, loadDB });
+
 app.listen(PORT, () => {
   console.log(`ML Career Simulator запущен: http://localhost:${PORT}`);
 });
