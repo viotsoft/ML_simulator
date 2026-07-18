@@ -1,0 +1,23 @@
+{
+  "id": "2026-07-20-lesson-a875bc",
+  "scheduledFor": "2026-07-20",
+  "rubric": "lesson",
+  "texts": {
+    "facebook": "0.97 ROC-AUC on test. 0.61 in production. Same model. 🚨\n\nThe clue? One single feature carried 0.61 of the model's importance — basically explaining the target on its own. That's the classic sign of data leakage, not skill.\n\nRule of thumb: if your offline metric looks too good, don't celebrate — investigate. Check how you split the data, what snuck into your features, and when your stats got computed.\n\nThis is 1 of 23 hands-on modules at https://ml-simulator-app-production.up.railway.app/en.html?utm_source=facebook&utm_medium=social&utm_campaign=organic&utm_content=2026-07-20-lesson-a875bc",
+    "linkedin": "A model scored 0.97 ROC-AUC in testing.\n\nIn production, it dropped to 0.61 — worse than the manual rules it replaced.\n\nThe investigation found the classic culprit: a single feature carried 0.61 of the model's total importance. It wasn't predicting the target — it was leaking it.\n\nThe rule of thumb every ML engineer needs: a suspiciously high offline metric is not good news. It's a symptom to investigate before deployment, not a result to ship.\n\nThree places leakage hides:\n\n→ The split — did the model accidentally see the future?\n→ The features — is one of them a consequence of the target, not a cause?\n→ The timing — were stats computed using data that wouldn't exist yet at prediction time?\n\nThis kind of post-mortem thinking is exactly what separates engineers who ship reliable models from those who get paged at 11am on a Thursday.\n\nThis is 1 of 23 hands-on modules at https://ml-simulator-app-production.up.railway.app/en.html?utm_source=linkedin&utm_medium=social&utm_campaign=organic&utm_content=2026-07-20-lesson-a875bc\n\n#MachineLearning #MLEngineer #DataScience #DataLeakage #CareerGrowth",
+    "tiktok": "0.97 offline. 0.61 in prod. Same model 😳 the leak was one feature. #ml #machinelearning #techcareer Link in bio"
+  },
+  "card": {
+    "kicker": "Production Incident",
+    "headline": "One feature explained 0.61? That's leakage.",
+    "lines": [
+      "ROC-AUC 0.97 offline, 0.61 in production",
+      "Check the split, the features, the timing",
+      "High score + prod flop = leakage signal",
+      "Never fit preprocessing before the split"
+    ],
+    "footer": "ml-simulator · start free"
+  },
+  "image": "2026-07-20-lesson-a875bc.png",
+  "published": {}
+}

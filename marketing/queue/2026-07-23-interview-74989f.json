@@ -1,0 +1,22 @@
+{
+  "id": "2026-07-23-interview-74989f",
+  "scheduledFor": "2026-07-23",
+  "rubric": "interview",
+  "texts": {
+    "facebook": "Ever notice food delivery apps show '35-45 min' instead of one number? That's not vague UX — it's quantile regression. Underestimating ETA kills trust way more than overestimating it kills conversion, so the model targets the P70-P80 range, not the mean. The real system splits ETA into kitchen time + courier wait + travel time, each its own model, then recalculates live as the order moves. Want to practice system design questions like this yourself? Junior track is free: https://ml-simulator-app-production.up.railway.app/en.html?utm_source=facebook&utm_medium=social&utm_campaign=organic&utm_content=2026-07-23-interview-74989f",
+    "linkedin": "Would you predict a single ETA number, or a range?\n\nHere's a system design question we use in ML Career Simulator's interview practice:\n\nDesign a delivery-time (ETA) prediction system for a food delivery app — 500K orders/day, 50ms latency, live updates as the order progresses.\n\nMost candidates jump straight to a regression model. The stronger answer starts with why mean error is the wrong metric: underestimating ETA (promised 30, delivered 60) hurts NPS far more than overestimating hurts conversion. So you optimize the P70-P80 quantile and show a range like '35-45 min', not a point estimate.\n\nThe next insight: decompose the target. ETA = kitchen time + courier wait + travel time. Three specialized models beat one end-to-end predictor — and they're easier to explain and debug.\n\nValidation has to include worst-case segments (new restaurants, rush hour, rain), because users remember the one terrible ETA, not the average.\n\nWant to practice this kind of system design interview end-to-end? ML Career Simulator hires you as a Junior ML Engineer at fictional company Datacore and grows you to Middle through 20 real business cases. The Junior track is free.\n\nhttps://ml-simulator-app-production.up.railway.app/en.html?utm_source=linkedin&utm_medium=social&utm_campaign=organic&utm_content=2026-07-23-interview-74989f\n\n#MachineLearning #MLEngineer #SystemDesign #DataScience #TechCareers",
+    "tiktok": "Delivery apps show '35-45 min' not one number. Here's why — quantile regression, not mean. #ml #machinelearning #techcareer Link in bio"
+  },
+  "card": {
+    "kicker": "ML Interview Q of the Day",
+    "headline": "Design an ETA prediction system for delivery",
+    "lines": [
+      "Predict P70-P80 quantile, not the mean",
+      "Split ETA: kitchen + courier wait + travel",
+      "Validate worst-case: rain, rush hour, new spots"
+    ],
+    "footer": "ml-simulator · start free"
+  },
+  "image": "2026-07-23-interview-74989f.png",
+  "published": {}
+}

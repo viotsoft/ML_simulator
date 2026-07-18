@@ -1,0 +1,23 @@
+{
+  "id": "2026-07-22-product-5db6a7",
+  "scheduledFor": "2026-07-22",
+  "rubric": "product",
+  "texts": {
+    "facebook": "You've finished 12 tutorials. Still no interview calls.\n\nHere's the gap: watching someone else code isn't the same as solving a real business case under pressure.\n\nML Career Simulator hires you as a Junior ML Engineer at fictional company Datacore. You grow to Middle by working through 20 real business cases.\n\n3 advanced modules are built directly on \"Machine Learning System Design\" by Babushkin & Kravchenko (Manning) — the same frameworks real ML system designers use.\n\nStart free: https://ml-simulator-app-production.up.railway.app/en.html?utm_source=facebook&utm_medium=social&utm_campaign=organic&utm_content=2026-07-22-product-5db6a7",
+    "linkedin": "Tutorials taught you the theory. They didn't teach you how to ship.\n\nThat's the gap between finishing a course and getting hired as an ML Engineer: recruiters don't ask if you watched a video series, they ask what you built and how you'd design a system under real constraints.\n\nML Career Simulator closes that gap differently. You're hired as a Junior ML Engineer at fictional company Datacore, and you progress to Middle level by working through 20 real business cases — the kind that show up in actual interviews and actual jobs.\n\nThree of the advanced modules are built directly on \"Machine Learning System Design\" by Babushkin & Kravchenko (Manning), so you're learning the same frameworks used by practicing ML system designers, not a simplified version of them.\n\nIf you're tired of tutorials that don't translate into offers, this is worth 20 minutes of your time.\n\nStart free: https://ml-simulator-app-production.up.railway.app/en.html?utm_source=linkedin&utm_medium=social&utm_campaign=organic&utm_content=2026-07-22-product-5db6a7\n\n#MachineLearning #MLEngineer #DataScience #CareerGrowth #TechJobs",
+    "tiktok": "Tutorials won't get you hired. 20 real cases might 👀 #ml #machinelearning #techcareer Link in bio"
+  },
+  "card": {
+    "kicker": "Free to Start",
+    "headline": "Become a Junior ML Engineer at Datacore",
+    "lines": [
+      "20 real business cases",
+      "3 modules from Manning's ML System Design",
+      "Grow from Junior to Middle",
+      "Start free today"
+    ],
+    "footer": "ml-simulator · start free"
+  },
+  "image": "2026-07-22-product-5db6a7.png",
+  "published": {}
+}

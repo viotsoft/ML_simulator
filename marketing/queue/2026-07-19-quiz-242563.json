@@ -1,0 +1,23 @@
+{
+  "id": "2026-07-19-quiz-242563",
+  "scheduledFor": "2026-07-19",
+  "rubric": "quiz",
+  "texts": {
+    "facebook": "Quick ML quiz — can you spot the right answer? 🤔\n\nWhy scale features before training a linear model?\n\nA) For code beauty\nB) Features of different scales hurt convergence and make coefficients incomparable\nC) To remove missing values\nD) Scaling enlarges the data\n\nAnswer below — I'll post the explanation tomorrow!\n\nThis is 1 of 120 questions inside ML Career Simulator, where you level up from Junior to Middle ML Engineer at Datacore. https://ml-simulator-app-production.up.railway.app/en.html?utm_source=facebook&utm_medium=social&utm_campaign=organic&utm_content=2026-07-19-quiz-242563",
+    "linkedin": "Quick ML quiz for your feed.\n\nWhy should you scale features before training a linear model?\n\nA) For code beauty\nB) Features of different scales hurt convergence and make coefficients incomparable\nC) To remove missing values\nD) Scaling enlarges the data\n\nDrop your answer in the comments — I'll share the full explanation tomorrow.\n\nThis is just one of 120 real business-case questions inside ML Career Simulator, a course where you're hired as a Junior ML Engineer at fictional company Datacore and grow to Middle through hands-on scenarios.\n\nTest your knowledge here: https://ml-simulator-app-production.up.railway.app/en.html?utm_source=linkedin&utm_medium=social&utm_campaign=organic&utm_content=2026-07-19-quiz-242563\n\n#MachineLearning #MLEngineer #DataScience #CareerGrowth #TechEducation",
+    "tiktok": "ML quiz: why scale features before a linear model? Comment your guess! #ml #machinelearning #techcareer Link in bio"
+  },
+  "card": {
+    "kicker": "Quiz Challenge",
+    "headline": "Why scale features before a linear model?",
+    "lines": [
+      "A) For code beauty",
+      "B) Hurts convergence & comparability",
+      "C) To remove missing values",
+      "D) Scaling enlarges the data"
+    ],
+    "footer": "ml-simulator · start free"
+  },
+  "image": "2026-07-19-quiz-242563.png",
+  "published": {}
+}

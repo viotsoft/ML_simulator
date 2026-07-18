@@ -1,0 +1,23 @@
+{
+  "id": "2026-07-21-story-60aed3",
+  "scheduledFor": "2026-07-21",
+  "rubric": "story",
+  "texts": {
+    "facebook": "8% of subscribers are quietly walking out the door every month. 📉\n\nMax storms into the room with a chart and zero patience: \"We can't call 200,000 customers. Give me a list of who's leaving.\"\n\nLena's already thinking in code: binary classification, historical labels, probabilities the retention team can rank and act on.\n\nThis is Module 5 of ML Career Simulator: you're the Junior ML Engineer who has to turn panic into a churn model using logistic regression — and explain why the output is a probability, not a guess.\n\nStep into the seat and solve it yourself: https://ml-simulator-app-production.up.railway.app/en.html?utm_source=facebook&utm_medium=social&utm_campaign=organic&utm_content=2026-07-21-story-60aed3",
+    "linkedin": "\"We can't call 200,000 customers. Give me a list of who's leaving in 30 days.\"\n\nThat's how the emergency sync starts in Module 5 of ML Career Simulator.\n\nMax, the stakeholder, has a real budget problem: retaining a customer costs 5x less than acquiring one, but the retention team can't reach everyone. He needs priorities, not a spreadsheet of hunches.\n\nLena reframes it as a binary classification problem — historical labels, engineered features (activity, payments, tickets, tenure), and a model that outputs something retention can actually use: a probability of churn per customer.\n\nYou're the Junior ML Engineer in the room. Your job:\n\n- Understand why linear regression breaks down here\n- Wrap the math in a sigmoid to get real probabilities\n- Train a logistic regression model with sklearn\n- Deliver a ranked list the business can act on\n\nThis is one of 20 business cases inside ML Career Simulator, a gamified course where you grow from Junior to Middle ML Engineer at a fictional company, Datacore — by actually doing the work.\n\nTry the churn case yourself: https://ml-simulator-app-production.up.railway.app/en.html?utm_source=linkedin&utm_medium=social&utm_campaign=organic&utm_content=2026-07-21-story-60aed3\n\n#MachineLearning #MLEngineer #DataScience #LogisticRegression #TechCareer",
+    "tiktok": "Boss: \"Give me a list of who's leaving.\" You: *opens sklearn* 😅 Churn model, Module 5. Link in bio #ml #machinelearning #techcareer #datascience"
+  },
+  "card": {
+    "kicker": "Datacore · Module 5",
+    "headline": "200,000 customers. Who's leaving next?",
+    "lines": [
+      "Binary classification, not guesswork",
+      "Sigmoid turns math into probability",
+      "Rank customers for retention calls",
+      "Train it yourself with sklearn"
+    ],
+    "footer": "ml-simulator · start free"
+  },
+  "image": "2026-07-21-story-60aed3.png",
+  "published": {}
+}

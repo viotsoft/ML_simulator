@@ -1,0 +1,23 @@
+{
+  "id": "2026-07-18-interview-9d8984",
+  "scheduledFor": "2026-07-18",
+  "rubric": "interview",
+  "texts": {
+    "facebook": "Your A/B test says 'winner!' — but is it lying to you? 🤔\n\nToday's ML interview question: Design an A/B test for a new recommendation model. Which mistakes most often break such tests?\n\nStrong answer: lock your North Star metric (like revenue, not just CTR) before launch, randomize by user, size the test with power analysis, and never peek early. Most tests die from optimizing a proxy metric or forgetting guardrails like latency.\n\nPractice this exact question in a full mock interview — Junior track is free: https://ml-simulator-app-production.up.railway.app/en.html?utm_source=facebook&utm_medium=social&utm_campaign=organic&utm_content=2026-07-18-interview-9d8984",
+    "linkedin": "Interview question of the day (Middle ML Engineer track):\n\nDesign an A/B test for a new recommendation model. Which mistakes most often break such tests?\n\nA strong answer covers four pillars: a North Star decision metric (like revenue per session) fixed before launch, with CTR as a proxy and guardrails like latency and session length; randomization by user with a check for spillovers; sample size and duration set by power analysis, not by 'it turned significant'; and an A/A test to confirm the split works.\n\nWhere these tests usually break: peeking too early, non-random assignment (by city or platform), chasing a proxy metric while the North Star quietly drops, and forgetting guardrails while 'winning' on paper.\n\nWant to practice this out loud, in a real mock interview? The Junior track is free — start here: https://ml-simulator-app-production.up.railway.app/en.html?utm_source=linkedin&utm_medium=social&utm_campaign=organic&utm_content=2026-07-18-interview-9d8984\n\n#MachineLearning #MLEngineer #DataScience #ABTesting #TechInterview",
+    "tiktok": "A/B test 'wins' but revenue tanks? 😅 That's the #1 mistake in ML interviews. #ml #machinelearning #techcareer Link in bio"
+  },
+  "card": {
+    "kicker": "ML Interview Q&A",
+    "headline": "Design an A/B Test for a Recsys Model",
+    "lines": [
+      "Lock North Star metric before launch",
+      "Randomize by user, check spillovers",
+      "Size test via power analysis, no peeking",
+      "Run an A/A test to verify the split"
+    ],
+    "footer": "ml-simulator · start free"
+  },
+  "image": "2026-07-18-interview-9d8984.png",
+  "published": {}
+}

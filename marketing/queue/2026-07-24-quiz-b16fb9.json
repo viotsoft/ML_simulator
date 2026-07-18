@@ -1,0 +1,23 @@
+{
+  "id": "2026-07-24-quiz-b16fb9",
+  "scheduledFor": "2026-07-24",
+  "rubric": "quiz",
+  "texts": {
+    "facebook": "Quiz time 🧠 Why doesn't an ML project end after the model is deployed?\n\nA) Documentation must be written\nB) Data changes over time — model degrades and needs monitoring/retraining\nC) Other teams handle the deployment\nD) It never ends — the model works forever\n\nAnswer in the comments — I'll post the explanation tomorrow. This is 1 of 120 questions inside ML Career Simulator, where you grow from Junior to Middle ML Engineer through 20 real cases at Datacore. https://ml-simulator-app-production.up.railway.app/en.html?utm_source=facebook&utm_medium=social&utm_campaign=organic&utm_content=2026-07-24-quiz-b16fb9",
+    "linkedin": "Here's a question that trips up a lot of new ML engineers:\n\nWhy doesn't an ML project end after the model is deployed?\n\nA) Because documentation must be written\nB) Data changes over time and the model degrades — it needs monitoring and retraining\nC) Because other teams handle the deployment\nD) It does end — the model works forever\n\nDrop your answer in the comments. I'll share the explanation tomorrow.\n\nThis is one of 120 real-world questions built into ML Career Simulator — a course where you're hired as a Junior ML Engineer at fictional company Datacore and grow to Middle through 20 business cases.\n\nhttps://ml-simulator-app-production.up.railway.app/en.html?utm_source=linkedin&utm_medium=social&utm_campaign=organic&utm_content=2026-07-24-quiz-b16fb9\n\n#MachineLearning #MLEngineer #DataScience #CareerGrowth #AIJobs",
+    "tiktok": "Why doesn't an ML project end after deployment? 🤔 Comment your answer! #ml #machinelearning #techcareer Link in bio"
+  },
+  "card": {
+    "kicker": "Quiz Challenge",
+    "headline": "Why doesn't an ML project end at deployment?",
+    "lines": [
+      "A) Documentation must be written",
+      "B) Data changes; model needs monitoring",
+      "C) Other teams handle deployment",
+      "D) It never ends — model works forever"
+    ],
+    "footer": "ml-simulator · start free"
+  },
+  "image": "2026-07-24-quiz-b16fb9.png",
+  "published": {}
+}
