@@ -1,0 +1,25 @@
+{
+  "id": "2026-07-18-audience-mlcode10-reel",
+  "scheduledFor": "2026-07-18",
+  "rubric": "audience",
+  "format": "reel",
+  "texts": {
+    "facebook": "Software engineers, here's the ML industry's best-kept secret: the model is the SMALLEST part of the job.\n\nA production ML system is ~10% model code and ~90% things you already know how to build — data pipelines, APIs, monitoring, deployment, tests. That's why engineers who switch to ML often ramp up faster than fresh ML graduates: the hard part for them is already muscle memory.\n\nThinking about the switch? Try on the job before committing: in ML Career Simulator you work as an ML engineer at a fictional company — 20 real business cases from EDA to production. First 2 modules are free:\nhttps://ml-simulator-app-production.up.railway.app/en.html?utm_source=facebook&utm_medium=social&utm_campaign=organic&utm_content=2026-07-18-audience-mlcode10-reel",
+    "instagram": "Software engineers: the ML industry's best-kept secret 👇\n\nThe model is ~10% of an ML system. The other 90% — pipelines, APIs, monitoring, deployment — is engineering you already know.\n\nThat's why devs who switch often ramp up faster than fresh ML grads. Try the job on: 20 real business cases, from EDA to production. First 2 modules free — Link in bio.\n\n#mlengineer #softwareengineer #careerchange #machinelearning #backend #devops #techcareer",
+    "linkedin": "The model is ~10% of a production ML system. The other 90% is engineering you already know: pipelines, APIs, monitoring, deployment. ML Career Simulator lets engineers try the ML job on — 20 real business cases: https://ml-simulator-app-production.up.railway.app/en.html?utm_source=linkedin&utm_medium=social&utm_campaign=organic&utm_content=2026-07-18-audience-mlcode10-reel\n\n#MachineLearning #MLEngineer #CareerChange",
+    "tiktok": "ML code is only 10% of an ML system. The rest? You already know it. #mlengineer #softwareengineer #ml — Link in bio"
+  },
+  "card": {
+    "kicker": "FOR ENGINEERS",
+    "headline": "ML code is 10% of an ML system",
+    "lines": [
+      "90% is engineering you already know",
+      "Pipelines, APIs, monitoring, deploy",
+      "Switchers ramp up faster than grads"
+    ],
+    "footer": "ml-simulator · start free"
+  },
+  "image": "2026-07-18-audience-mlcode10-reel.png",
+  "video": "2026-07-18-audience-mlcode10-reel.mp4",
+  "published": {}
+}
