@@ -120,6 +120,17 @@ async function publishInstagram(post) {
     'Instagram /media'
   )).json();
 
+  // Контейнер обрабатывается асинхронно — публиковать можно только со статусом FINISHED
+  for (let i = 0; i < 15; i++) {
+    const st = await (await apiCheck(
+      await fetch(`https://graph.facebook.com/v23.0/${container.id}?fields=status_code&access_token=${token}`),
+      'Instagram container status'
+    )).json();
+    if (st.status_code === 'FINISHED') break;
+    if (st.status_code === 'ERROR') throw new Error('Instagram не смог обработать картинку (status ERROR)');
+    await new Promise((r) => setTimeout(r, 2000));
+  }
+
   const pub = await (await apiCheck(
     await fetch(`https://graph.facebook.com/v23.0/${igUser}/media_publish`, {
       method: 'POST',
