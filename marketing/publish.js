@@ -19,10 +19,12 @@ const LINKEDIN_VERSION = process.env.LINKEDIN_VERSION || '202506';
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
 const only = args.includes('--platform') ? args[args.indexOf('--platform') + 1] : null;
-const PLATFORMS = only ? [only] : ['facebook', 'linkedin', 'tiktok'];
+// instagram идёт после facebook: картинку для него берём из FB-поста (публичный CDN)
+const PLATFORMS = only ? [only] : ['facebook', 'instagram', 'linkedin', 'tiktok'];
 
 const REQUIRED_ENV = {
   facebook: ['FB_PAGE_ID', 'FB_PAGE_TOKEN'],
+  instagram: ['FB_PAGE_TOKEN', 'IG_USER_ID'],
   linkedin: ['LINKEDIN_TOKEN', 'LINKEDIN_PERSON_URN'],
   tiktok: ['TIKTOK_CLIENT_KEY', 'TIKTOK_CLIENT_SECRET', 'TIKTOK_REFRESH_TOKEN'],
 };
@@ -75,7 +77,48 @@ async function publishFacebook(post, imagePath) {
     'Facebook /photos'
   );
   const data = await res.json();
-  return data.post_id || data.id;
+  // photoId нужен Instagram-ветке как источник публичного URL картинки
+  return { id: data.post_id || data.id, photoId: data.id };
+}
+
+// ---------- Instagram: тем же Meta-приложением, картинка — из FB-поста ----------
+// Content Publishing API принимает только публичный image_url, поэтому Instagram
+// публикуется ПОСЛЕ Facebook: берём CDN-ссылку уже загруженной туда карточки.
+
+async function publishInstagram(post) {
+  const token = process.env.FB_PAGE_TOKEN;
+  const igUser = process.env.IG_USER_ID;
+  const fb = post.published.facebook;
+  if (!fb || !fb.photoId) throw new Error('сначала пост должен выйти в Facebook (источник картинки)');
+
+  const photo = await (await apiCheck(
+    await fetch(`https://graph.facebook.com/v23.0/${fb.photoId}?fields=images&access_token=${token}`),
+    'Facebook photo url'
+  )).json();
+  const imageUrl = photo.images && photo.images[0] && photo.images[0].source;
+  if (!imageUrl) throw new Error('не удалось получить URL картинки из FB-поста');
+
+  const caption = post.texts.instagram
+    || post.texts.facebook.replace(/utm_source=facebook/g, 'utm_source=instagram');
+
+  const container = await (await apiCheck(
+    await fetch(`https://graph.facebook.com/v23.0/${igUser}/media`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ image_url: imageUrl, caption, access_token: token }),
+    }),
+    'Instagram /media'
+  )).json();
+
+  const pub = await (await apiCheck(
+    await fetch(`https://graph.facebook.com/v23.0/${igUser}/media_publish`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ creation_id: container.id, access_token: token }),
+    }),
+    'Instagram /media_publish'
+  )).json();
+  return pub.id;
 }
 
 // ---------- LinkedIn: загрузка картинки + пост от имени профиля ----------
@@ -229,7 +272,7 @@ function warnLinkedinExpiry() {
   } catch {}
 }
 
-const publishers = { facebook: publishFacebook, linkedin: publishLinkedin, tiktok: publishTiktok };
+const publishers = { facebook: publishFacebook, instagram: publishInstagram, linkedin: publishLinkedin, tiktok: publishTiktok };
 
 async function main() {
   if (!DRY_RUN) await require('./tls-fix').ensureTls();
@@ -255,7 +298,7 @@ async function main() {
     const imagePath = path.join(QUEUE_DIR, item.post.image);
     if (DRY_RUN) {
       console.log(`[${platform}] DRY-RUN — был бы опубликован ${item.post.id}:`);
-      console.log(item.post.texts[platform]);
+      console.log(item.post.texts[platform] || '(будет использован facebook-текст с utm_source=instagram)');
       const media = platform === 'tiktok' ? path.join(QUEUE_DIR, item.post.video) : imagePath;
       console.log(`  media: ${media} (${fs.existsSync(media) ? 'есть' : 'НЕТ ФАЙЛА!'})`);
       continue;
@@ -265,10 +308,11 @@ async function main() {
       continue;
     }
     try {
-      const id = await publishers[platform](item.post, imagePath);
-      item.post.published[platform] = { at: new Date().toISOString(), id };
+      const result = await publishers[platform](item.post, imagePath);
+      const rec = typeof result === 'object' ? result : { id: result };
+      item.post.published[platform] = { at: new Date().toISOString(), ...rec };
       fs.writeFileSync(item.file, JSON.stringify(item.post, null, 2));
-      console.log(`[${platform}] ✓ опубликован ${item.post.id} → ${id}`);
+      console.log(`[${platform}] ✓ опубликован ${item.post.id} → ${rec.id}`);
     } catch (e) {
       failed = true;
       console.error(`[${platform}] ✗ ${e.message}`);

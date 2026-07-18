@@ -53,7 +53,8 @@ async function facebook(rl) {
   const appId = (await rl.question('App ID (developers.facebook.com → ваше приложение): ')).trim();
   const appSecret = (await rl.question('App Secret (Settings → Basic): ')).trim();
 
-  const scope = 'pages_manage_posts,pages_read_engagement,pages_show_list';
+  // instagram_* — для публикации в привязанный IG Business-аккаунт тем же токеном
+  const scope = 'pages_manage_posts,pages_read_engagement,pages_show_list,instagram_basic,instagram_content_publish';
   openBrowser(`https://www.facebook.com/v23.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(REDIRECT)}&scope=${scope}&response_type=code`);
   const code = await waitForCode();
 
@@ -75,7 +76,22 @@ async function facebook(rl) {
   if (!page) throw new Error('Неверный номер');
 
   console.log('\n(Page-токен, полученный из долгоживущего user-токена, не истекает.)');
-  return { FB_PAGE_ID: page.id, FB_PAGE_TOKEN: page.access_token };
+
+  const secrets = { FB_PAGE_ID: page.id, FB_PAGE_TOKEN: page.access_token };
+  // Если к странице привязан Instagram Business — включаем и его
+  try {
+    const ig = await getJSON(
+      `https://graph.facebook.com/v23.0/${page.id}?fields=instagram_business_account&access_token=${page.access_token}`,
+      {}, 'проверка Instagram'
+    );
+    if (ig.instagram_business_account) {
+      secrets.IG_USER_ID = ig.instagram_business_account.id;
+      console.log('✓ К странице привязан Instagram Business — параллельный постинг в Instagram включён.');
+    } else {
+      console.log('ℹ Instagram не привязан к странице. Чтобы постить и туда: переведите IG-аккаунт в Business/Creator,\n  привяжите его к этой Facebook-странице и запустите этот шаг ещё раз.');
+    }
+  } catch {}
+  return secrets;
 }
 
 async function linkedin(rl) {

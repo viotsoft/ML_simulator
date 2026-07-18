@@ -125,11 +125,12 @@ Rules:
 - First line must be a scroll-stopping hook. No "In today's fast-paced world" clichés, no emoji spam (max 2 emoji per post).
 - facebook text: up to 500 chars, casual. linkedin text: up to 1200 chars, professional but human, short paragraphs, 3-5 hashtags at the end (e.g. #MachineLearning #MLEngineer #DataScience).
 - tiktok text: a video caption up to 150 chars, punchy, 3-4 hashtags (#ml #machinelearning #techcareer), NO links and NO {{LINK}} — end with "Link in bio".
+- instagram text: up to 400 chars, hook first line, 5-8 hashtags at the end, NO links and NO {{LINK}} (links are not clickable there) — end with "Link in bio".
 - The card is a square image: kicker (small label, up to 30 chars), headline (up to 60 chars, the hook), lines (2-4 bullet strings, up to 55 chars each), footer is fixed by the system.
 - Never invent facts about the course beyond what is given.
 
 Return ONLY valid JSON, no markdown fences:
-{"facebook": "...", "linkedin": "...", "tiktok": "...", "card": {"kicker": "...", "headline": "...", "lines": ["...", "..."]}}`;
+{"facebook": "...", "linkedin": "...", "tiktok": "...", "instagram": "...", "card": {"kicker": "...", "headline": "...", "lines": ["...", "..."]}}`;
 
 const AUDIENCE_VOICE = {
   beginner: `Audience: complete beginners who dream of starting ML but feel intimidated.
@@ -315,8 +316,9 @@ async function main() {
       texts: {
         facebook: gen.facebook.replace('{{LINK}}', trackedLink('facebook', id)),
         linkedin: gen.linkedin.replace('{{LINK}}', trackedLink('linkedin', id)),
-        // TikTok не даёт кликабельных ссылок в описании — CTA "Link in bio"
+        // TikTok и Instagram не дают кликабельных ссылок — CTA "Link in bio"
         tiktok: (gen.tiktok || '').replace(/\s*\{\{LINK\}\}\s*/g, ' ').trim(),
+        instagram: (gen.instagram || gen.tiktok || '').replace(/\s*\{\{LINK\}\}\s*/g, ' ').trim(),
       },
       card: { ...gen.card, footer: 'ml-simulator · start free' },
       image: `${id}.png`,
