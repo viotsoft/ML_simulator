@@ -21,5 +21,16 @@
   },
   "image": "2026-07-18-audience-recsys-reel.png",
   "video": "2026-07-18-audience-recsys-reel.mp4",
-  "published": {}
+  "published": {
+    "facebook": {
+      "at": "2026-07-18T13:42:26.626Z",
+      "id": "1584110773321950",
+      "reel": true
+    },
+    "instagram": {
+      "at": "2026-07-18T13:42:48.399Z",
+      "id": "18070580690447942",
+      "reel": true
+    }
+  }
 }
