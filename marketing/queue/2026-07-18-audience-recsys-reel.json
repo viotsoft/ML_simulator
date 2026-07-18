@@ -1,0 +1,25 @@
+{
+  "id": "2026-07-18-audience-recsys-reel",
+  "scheduledFor": "2026-07-18",
+  "rubric": "audience",
+  "format": "reel",
+  "texts": {
+    "facebook": "Ever wondered why \"Frequently bought together\" is always eerily accurate?\n\nIt's not magic — it's a recommender system, and it quietly drives up to a third of revenue at big marketplaces. A model learns from millions of carts which products live together, and every suggestion is a tiny, automated sales pitch.\n\nWant to understand (and build) systems like this? In ML Career Simulator you'll build a recommender for a fictional company as one of 20 real business cases. First 2 modules are free:\nhttps://ml-simulator-app-production.up.railway.app/en.html?utm_source=facebook&utm_medium=social&utm_campaign=organic&utm_content=2026-07-18-audience-recsys-reel",
+    "instagram": "Ever wondered why \"Frequently bought together\" is always eerily accurate? 🛒\n\nIt's a recommender system — and it quietly drives up to a third of revenue at big marketplaces. Every suggestion is a tiny automated sales pitch.\n\nLearn to build one yourself — through real business cases, from Junior to Middle ML Engineer. First 2 modules free — Link in bio.\n\n#machinelearning #recsys #datascience #mlengineer #techcareer #ecommerce #ml",
+    "linkedin": "Recommender systems quietly drive up to a third of marketplace revenue. In ML Career Simulator you build one as a real business case. First 2 modules free: https://ml-simulator-app-production.up.railway.app/en.html?utm_source=linkedin&utm_medium=social&utm_campaign=organic&utm_content=2026-07-18-audience-recsys-reel\n\n#MachineLearning #RecSys #MLEngineer",
+    "tiktok": "How \"Frequently bought together\" makes millions 🛒 #ml #recsys #machinelearning — Link in bio"
+  },
+  "card": {
+    "kicker": "ML × BUSINESS",
+    "headline": "How recommendations actually make money",
+    "lines": [
+      "Up to 1/3 of marketplace revenue",
+      "Every suggestion = a tiny sales pitch",
+      "Built from millions of carts"
+    ],
+    "footer": "ml-simulator · start free"
+  },
+  "image": "2026-07-18-audience-recsys-reel.png",
+  "video": "2026-07-18-audience-recsys-reel.mp4",
+  "published": {}
+}

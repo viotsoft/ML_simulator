@@ -60,12 +60,14 @@ async function apiCheck(res, what) {
   return res;
 }
 
-// ---------- Facebook: фото + текст на страницу ----------
+// ---------- Facebook: фото + текст на страницу (или Reels, если format:'reel') ----------
 
 async function publishFacebook(post, imagePath) {
   const pageId = process.env.FB_PAGE_ID;
   const token = process.env.FB_PAGE_TOKEN;
   if (!pageId || !token) throw new Error('FB_PAGE_ID / FB_PAGE_TOKEN не заданы');
+
+  if (post.format === 'reel' && post.video) return publishFacebookReel(post, pageId, token);
 
   const form = new FormData();
   form.append('message', post.texts.facebook);
@@ -81,11 +83,93 @@ async function publishFacebook(post, imagePath) {
   return { id: data.post_id || data.id, photoId: data.id };
 }
 
+// Facebook Reels: start → бинарная загрузка на rupload → finish (PUBLISHED)
+async function publishFacebookReel(post, pageId, token) {
+  const video = fs.readFileSync(path.join(QUEUE_DIR, post.video));
+
+  const start = await (await apiCheck(
+    await fetch(`https://graph.facebook.com/v23.0/${pageId}/video_reels`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ upload_phase: 'start', access_token: token }),
+    }),
+    'FB Reels start'
+  )).json();
+
+  await apiCheck(
+    await fetch(start.upload_url, {
+      method: 'POST',
+      headers: { Authorization: `OAuth ${token}`, offset: '0', file_size: String(video.length) },
+      body: video,
+    }),
+    'FB Reels upload'
+  );
+
+  const fin = await (await apiCheck(
+    await fetch(`https://graph.facebook.com/v23.0/${pageId}/video_reels?upload_phase=finish&video_id=${start.video_id}&video_state=PUBLISHED&description=${encodeURIComponent(post.texts.facebook)}&access_token=${token}`, { method: 'POST' }),
+    'FB Reels finish'
+  )).json();
+  if (!fin.success) throw new Error(`FB Reels finish: ${JSON.stringify(fin)}`);
+  return { id: start.video_id, reel: true };
+}
+
+// Instagram Reels: resumable-загрузка (публичный URL не нужен) + ожидание обработки
+async function publishInstagramReel(post) {
+  const token = process.env.FB_PAGE_TOKEN;
+  const igUser = process.env.IG_USER_ID;
+  const video = fs.readFileSync(path.join(QUEUE_DIR, post.video));
+
+  const container = await (await apiCheck(
+    await fetch(`https://graph.facebook.com/v23.0/${igUser}/media`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        media_type: 'REELS',
+        upload_type: 'resumable',
+        caption: post.texts.instagram || post.texts.tiktok || '',
+        access_token: token,
+      }),
+    }),
+    'IG Reels container'
+  )).json();
+
+  await apiCheck(
+    await fetch(container.uri || `https://rupload.facebook.com/ig-api-upload/v23.0/${container.id}`, {
+      method: 'POST',
+      headers: { Authorization: `OAuth ${token}`, offset: '0', file_size: String(video.length) },
+      body: video,
+    }),
+    'IG Reels upload'
+  );
+
+  // обработка видео занимает десятки секунд
+  for (let i = 0; i < 40; i++) {
+    const st = await (await apiCheck(
+      await fetch(`https://graph.facebook.com/v23.0/${container.id}?fields=status_code&access_token=${token}`),
+      'IG Reels status'
+    )).json();
+    if (st.status_code === 'FINISHED') break;
+    if (st.status_code === 'ERROR') throw new Error('Instagram не смог обработать видео (status ERROR)');
+    await new Promise((r) => setTimeout(r, 3000));
+  }
+
+  const pub = await (await apiCheck(
+    await fetch(`https://graph.facebook.com/v23.0/${igUser}/media_publish`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ creation_id: container.id, access_token: token }),
+    }),
+    'IG Reels publish'
+  )).json();
+  return { id: pub.id, reel: true };
+}
+
 // ---------- Instagram: тем же Meta-приложением, картинка — из FB-поста ----------
 // Content Publishing API принимает только публичный image_url, поэтому Instagram
 // публикуется ПОСЛЕ Facebook: берём CDN-ссылку уже загруженной туда карточки.
 
 async function publishInstagram(post) {
+  if (post.format === 'reel' && post.video) return publishInstagramReel(post);
   const token = process.env.FB_PAGE_TOKEN;
   const igUser = process.env.IG_USER_ID;
   const fb = post.published.facebook;
