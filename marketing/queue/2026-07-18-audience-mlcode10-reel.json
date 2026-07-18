@@ -21,5 +21,16 @@
   },
   "image": "2026-07-18-audience-mlcode10-reel.png",
   "video": "2026-07-18-audience-mlcode10-reel.mp4",
-  "published": {}
+  "published": {
+    "facebook": {
+      "at": "2026-07-18T16:39:37.705Z",
+      "id": "1786166346160717",
+      "reel": true
+    },
+    "instagram": {
+      "at": "2026-07-18T16:40:15.262Z",
+      "id": "18078961397690219",
+      "reel": true
+    }
+  }
 }
