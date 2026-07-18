@@ -19,6 +19,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - run: sudo apt-get install -y ffmpeg # для TikTok-видео (в образе раннера его нет)
       - run: npm ci --prefix marketing
       - run: node marketing/generate.js --posts 7
         env:

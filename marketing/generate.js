@@ -24,6 +24,7 @@ const RUBRICS = ['interview', 'quiz', 'lesson', 'story', 'product'];
 const args = process.argv.slice(2);
 const OFFLINE = args.includes('--offline');
 const DRY_RUN = args.includes('--dry-run');
+const VIDEOS_ONLY = args.includes('--videos-only'); // досборка mp4 для готовой очереди
 const POSTS = Number(args[args.indexOf('--posts') + 1]) || 7;
 
 // ---------- контент курса ----------
@@ -237,7 +238,22 @@ function trackedLink(platform, postId) {
   return `${APP_URL}/en.html?utm_source=${platform}&utm_medium=social&utm_campaign=organic&utm_content=${postId}`;
 }
 
+// Собрать недостающие видео для уже сгенерированных постов (например, если
+// при генерации не было ffmpeg)
+async function videosOnly() {
+  const { makeVideo } = require('./make-video');
+  for (const f of fs.readdirSync(QUEUE_DIR).filter((f) => f.endsWith('.json'))) {
+    const p = JSON.parse(fs.readFileSync(path.join(QUEUE_DIR, f), 'utf8'));
+    if (p.video && fs.existsSync(path.join(QUEUE_DIR, p.video))) continue;
+    p.video = `${p.id}.mp4`;
+    await makeVideo(p, path.join(QUEUE_DIR, p.video));
+    fs.writeFileSync(path.join(QUEUE_DIR, f), JSON.stringify(p, null, 2));
+    console.log(`✓ видео ${p.video}`);
+  }
+}
+
 async function main() {
+  if (VIDEOS_ONLY) return videosOnly();
   if (!OFFLINE) await require('./tls-fix').ensureTls();
   const state = loadState();
   const posts = [];
