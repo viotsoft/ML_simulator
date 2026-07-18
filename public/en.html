@@ -7,6 +7,14 @@
   <meta name="description" content="A gamified ML engineer career simulator: 23 modules with real business cases, from a junior's first day to defending a project for a middle position. First 2 modules free.">
   <link rel="stylesheet" href="/css/style.css">
   <script>localStorage.setItem('lang','en');document.cookie='lang=en; Path=/; Max-Age=31536000; SameSite=Lax';</script>
+  <script>
+    // Проброс utm-меток с лендинга в приложение — атрибуция регистраций
+    addEventListener('DOMContentLoaded', () => {
+      const qs = new URLSearchParams(location.search);
+      if (!qs.get('utm_source')) return;
+      document.querySelectorAll('a[href^="/app.html"]').forEach((a) => { a.href = '/app.html?' + qs; });
+    });
+  </script>
 </head>
 <body>
 

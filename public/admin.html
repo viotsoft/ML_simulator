@@ -24,6 +24,7 @@
           <th>Имя</th>
           <th>Email</th>
           <th>Регистрация</th>
+          <th>Источник</th>
           <th>Подписка</th>
           <th>Прогресс</th>
           <th>Сертификат</th>
@@ -63,6 +64,7 @@ function render(users) {
       <td>${esc(u.name)}</td>
       <td>${esc(u.email)}</td>
       <td>${fmtDate(u.createdAt)}</td>
+      <td>${u.source ? esc(u.source) : '—'}</td>
       <td>${u.subscribed
         ? '<span class="badge badge-pro">PRO</span>'
         : '<span class="badge badge-free">FREE</span>'}</td>

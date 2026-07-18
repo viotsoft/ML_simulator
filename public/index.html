@@ -7,6 +7,14 @@
   <meta name="description" content="Игровой симулятор карьеры ML-инженера: 20 модулей с реальными бизнес-кейсами, от первого дня джуниора до защиты проекта на позицию middle. Первые 2 модуля бесплатно.">
   <link rel="stylesheet" href="/css/style.css">
   <script>localStorage.setItem('lang','ru');document.cookie='lang=ru; Path=/; Max-Age=31536000; SameSite=Lax';</script>
+  <script>
+    // Проброс utm-меток с лендинга в приложение — атрибуция регистраций
+    addEventListener('DOMContentLoaded', () => {
+      const qs = new URLSearchParams(location.search);
+      if (!qs.get('utm_source')) return;
+      document.querySelectorAll('a[href^="/app.html"]').forEach((a) => { a.href = '/app.html?' + qs; });
+    });
+  </script>
 </head>
 <body>
 

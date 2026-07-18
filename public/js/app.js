@@ -5,6 +5,18 @@ const userPanel = document.getElementById('userPanel');
 // ---------------------------------------------------------------- i18n
 let LANG = localStorage.getItem('lang') || 'ru';
 if (!['ru', 'en'].includes(LANG)) LANG = 'ru';
+
+// Первое касание: запоминаем utm-метки, чтобы при регистрации знать источник
+try {
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('utm_source') && !localStorage.getItem('firstTouch')) {
+    const ft = {};
+    for (const k of ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content']) {
+      if (qs.get(k)) ft[k] = qs.get(k).slice(0, 64);
+    }
+    localStorage.setItem('firstTouch', JSON.stringify(ft));
+  }
+} catch {}
 document.cookie = `lang=${LANG}; Path=/; Max-Age=31536000; SameSite=Lax`;
 document.documentElement.lang = LANG;
 
@@ -284,7 +296,10 @@ function renderAuth(mode = 'register') {
       email: document.getElementById('fEmail').value,
       password: document.getElementById('fPass').value,
     };
-    if (mode === 'register') body.name = document.getElementById('fName').value;
+    if (mode === 'register') {
+      body.name = document.getElementById('fName').value;
+      try { body.source = JSON.parse(localStorage.getItem('firstTouch')); } catch {}
+    }
     try {
       const data = await api(mode === 'register' ? '/api/register' : '/api/login',
         { method: 'POST', body: JSON.stringify(body) });

@@ -1,0 +1,8 @@
+{
+  "name": "ml-simulator-marketing",
+  "private": true,
+  "description": "Генерация и публикация соцсетевого контента (не попадает в прод-образ)",
+  "dependencies": {
+    "sharp": "^0.34.0"
+  }
+}

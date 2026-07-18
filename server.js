@@ -200,7 +200,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ---------------------------------------------------------------- auth API
 app.post('/api/register', (req, res) => {
-  const { name, email, password } = req.body || {};
+  const { name, email, password, source } = req.body || {};
   if (!name || !email || !password) return res.status(400).json({ error: 'Заполните имя, email и пароль' });
   if (password.length < 6) return res.status(400).json({ error: 'Пароль — минимум 6 символов' });
   const key = String(email).trim().toLowerCase();
@@ -209,6 +209,14 @@ app.post('/api/register', (req, res) => {
   const db = loadDB();
   if (db.users[key]) return res.status(409).json({ error: 'Пользователь с таким email уже существует' });
 
+  // Откуда пришёл пользователь (utm-метки соцсетей) — только известные ключи
+  const src = {};
+  if (source && typeof source === 'object') {
+    for (const k of ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content']) {
+      if (typeof source[k] === 'string' && source[k]) src[k] = source[k].slice(0, 64);
+    }
+  }
+
   const { salt, hash } = hashPassword(password);
   db.users[key] = {
     name: String(name).trim(),
@@ -216,6 +224,7 @@ app.post('/api/register', (req, res) => {
     salt, hash,
     subscribed: false,
     createdAt: new Date().toISOString(),
+    source: Object.keys(src).length ? src : null,
     progress: {} // moduleId -> { score, total, passedAt, attempts }
   };
   const token = crypto.randomBytes(32).toString('hex');
@@ -606,6 +615,7 @@ app.get('/api/admin/users', requireAdmin, (req, res) => {
       name: u.name,
       email: u.email,
       createdAt: u.createdAt || null,
+      source: (u.source && u.source.utm_source) || null,
       subscribed: !!u.subscribed,
       subscribedAt: u.subscribedAt || null,
       passedCount: passed,
