@@ -74,10 +74,8 @@ async function facebook(rl) {
   const page = pages.data[n];
   if (!page) throw new Error('Неверный номер');
 
-  console.log('\n→ Добавьте в GitHub Secrets:\n');
-  console.log(`FB_PAGE_ID=${page.id}`);
-  console.log(`FB_PAGE_TOKEN=${page.access_token}`);
   console.log('\n(Page-токен, полученный из долгоживущего user-токена, не истекает.)');
+  return { FB_PAGE_ID: page.id, FB_PAGE_TOKEN: page.access_token };
 }
 
 async function linkedin(rl) {
@@ -106,9 +104,6 @@ async function linkedin(rl) {
     headers: { Authorization: `Bearer ${tok.access_token}` },
   }, 'userinfo');
 
-  console.log('\n→ Добавьте в GitHub Secrets:\n');
-  console.log(`LINKEDIN_TOKEN=${tok.access_token}`);
-  console.log(`LINKEDIN_PERSON_URN=urn:li:person:${me.sub}`);
   console.log(`\nТокен живёт ~${Math.round((tok.expires_in || 5184000) / 86400)} дней — публикатор напомнит о перевыпуске в логах Actions.`);
 
   // Дата выпуска — для предупреждения в publish.js (файл коммитится в репо)
@@ -117,6 +112,7 @@ async function linkedin(rl) {
   state.linkedin = { issuedAt: new Date().toISOString() };
   fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
   console.log('Дата выпуска записана в marketing/state.json — закоммитьте её.');
+  return { LINKEDIN_TOKEN: tok.access_token, LINKEDIN_PERSON_URN: `urn:li:person:${me.sub}` };
 }
 
 async function tiktok(rl) {
@@ -146,31 +142,34 @@ Login Kit → Redirect URI → ${redirect}
   }, 'обмен code на токен');
   if (!tok.access_token) throw new Error('TikTok не вернул токен: ' + JSON.stringify(tok));
 
-  console.log('\n→ Добавьте в GitHub Secrets:\n');
-  console.log(`TIKTOK_CLIENT_KEY=${clientKey}`);
-  console.log(`TIKTOK_CLIENT_SECRET=${clientSecret}`);
-  console.log(`TIKTOK_REFRESH_TOKEN=${tok.refresh_token}`);
   console.log(`\nRefresh-токен живёт ~${Math.round((tok.refresh_expires_in || 31536000) / 86400)} дней; access-токен публикатор обновляет сам при каждом запуске.`);
   console.log('До прохождения аудита приложения видео публикуются приватно (SELF_ONLY) — это ожидаемо.');
+  return { TIKTOK_CLIENT_KEY: clientKey, TIKTOK_CLIENT_SECRET: clientSecret, TIKTOK_REFRESH_TOKEN: tok.refresh_token };
 }
+
+const FLOWS = { facebook, linkedin, tiktok };
 
 async function main() {
   const which = process.argv[2];
+  if (!FLOWS[which]) {
+    console.log('Использование: node marketing/auth-helper.js facebook | linkedin | tiktok');
+    process.exit(1);
+  }
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   try {
-    if (which === 'facebook') await facebook(rl);
-    else if (which === 'linkedin') await linkedin(rl);
-    else if (which === 'tiktok') await tiktok(rl);
-    else {
-      console.log('Использование: node marketing/auth-helper.js facebook | linkedin | tiktok');
-      process.exit(1);
-    }
+    const secrets = await FLOWS[which](rl);
+    console.log('\n→ Добавьте в GitHub Secrets (или запустите node marketing/setup.js — он делает это сам):\n');
+    for (const [k, v] of Object.entries(secrets)) console.log(`${k}=${v}`);
   } finally {
     rl.close();
   }
 }
 
-main().catch((e) => {
-  console.error('\nОшибка:', e.message);
-  process.exit(1);
-});
+module.exports = { facebook, linkedin, tiktok, openBrowser };
+
+if (require.main === module) {
+  main().catch((e) => {
+    console.error('\nОшибка:', e.message);
+    process.exit(1);
+  });
+}
