@@ -1,6 +1,6 @@
 {
   "id": "2026-07-19-quiz-242563",
-  "scheduledFor": "2026-07-19",
+  "scheduledFor": "2026-07-18",
   "rubric": "quiz",
   "texts": {
     "facebook": "Quick ML quiz — can you spot the right answer? 🤔\n\nWhy scale features before training a linear model?\n\nA) For code beauty\nB) Features of different scales hurt convergence and make coefficients incomparable\nC) To remove missing values\nD) Scaling enlarges the data\n\nAnswer below — I'll post the explanation tomorrow!\n\nThis is 1 of 120 questions inside ML Career Simulator, where you level up from Junior to Middle ML Engineer at Datacore. https://ml-simulator-app-production.up.railway.app/en.html?utm_source=facebook&utm_medium=social&utm_campaign=organic&utm_content=2026-07-19-quiz-242563",

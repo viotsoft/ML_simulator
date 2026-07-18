@@ -89,13 +89,23 @@ async function publishInstagram(post) {
   const token = process.env.FB_PAGE_TOKEN;
   const igUser = process.env.IG_USER_ID;
   const fb = post.published.facebook;
-  if (!fb || !fb.photoId) throw new Error('сначала пост должен выйти в Facebook (источник картинки)');
+  if (!fb || !(fb.photoId || fb.id)) throw new Error('сначала пост должен выйти в Facebook (источник картинки)');
 
-  const photo = await (await apiCheck(
-    await fetch(`https://graph.facebook.com/v23.0/${fb.photoId}?fields=images&access_token=${token}`),
-    'Facebook photo url'
-  )).json();
-  const imageUrl = photo.images && photo.images[0] && photo.images[0].source;
+  let imageUrl;
+  if (fb.photoId) {
+    const photo = await (await apiCheck(
+      await fetch(`https://graph.facebook.com/v23.0/${fb.photoId}?fields=images&access_token=${token}`),
+      'Facebook photo url'
+    )).json();
+    imageUrl = photo.images && photo.images[0] && photo.images[0].source;
+  } else {
+    // старые записи без photoId: берём картинку прямо из поста
+    const p = await (await apiCheck(
+      await fetch(`https://graph.facebook.com/v23.0/${fb.id}?fields=full_picture&access_token=${token}`),
+      'Facebook post picture'
+    )).json();
+    imageUrl = p.full_picture;
+  }
   if (!imageUrl) throw new Error('не удалось получить URL картинки из FB-поста');
 
   const caption = post.texts.instagram
