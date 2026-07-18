@@ -1,0 +1,21 @@
+{
+  "id": "2026-07-18-audience-nophd",
+  "scheduledFor": "2026-07-18",
+  "rubric": "audience",
+  "texts": {
+    "facebook": "Nobody on an ML team will ever ask where your PhD is.\n\nThey'll ask what you've built. Whether you can look at messy data and find the story in it. Whether your model survives contact with production.\n\nAll of that is learnable by doing — and none of it requires a degree. Most working ML engineers picked it up exactly that way: one real task at a time.\n\nThat's how ML Career Simulator works: you get \"hired\" as a Junior at a fictional company and grow to Middle through 20 real business cases. The first 2 modules are free, no card required:\nhttps://ml-simulator-app-production.up.railway.app/en.html?utm_source=facebook&utm_medium=social&utm_campaign=organic&utm_content=2026-07-18-audience-nophd",
+    "instagram": "Nobody on an ML team will ask where your PhD is. 🌌\n\nThey'll ask what you've built — and that is learnable by doing, one real task at a time.\n\nStart your ML career the practical way: get \"hired\" at a fictional company and grow from Junior to Middle through 20 real business cases. First 2 modules are free — Link in bio.\n\n#machinelearning #mlengineer #careerchange #learntocode #datascience #techcareer #ml",
+    "linkedin": "Nobody on an ML team will ever ask where your PhD is.\n\nThey'll ask what you've built. Whether your model survives production. All of that is learnable by doing — no degree required.\n\nML Career Simulator: from Junior to Middle through 20 real business cases. First 2 modules free: https://ml-simulator-app-production.up.railway.app/en.html?utm_source=linkedin&utm_medium=social&utm_campaign=organic&utm_content=2026-07-18-audience-nophd\n\n#MachineLearning #MLEngineer #CareerGrowth",
+    "tiktok": "You don't need a PhD to start ML. Practice beats theory. #ml #machinelearning #techcareer — Link in bio"
+  },
+  "card": {
+    "kicker": "NO PHD REQUIRED",
+    "headline": "You can start ML from where you are",
+    "lines": [
+      "Practice beats theory"
+    ],
+    "footer": "ml-simulator · start free"
+  },
+  "image": "2026-07-18-audience-nophd.png",
+  "published": {}
+}
