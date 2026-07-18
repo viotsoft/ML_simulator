@@ -279,7 +279,7 @@ async function loadCreate() {
 // ---------------------------------------------------------------- подключения
 
 const NET_HINT = {
-  facebook: 'developers.facebook.com → Create App (Business). Instagram подключается автоматически, если IG Business привязан к странице.',
+  facebook: 'developers.facebook.com → Create App (Business). Обязательно: Settings → Basic → App Domains = домен сайта + Add Platform → Website (Site URL сайта); продукт Facebook Login → Settings → Valid OAuth Redirect URIs = URL ниже. Instagram подключается автоматически, если IG Business привязан к странице.',
   instagram: 'Подключается вместе с Facebook: привяжите IG Business-аккаунт к странице и нажмите Connect у Facebook.',
   linkedin: 'developer.linkedin.com → Create app → Products: «Share on LinkedIn» + «Sign In with LinkedIn» → Auth → добавьте Redirect URL ниже.',
   tiktok: 'developers.tiktok.com → Connect an app → Login Kit + Content Posting API → Redirect URI ниже. Сразу подайте на аудит (до него посты приватные).',
