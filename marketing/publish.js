@@ -3,9 +3,11 @@
 // Запускается ежедневно из GitHub Actions; берёт самый старый неопубликованный
 // пост с наступившей датой, публикует и помечает published.* (идемпотентно).
 //
-//   node marketing/publish.js [--platform facebook|linkedin] [--dry-run]
+//   node marketing/publish.js [--platform facebook|linkedin|tiktok] [--dry-run]
 //
-// Секреты (env): FB_PAGE_ID, FB_PAGE_TOKEN, LINKEDIN_TOKEN, LINKEDIN_PERSON_URN
+// Секреты (env): FB_PAGE_ID, FB_PAGE_TOKEN, LINKEDIN_TOKEN, LINKEDIN_PERSON_URN,
+//   TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET, TIKTOK_REFRESH_TOKEN
+// Платформы без секретов пропускаются (можно включать по одной).
 
 const fs = require('fs');
 const path = require('path');
@@ -17,7 +19,17 @@ const LINKEDIN_VERSION = process.env.LINKEDIN_VERSION || '202506';
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
 const only = args.includes('--platform') ? args[args.indexOf('--platform') + 1] : null;
-const PLATFORMS = only ? [only] : ['facebook', 'linkedin'];
+const PLATFORMS = only ? [only] : ['facebook', 'linkedin', 'tiktok'];
+
+const REQUIRED_ENV = {
+  facebook: ['FB_PAGE_ID', 'FB_PAGE_TOKEN'],
+  linkedin: ['LINKEDIN_TOKEN', 'LINKEDIN_PERSON_URN'],
+  tiktok: ['TIKTOK_CLIENT_KEY', 'TIKTOK_CLIENT_SECRET', 'TIKTOK_REFRESH_TOKEN'],
+};
+
+function configured(platform) {
+  return (REQUIRED_ENV[platform] || []).every((k) => process.env[k]);
+}
 
 function today() {
   return new Date().toISOString().slice(0, 10);
@@ -32,9 +44,13 @@ function loadQueue() {
     .sort((a, b) => a.post.scheduledFor.localeCompare(b.post.scheduledFor));
 }
 
-// Пост дня для платформы: дата наступила, ещё не публиковался туда
+// Пост дня для платформы: дата наступила, ещё не публиковался туда.
+// Для TikTok нужен собранный mp4 — посты без видео пропускаем.
 function nextFor(queue, platform) {
-  return queue.find((q) => q.post.scheduledFor <= today() && !q.post.published[platform]);
+  return queue.find((q) =>
+    q.post.scheduledFor <= today() &&
+    !q.post.published[platform] &&
+    (platform !== 'tiktok' || (q.post.video && fs.existsSync(path.join(QUEUE_DIR, q.post.video)))));
 }
 
 async function apiCheck(res, what) {
@@ -115,6 +131,91 @@ async function publishLinkedin(post, imagePath) {
   return res.headers.get('x-restli-id') || res.headers.get('x-linkedin-id') || 'ok';
 }
 
+// ---------- TikTok: Direct Post (FILE_UPLOAD) ----------
+// Access-токен живёт 24 часа — обновляем при каждом запуске по refresh-токену
+// (тот живёт 365 дней). До прохождения аудита приложения TikTok разрешает
+// только SELF_ONLY — берём максимально открытый уровень из creator_info.
+
+async function tiktokAccessToken() {
+  const res = await apiCheck(
+    await fetch('https://open.tiktokapis.com/v2/oauth/token/', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_key: process.env.TIKTOK_CLIENT_KEY,
+        client_secret: process.env.TIKTOK_CLIENT_SECRET,
+        grant_type: 'refresh_token',
+        refresh_token: process.env.TIKTOK_REFRESH_TOKEN,
+      }),
+    }),
+    'TikTok oauth/token'
+  );
+  const data = await res.json();
+  if (!data.access_token) throw new Error(`TikTok oauth/token: ${JSON.stringify(data)}`);
+  if (data.refresh_token && data.refresh_token !== process.env.TIKTOK_REFRESH_TOKEN) {
+    console.warn('::warning::TikTok выдал НОВЫЙ refresh-токен — обновите секрет TIKTOK_REFRESH_TOKEN');
+  }
+  return data.access_token;
+}
+
+async function tiktokJSON(url, token, body, what) {
+  const res = await apiCheck(
+    await fetch(url, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'content-type': 'application/json; charset=UTF-8' },
+      body: JSON.stringify(body || {}),
+    }),
+    what
+  );
+  const data = await res.json();
+  if (data.error && data.error.code !== 'ok') throw new Error(`${what}: ${JSON.stringify(data.error)}`);
+  return data.data;
+}
+
+async function publishTiktok(post) {
+  const token = await tiktokAccessToken();
+
+  const creator = await tiktokJSON(
+    'https://open.tiktokapis.com/v2/post/publish/creator_info/query/', token, {}, 'TikTok creator_info');
+  const levels = creator.privacy_level_options || [];
+  const privacy = levels.includes('PUBLIC_TO_EVERYONE') ? 'PUBLIC_TO_EVERYONE'
+    : levels.includes('EVERYONE') ? 'EVERYONE' : 'SELF_ONLY';
+  if (privacy === 'SELF_ONLY') {
+    console.warn('::warning::TikTok-приложение ещё не прошло аудит — видео публикуется приватно (SELF_ONLY)');
+  }
+
+  const videoPath = path.join(QUEUE_DIR, post.video);
+  const video = fs.readFileSync(videoPath);
+  const init = await tiktokJSON('https://open.tiktokapis.com/v2/post/publish/video/init/', token, {
+    post_info: {
+      title: post.texts.tiktok || post.card.headline,
+      privacy_level: privacy,
+      disable_comment: false,
+      disable_duet: false,
+      disable_stitch: false,
+    },
+    source_info: {
+      source: 'FILE_UPLOAD',
+      video_size: video.length,
+      chunk_size: video.length,
+      total_chunk_count: 1,
+    },
+  }, 'TikTok video/init');
+
+  await apiCheck(
+    await fetch(init.upload_url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'video/mp4',
+        'Content-Range': `bytes 0-${video.length - 1}/${video.length}`,
+      },
+      body: video,
+    }),
+    'TikTok video upload'
+  );
+  return init.publish_id;
+}
+
 // Токен LinkedIn живёт 60 дней — предупреждаем заранее (дата из state.json)
 function warnLinkedinExpiry() {
   try {
@@ -128,7 +229,7 @@ function warnLinkedinExpiry() {
   } catch {}
 }
 
-const publishers = { facebook: publishFacebook, linkedin: publishLinkedin };
+const publishers = { facebook: publishFacebook, linkedin: publishLinkedin, tiktok: publishTiktok };
 
 async function main() {
   const queue = loadQueue();
@@ -137,6 +238,11 @@ async function main() {
     return;
   }
   warnLinkedinExpiry();
+
+  if (!DRY_RUN && !PLATFORMS.some(configured)) {
+    console.error(`Ни одна платформа не настроена. Нужны секреты: ${JSON.stringify(REQUIRED_ENV)}`);
+    process.exit(1);
+  }
 
   let failed = false;
   for (const platform of PLATFORMS) {
@@ -149,7 +255,12 @@ async function main() {
     if (DRY_RUN) {
       console.log(`[${platform}] DRY-RUN — был бы опубликован ${item.post.id}:`);
       console.log(item.post.texts[platform]);
-      console.log(`  image: ${imagePath} (${fs.existsSync(imagePath) ? 'есть' : 'НЕТ ФАЙЛА!'})`);
+      const media = platform === 'tiktok' ? path.join(QUEUE_DIR, item.post.video) : imagePath;
+      console.log(`  media: ${media} (${fs.existsSync(media) ? 'есть' : 'НЕТ ФАЙЛА!'})`);
+      continue;
+    }
+    if (!configured(platform)) {
+      console.log(`[${platform}] пропущен — секреты не заданы (${REQUIRED_ENV[platform].join(', ')})`);
       continue;
     }
     try {

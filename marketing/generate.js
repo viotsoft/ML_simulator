@@ -118,11 +118,12 @@ Rules:
 - Put the literal placeholder {{LINK}} exactly once in each post text (it becomes a tracked URL).
 - First line must be a scroll-stopping hook. No "In today's fast-paced world" clichés, no emoji spam (max 2 emoji per post).
 - facebook text: up to 500 chars, casual. linkedin text: up to 1200 chars, professional but human, short paragraphs, 3-5 hashtags at the end (e.g. #MachineLearning #MLEngineer #DataScience).
+- tiktok text: a video caption up to 150 chars, punchy, 3-4 hashtags (#ml #machinelearning #techcareer), NO links and NO {{LINK}} — end with "Link in bio".
 - The card is a square image: kicker (small label, up to 30 chars), headline (up to 60 chars, the hook), lines (2-4 bullet strings, up to 55 chars each), footer is fixed by the system.
 - Never invent facts about the course beyond what is given.
 
 Return ONLY valid JSON, no markdown fences:
-{"facebook": "...", "linkedin": "...", "card": {"kicker": "...", "headline": "...", "lines": ["...", "..."]}}`;
+{"facebook": "...", "linkedin": "...", "tiktok": "...", "card": {"kicker": "...", "headline": "...", "lines": ["...", "..."]}}`;
 
 function buildPrompt(rubric, src) {
   switch (rubric) {
@@ -199,26 +200,31 @@ function offlinePost(rubric, src) {
     interview: () => ({
       facebook: `ML interview question: ${src.q}\n\nCould you answer it out loud? Practice the full mock interview (free Junior track): {{LINK}}`,
       linkedin: `ML interview question of the day (${src.track} track):\n\n"${src.q}"\n\nStrong candidates answer in under a minute. Practice with model answers — the Junior track is free: {{LINK}}\n\n#MachineLearning #MLEngineer #DataScience`,
+      tiktok: 'Could you answer this ML interview question out loud? #ml #machinelearning #interview — Link in bio',
       card: { kicker: 'INTERVIEW QUESTION', headline: src.q.slice(0, 60), lines: ['Can you answer in 60 seconds?', 'Model answer inside'] },
     }),
     quiz: () => ({
       facebook: `Quiz time!\n\n${src.question}\n${src.options.map((o, i) => `${'ABCD'[i]}) ${o}`).join('\n')}\n\nAnswer in the comments! 120 more inside: {{LINK}}`,
       linkedin: `ML quiz — answer in the comments:\n\n${src.question}\n\n${src.options.map((o, i) => `${'ABCD'[i]}) ${o}`).join('\n')}\n\nExplanation tomorrow. 120 questions like this in the course: {{LINK}}\n\n#MachineLearning #Quiz #DataScience`,
+      tiktok: 'ML quiz — answer in the comments! #ml #machinelearning #quiz — Link in bio',
       card: { kicker: 'ML QUIZ', headline: src.question.slice(0, 60), lines: src.options.map((o, i) => `${'ABCD'[i]}) ${o}`.slice(0, 55)) },
     }),
     lesson: () => ({
       facebook: `60-second ML lesson: ${src.title}.\n\n${src.subtitle}\n\nOne of 23 hands-on modules: {{LINK}}`,
       linkedin: `60-second ML lesson from module "${src.title}":\n\n${src.subtitle}\n\nThis is 1 of 23 hands-on modules in the ML Career Simulator: {{LINK}}\n\n#MachineLearning #MLEngineer #Learning`,
+      tiktok: '60-second ML lesson. #ml #machinelearning #learnontiktok — Link in bio',
       card: { kicker: '60-SECOND LESSON', headline: src.title.slice(0, 60), lines: [src.subtitle.slice(0, 55)] },
     }),
     story: () => ({
       facebook: `A day at Datacore: ${src.title}.\n\n${src.subtitle}\n\nLive this scenario yourself: {{LINK}}`,
       linkedin: `A day in the life of an ML engineer at Datacore:\n\n"${src.title}" — ${src.subtitle}\n\nThe ML Career Simulator lets you live these scenarios: {{LINK}}\n\n#MachineLearning #CareerGrowth #DataScience`,
+      tiktok: 'A day in the life of an ML engineer. #ml #techcareer #dayinthelife — Link in bio',
       card: { kicker: 'A DAY AT DATACORE', headline: src.title.slice(0, 60), lines: [src.subtitle.slice(0, 55)] },
     }),
     product: () => ({
       facebook: `Tutorials don't get you hired. Practice does.\n\n${src.fact}\n\nStart free: {{LINK}}`,
       linkedin: `Tutorials don't get you hired. Practice does.\n\n${src.fact}\n\nStart free — no card required: {{LINK}}\n\n#MachineLearning #MLEngineer #CareerGrowth`,
+      tiktok: 'From Junior to Middle ML Engineer — through real work cases. #ml #machinelearning #techcareer — Link in bio',
       card: { kicker: 'ML CAREER SIMULATOR', headline: 'From Junior to Middle ML Engineer', lines: [src.fact.slice(0, 55)] },
     }),
   };
@@ -251,9 +257,12 @@ async function main() {
       texts: {
         facebook: gen.facebook.replace('{{LINK}}', trackedLink('facebook', id)),
         linkedin: gen.linkedin.replace('{{LINK}}', trackedLink('linkedin', id)),
+        // TikTok не даёт кликабельных ссылок в описании — CTA "Link in bio"
+        tiktok: (gen.tiktok || '').replace(/\s*\{\{LINK\}\}\s*/g, ' ').trim(),
       },
       card: { ...gen.card, footer: 'ml-simulator · start free' },
       image: `${id}.png`,
+      video: `${id}.mp4`,
       published: {},
     });
   }
@@ -271,8 +280,16 @@ async function main() {
 
   fs.mkdirSync(QUEUE_DIR, { recursive: true });
   const { renderCard } = require('./render-card');
+  const { makeVideo } = require('./make-video');
   for (const p of posts) {
     await renderCard(p.card, path.join(QUEUE_DIR, p.image));
+    try {
+      await makeVideo(p, path.join(QUEUE_DIR, p.video));
+    } catch (e) {
+      // без ffmpeg пост остаётся валидным для FB/LinkedIn, TikTok его пропустит
+      console.warn(`  видео не собрано (${e.message.split('\n')[0]}) — пост без TikTok`);
+      delete p.video;
+    }
     fs.writeFileSync(path.join(QUEUE_DIR, `${p.id}.json`), JSON.stringify(p, null, 2));
     console.log(`✓ ${p.id}`);
   }

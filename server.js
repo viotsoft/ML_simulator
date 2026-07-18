@@ -602,6 +602,25 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+// Приёмник кода OAuth TikTok: их redirect_uri обязан быть публичным HTTPS
+// (localhost запрещён), поэтому код показываем здесь, а пользователь вставляет
+// его в marketing/auth-helper.js. Без client_secret код бесполезен — не секрет.
+app.get('/api/tiktok/callback', (req, res) => {
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const code = req.query.code ? esc(req.query.code) : '';
+  const err = req.query.error ? esc(req.query.error_description || req.query.error) : '';
+  res.type('html').send(`<!DOCTYPE html><meta charset="utf-8">
+<body style="font-family:sans-serif;background:#0b1020;color:#e8ecf8;display:grid;place-items:center;min-height:90vh">
+<div style="max-width:640px;text-align:center">
+${code
+    ? `<h2>Код авторизации TikTok</h2>
+       <p>Скопируйте и вставьте в терминал (auth-helper):</p>
+       <code style="display:block;word-break:break-all;background:#161d38;border:1px solid #263056;border-radius:12px;padding:16px;margin-top:12px">${code}</code>`
+    : `<h2>Ошибка авторизации TikTok</h2><p>${err || 'код не получен'}</p>`}
+</div></body>`);
+});
+
 app.get('/admin', requireAdmin, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });

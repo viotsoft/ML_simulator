@@ -4,6 +4,7 @@
 //
 //   node marketing/auth-helper.js facebook   — долгоживущий Page Token (не истекает)
 //   node marketing/auth-helper.js linkedin   — токен профиля (живёт 60 дней)
+//   node marketing/auth-helper.js tiktok     — refresh-токен (живёт 365 дней)
 //
 // Предварительно (см. MARKETING.md): создать приложения на
 // developers.facebook.com и developer.linkedin.com; в LinkedIn-приложении
@@ -118,14 +119,50 @@ async function linkedin(rl) {
   console.log('Дата выпуска записана в marketing/state.json — закоммитьте её.');
 }
 
+async function tiktok(rl) {
+  console.log('\n=== TikTok: refresh-токен для Content Posting API ===');
+  const appUrl = process.env.APP_URL || 'https://ml-simulator-app-production.up.railway.app';
+  const redirect = `${appUrl}/api/tiktok/callback`;
+  console.log(`В приложении на developers.tiktok.com: продукты Login Kit + Content Posting API;
+Login Kit → Redirect URI → ${redirect}
+(localhost TikTok не принимает, поэтому код авторизации покажет страница на вашем сайте).`);
+  const clientKey = (await rl.question('Client key: ')).trim();
+  const clientSecret = (await rl.question('Client secret: ')).trim();
+
+  const scope = encodeURIComponent('user.info.basic,video.publish');
+  openBrowser(`https://www.tiktok.com/v2/auth/authorize/?client_key=${clientKey}&scope=${scope}&response_type=code&redirect_uri=${encodeURIComponent(redirect)}&state=mlsim`);
+  const code = decodeURIComponent((await rl.question('Вставьте код со страницы: ')).trim());
+
+  const tok = await getJSON('https://open.tiktokapis.com/v2/oauth/token/', {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_key: clientKey,
+      client_secret: clientSecret,
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: redirect,
+    }),
+  }, 'обмен code на токен');
+  if (!tok.access_token) throw new Error('TikTok не вернул токен: ' + JSON.stringify(tok));
+
+  console.log('\n→ Добавьте в GitHub Secrets:\n');
+  console.log(`TIKTOK_CLIENT_KEY=${clientKey}`);
+  console.log(`TIKTOK_CLIENT_SECRET=${clientSecret}`);
+  console.log(`TIKTOK_REFRESH_TOKEN=${tok.refresh_token}`);
+  console.log(`\nRefresh-токен живёт ~${Math.round((tok.refresh_expires_in || 31536000) / 86400)} дней; access-токен публикатор обновляет сам при каждом запуске.`);
+  console.log('До прохождения аудита приложения видео публикуются приватно (SELF_ONLY) — это ожидаемо.');
+}
+
 async function main() {
   const which = process.argv[2];
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   try {
     if (which === 'facebook') await facebook(rl);
     else if (which === 'linkedin') await linkedin(rl);
+    else if (which === 'tiktok') await tiktok(rl);
     else {
-      console.log('Использование: node marketing/auth-helper.js facebook | linkedin');
+      console.log('Использование: node marketing/auth-helper.js facebook | linkedin | tiktok');
       process.exit(1);
     }
   } finally {

@@ -86,9 +86,72 @@ function buildSvg(card) {
 </svg>`;
 }
 
+// ---------- вертикальные слайды 1080×1920 для TikTok-видео ----------
+
+const SW = 1080;
+const SH = 1920;
+const SPAD = 100;
+
+function slideChrome(inner) {
+  return `<svg width="${SW}" height="${SH}" viewBox="0 0 ${SW} ${SH}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="${C.bgSoft}"/>
+      <stop offset="1" stop-color="${C.bg}"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="${C.accent}"/>
+      <stop offset="1" stop-color="${C.green}"/>
+    </linearGradient>
+  </defs>
+  <rect width="${SW}" height="${SH}" fill="url(#bg)"/>
+  <rect x="60" y="140" width="${SW - 120}" height="${SH - 320}" rx="32" fill="${C.card}" stroke="${C.border}" stroke-width="2"/>
+  <rect x="60" y="140" width="${SW - 120}" height="12" rx="6" fill="url(#bar)"/>
+  ${inner}
+  <text x="${SPAD}" y="${SH - 260}" font-family="Helvetica, Arial, sans-serif" font-size="40" font-weight="700" fill="${C.text}">ML Career Simulator</text>
+  <text x="${SPAD}" y="${SH - 206}" font-family="Helvetica, Arial, sans-serif" font-size="32" fill="${C.accent}">start free · link in bio</text>
+</svg>`;
+}
+
+// type: 'hook' (кикер + крупный заголовок), 'points' (пункты), 'cta' (финальный призыв)
+function buildSlideSvg(type, card) {
+  const font = 'Helvetica, Arial, sans-serif';
+  let inner = '';
+  if (type === 'hook') {
+    const lines = wrap(card.headline || '', 20, 6);
+    let y = 560;
+    inner = `<text x="${SPAD}" y="420" font-family="${font}" font-size="36" font-weight="700" letter-spacing="4" fill="${C.accent}">${esc((card.kicker || '').toUpperCase())}</text>`
+      + lines.map((l) => `<text x="${SPAD}" y="${(y += 96)}" font-family="${font}" font-size="80" font-weight="700" fill="${C.text}">${esc(l)}</text>`).join('\n');
+  } else if (type === 'points') {
+    let y = 480;
+    inner = `<text x="${SPAD}" y="400" font-family="${font}" font-size="36" font-weight="700" letter-spacing="4" fill="${C.accent}">${esc((card.kicker || '').toUpperCase())}</text>`
+      + (card.lines || []).slice(0, 4).map((line) => {
+        const ls = wrap(line, 34, 3);
+        const bullet = `<circle cx="${SPAD + 14}" cy="${y + 62}" r="11" fill="${C.green}"/>`;
+        const t = ls.map((l) => `<text x="${SPAD + 52}" y="${(y += 64)}" font-family="${font}" font-size="46" fill="${C.text}">${esc(l)}</text>`).join('\n');
+        y += 40;
+        return bullet + t;
+      }).join('\n');
+  } else {
+    // cta
+    inner = `
+  <text x="${SW / 2}" y="740" text-anchor="middle" font-family="${font}" font-size="88" font-weight="700" fill="${C.text}">From Junior to</text>
+  <text x="${SW / 2}" y="850" text-anchor="middle" font-family="${font}" font-size="88" font-weight="700" fill="${C.text}">Middle ML Engineer</text>
+  <text x="${SW / 2}" y="980" text-anchor="middle" font-family="${font}" font-size="48" fill="${C.muted}">20 real business cases · certificate</text>
+  <rect x="${SW / 2 - 300}" y="1070" width="600" height="120" rx="60" fill="${C.accent}"/>
+  <text x="${SW / 2}" y="1147" text-anchor="middle" font-family="${font}" font-size="52" font-weight="700" fill="#0b1020">Start free — link in bio</text>`;
+  }
+  return slideChrome(inner);
+}
+
 async function renderCard(card, outPath) {
   const sharp = require('sharp');
   await sharp(Buffer.from(buildSvg(card))).png().toFile(outPath);
 }
 
-module.exports = { renderCard, buildSvg };
+async function renderSlide(type, card, outPath) {
+  const sharp = require('sharp');
+  await sharp(Buffer.from(buildSlideSvg(type, card))).png().toFile(outPath);
+}
+
+module.exports = { renderCard, renderSlide, buildSvg, buildSlideSvg };
