@@ -18,8 +18,10 @@ const STATE_FILE = path.join(__dirname, 'state.json');
 const APP_URL = process.env.APP_URL || 'https://ml-simulator-app-production.up.railway.app';
 const MODEL = process.env.MARKETING_MODEL || 'claude-sonnet-5';
 
-// Порядок рубрик: 4 контентных + 1 продуктовая на каждые 5 постов
-const RUBRICS = ['interview', 'quiz', 'lesson', 'story', 'product'];
+// Порядок рубрик: 5 контентных + 1 продуктовая на каждые 6 постов.
+// 'audience' — темы из marketing/topics.json под три аудитории
+// (новички / свитчеры из разработки / бизнес-контекст).
+const RUBRICS = ['interview', 'quiz', 'audience', 'lesson', 'story', 'product'];
 
 const args = process.argv.slice(2);
 const OFFLINE = args.includes('--offline');
@@ -36,6 +38,7 @@ function loadJSON(p) {
 const modules = loadJSON(path.join(ROOT, 'content/en/modules.json'));
 const quizzes = loadJSON(path.join(ROOT, 'content/en/quizzes.json'));
 const interviews = loadJSON(path.join(ROOT, 'content/en/interviews.json'));
+const topics = loadJSON(path.join(__dirname, 'topics.json')).topics;
 
 // Плоские списки для ротации
 const quizPool = [];
@@ -89,8 +92,10 @@ function pickRotating(pool, usedKeys, keyFn) {
 }
 
 function pickSource(rubric, state) {
-  const used = state.used[rubric];
+  const used = (state.used[rubric] = state.used[rubric] || []);
   switch (rubric) {
+    case 'audience':
+      return pickRotating(topics, used, (t) => t.id);
     case 'quiz':
       return pickRotating(quizPool, used, (q) => q.key);
     case 'interview':
@@ -126,8 +131,26 @@ Rules:
 Return ONLY valid JSON, no markdown fences:
 {"facebook": "...", "linkedin": "...", "tiktok": "...", "card": {"kicker": "...", "headline": "...", "lines": ["...", "..."]}}`;
 
+const AUDIENCE_VOICE = {
+  beginner: `Audience: complete beginners who dream of starting ML but feel intimidated.
+Tone: encouraging, zero jargon (explain any term in one clause), remove fear. CTA: the first 2 modules are free, start today.`,
+  switcher: `Audience: working software engineers considering a switch to ML.
+Tone: peer-to-peer, respect their existing skills, map ML concepts to engineering concepts they know. CTA: the simulator feels like a real job, not a course — see if the work suits you.`,
+  business: `Audience: students, product managers and analysts who want to understand the business side of ML.
+Tone: business-first, money and decisions over math, concrete company examples. CTA: the course teaches ML through real business cases — understand what your future team actually does.`,
+};
+
 function buildPrompt(rubric, src) {
   switch (rubric) {
+    case 'audience':
+      return `${COMMON_RULES}
+
+Rubric: audience-targeted post.
+${AUDIENCE_VOICE[src.audience]}
+Topic: ${src.topic}
+Angle to take: ${src.angle}
+
+Post format: open with a hook that names the reader's situation, deliver one genuinely useful insight on the topic (not a teaser — real value), then bridge naturally to the CTA with {{LINK}}. Card: the topic as headline, 2-3 key points as lines.`;
     case 'interview':
       return `${COMMON_RULES}
 
@@ -198,6 +221,12 @@ async function callClaude(prompt) {
 // Шаблонные посты без API — только чтобы проверить конвейер end-to-end
 function offlinePost(rubric, src) {
   const map = {
+    audience: () => ({
+      facebook: `${src.topic}\n\n(${src.angle})\n\nStart free: {{LINK}}`,
+      linkedin: `${src.topic}\n\n${src.angle}\n\nStart free: {{LINK}}\n\n#MachineLearning #MLEngineer #CareerGrowth`,
+      tiktok: `${src.topic.slice(0, 100)} #ml #machinelearning #techcareer — Link in bio`,
+      card: { kicker: src.audience === 'switcher' ? 'FOR ENGINEERS' : src.audience === 'business' ? 'ML × BUSINESS' : 'START IN ML', headline: src.topic.slice(0, 60), lines: [src.angle.slice(0, 55)] },
+    }),
     interview: () => ({
       facebook: `ML interview question: ${src.q}\n\nCould you answer it out loud? Practice the full mock interview (free Junior track): {{LINK}}`,
       linkedin: `ML interview question of the day (${src.track} track):\n\n"${src.q}"\n\nStrong candidates answer in under a minute. Practice with model answers — the Junior track is free: {{LINK}}\n\n#MachineLearning #MLEngineer #DataScience`,
