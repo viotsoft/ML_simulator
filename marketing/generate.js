@@ -29,14 +29,29 @@ function loadJSON(p) {
   return JSON.parse(fs.readFileSync(p, 'utf8'));
 }
 
+// Оптимистичная загрузка: новый или битый файл трека не должен ронять генерацию.
+function loadJSONSoft(p, fallback) {
+  try { return loadJSON(p); }
+  catch (e) { console.warn(`[content] ${p}: ${e.message} — пропускаем`); return fallback; }
+}
+
 const modules = loadJSON(path.join(ROOT, 'content/en/modules.json'));
 const quizzes = loadJSON(path.join(ROOT, 'content/en/quizzes.json'));
 const interviews = loadJSON(path.join(ROOT, 'content/en/interviews.json'));
+const agentModules = loadJSONSoft(path.join(ROOT, 'content/en/agents.json'), []);
+const agentQuizzes = loadJSONSoft(path.join(ROOT, 'content/en/agent-quizzes.json'), {});
+const ccaModules = loadJSONSoft(path.join(ROOT, 'content/en/cca.json'), []);
+const ccaQuizzes = loadJSONSoft(path.join(ROOT, 'content/en/cca-quizzes.json'), {});
+
+// Рубрики lesson/story/quiz тянут материал из всех треков: иначе новые треки
+// никогда не попадают в контент, а посты повторяются по одному и тому же курсу.
+const ready = (list) => list.filter((m) => m.status !== 'soon');
+const allModules = [...modules, ...ready(agentModules), ...ready(ccaModules)];
 const topics = loadJSON(path.join(__dirname, 'topics.json')).topics;
 
 // Плоские списки для ротации
 const quizPool = [];
-for (const [mod, list] of Object.entries(quizzes)) {
+for (const [mod, list] of Object.entries({ ...quizzes, ...agentQuizzes, ...ccaQuizzes })) {
   list.forEach((q, i) => quizPool.push({ key: `${mod}:${i}`, mod, ...q }));
 }
 const interviewPool = [];
@@ -65,6 +80,10 @@ const PRODUCT_FACTS = [
   'There is a second track — Agentic Engineering: 20 cases on building LLM-agent systems in a real company and taking them to market, from Junior to Senior AI Engineer.',
   'The agentic engineering track is included in the same $20/month subscription and earns a separate AI Agent Engineer certificate.',
   'The course covers two skills at once: classic ML and agentic automation — the combination enterprises are short of.',
+  'There is a third track: preparation for the Claude Certified Architect – Foundations (CCAR-F) exam — 20 modules covering all 30 official exam objectives, weighted by domain.',
+  'The certification track ends with a mock exam: 60 questions in 120 minutes, a 720 passing score on a 100–1000 scale, and a report showing percent correct per domain — the same shape as the real score report.',
+  'The Claude Certified Architect prep track is included in the same $20/month subscription; finishing it and passing the mock exam earns a "CCAR-F Exam Ready" certificate. It is independent preparation, not affiliated with Anthropic, and does not replace the official exam.',
+  'The mock exam report links a weak domain straight back to the modules that cover it, so studying goes where the score actually dropped.',
 ];
 
 // ---------- состояние ротации ----------
@@ -103,11 +122,11 @@ function pickSource(rubric, state) {
     case 'interview':
       return pickRotating(interviewPool, used, (q) => q.key);
     case 'lesson': {
-      const m = pickRotating(modules, used, (m) => m.id);
+      const m = pickRotating(allModules, used, (m) => m.id);
       return { ...m, excerpt: moduleExcerpt(m.id) };
     }
     case 'story': {
-      const m = pickRotating(modules, used, (m) => m.id);
+      const m = pickRotating(allModules, used, (m) => m.id);
       return { ...m, excerpt: moduleExcerpt(m.id).slice(0, 1500) };
     }
     case 'product':
@@ -120,7 +139,9 @@ function pickSource(rubric, state) {
 const COMMON_RULES = `
 You write organic social media posts in English promoting "ML Career Simulator" —
 a gamified course where the learner is hired as a Junior ML Engineer at fictional
-company Datacore and grows to Middle through 20 real business cases.
+company Datacore and grows to Middle through 20 real business cases. Two further
+tracks build on the same storyline: agentic engineering up to Senior AI Engineer,
+and preparation for the Claude Certified Architect (CCAR-F) exam with a mock exam.
 
 Rules:
 - Put the literal placeholder {{LINK}} exactly once in each post text (it becomes a tracked URL).

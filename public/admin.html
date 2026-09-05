@@ -29,8 +29,10 @@
           <th>Регистрация</th>
           <th>Источник</th>
           <th>Подписка</th>
-          <th>Прогресс</th>
-          <th>Сертификат</th>
+          <th>ML</th>
+          <th>Агенты</th>
+          <th>CCAR-F</th>
+          <th>Сертификаты</th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
@@ -50,6 +52,27 @@ const fmtDate = (iso) => {
 };
 
 let ALL_USERS = [];
+
+const TRACK_LABEL = { ml: "Middle ML", agent: "AI Agent", cca: "CCAR-F" };
+
+function trackCell(u, key) {
+  const t = (u.tracks || {})[key];
+  if (!t) return "—";
+  const done = t.passed >= t.required;
+  return `<span class="${done ? "trk-done" : ""}">${t.passed} / ${t.required}</span>`;
+}
+
+function examCell(u) {
+  const t = (u.tracks || {}).cca;
+  if (!t || t.examBest === null || t.examBest === undefined) return "";
+  return ` <span class="exam-badge ${t.examPassed ? "ok" : ""}">${t.examBest}</span>`;
+}
+
+function certCell(u) {
+  const got = Object.keys(TRACK_LABEL).filter((k) => (u.tracks || {})[k] && u.tracks[k].certificateReady);
+  if (!got.length) return "—";
+  return got.map((k) => `<span class="badge badge-pro">${TRACK_LABEL[k]}</span>`).join(" ");
+}
 
 function render(users) {
   const tbody = document.getElementById('tbody');
@@ -71,8 +94,10 @@ function render(users) {
       <td>${u.subscribed
         ? '<span class="badge badge-pro">PRO</span>'
         : '<span class="badge badge-free">FREE</span>'}</td>
-      <td>${u.passedCount} / 20</td>
-      <td>${u.certificateReady ? '🎓 да' : '—'}</td>
+      <td>${trackCell(u, 'ml')}</td>
+      <td>${trackCell(u, 'agent')}</td>
+      <td>${trackCell(u, 'cca')}${examCell(u)}</td>
+      <td>${certCell(u)}</td>
     </tr>`).join('');
 }
 
@@ -88,7 +113,10 @@ async function load() {
   document.getElementById('stats').innerHTML = `
     <div class="admin-stat"><div class="n">${data.total}</div><div class="l">Всего пользователей</div></div>
     <div class="admin-stat"><div class="n">${data.subscribed}</div><div class="l">С подпиской PRO</div></div>
-    <div class="admin-stat"><div class="n">${data.certified}</div><div class="l">Получили сертификат</div></div>
+    <div class="admin-stat"><div class="n">${(data.certifiedByTrack || {}).ml ?? data.certified}</div><div class="l">Сертификат Middle ML</div></div>
+    <div class="admin-stat"><div class="n">${(data.certifiedByTrack || {}).agent ?? 0}</div><div class="l">Сертификат AI Agent</div></div>
+    <div class="admin-stat"><div class="n">${(data.certifiedByTrack || {}).cca ?? 0}</div><div class="l">Сертификат CCAR-F</div></div>
+    <div class="admin-stat"><div class="n">${data.examPassed ?? 0}</div><div class="l">Сдали пробный экзамен</div></div>
   `;
   render(ALL_USERS);
 }

@@ -1124,13 +1124,21 @@ app.get('/api/admin/users', requireAdmin, (req, res) => {
       certificateReady: passed >= CERT_REQUIRED,
       agentPassedCount: agentPassed,
       agentCertificateReady: agentPassed >= AGENT_CERT_REQUIRED,
+      // те же данные по всем трекам одним циклом — четвёртый трек не потребует правок
+      tracks: trackSummary(u),
     };
   }).sort((x, y) => new Date(y.createdAt || 0) - new Date(x.createdAt || 0));
 
+  const certified = {};
+  for (const key of Object.keys(TRACKS)) {
+    certified[key] = users.filter((u) => u.tracks[key] && u.tracks[key].certificateReady).length;
+  }
   res.json({
     total: users.length,
     subscribed: users.filter((u) => u.subscribed).length,
-    certified: users.filter((u) => u.certificateReady).length,
+    certified: certified.ml,          // прежнее поле сохраняем: считает ML-трек
+    certifiedByTrack: certified,
+    examPassed: users.filter((u) => u.tracks.cca && u.tracks.cca.examPassed).length,
     users,
   });
 });

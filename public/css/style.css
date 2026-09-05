@@ -685,3 +685,11 @@ a:hover { text-decoration: underline; }
   .exam-dot { width: 26px; height: 26px; font-size: 11px; }
   .exam-nav .btn-primary { margin-left: 0; width: 100%; }
 }
+
+/* колонки треков в админке */
+.trk-done { color: #34d399; font-weight: 700; }
+.exam-badge {
+  display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 6px;
+  font-size: 11px; font-weight: 700; border: 1px solid #fbbf24; color: #fbbf24;
+}
+.exam-badge.ok { border-color: #34d399; color: #34d399; }
