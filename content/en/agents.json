@@ -25,7 +25,7 @@
       "retries"
     ],
     "free": true,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a03",
@@ -39,7 +39,7 @@
       "routing"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a04",
@@ -53,7 +53,7 @@
       "guardrails"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a05",
@@ -67,7 +67,7 @@
       "retrieval"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a06",
@@ -81,7 +81,7 @@
       "LLM-as-judge"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a07",
@@ -95,7 +95,7 @@
       "autonomy"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a08",
@@ -109,7 +109,7 @@
       "critic"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a09",
@@ -123,7 +123,7 @@
       "integrations"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a10",
@@ -137,7 +137,7 @@
       "privacy"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a11",
@@ -151,7 +151,7 @@
       "gates"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a12",
@@ -165,7 +165,7 @@
       "routing"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a13",
@@ -179,7 +179,7 @@
       "fallback"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a14",
@@ -193,7 +193,7 @@
       "debugging"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a15",
@@ -207,7 +207,7 @@
       "isolation"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a16",
@@ -221,7 +221,7 @@
       "rollback"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a17",
@@ -235,7 +235,7 @@
       "process"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a18",
@@ -249,7 +249,7 @@
       "product"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a19",
@@ -263,7 +263,7 @@
       "business"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a20",
@@ -277,6 +277,6 @@
       "architecture"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   }
 ]

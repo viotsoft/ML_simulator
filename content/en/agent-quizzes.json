@@ -55,5 +55,1088 @@
       "answer": 2,
       "explanation": "A CEO thinks in risk and money, not model properties. The argument that works ties the cost of a mistake to a plan for removing it: start with approval, gather statistics, raise autonomy on the numbers. \"Not good enough\" and \"legal will refuse\" sound like excuses and offer no way forward."
     }
+  ],
+  "a02": [
+    {
+      "question": "Why use schema-backed tool calling instead of asking for JSON in the prompt?",
+      "options": [
+        "It costs fewer tokens",
+        "It lets the model call external APIs",
+        "The provider validates the schema instead of your regex — the answer is guaranteed to match the contract",
+        "It allows using a cheaper model"
+      ],
+      "answer": 2,
+      "explanation": "The main value here is not calling external systems but the format guarantee: the provider forces the model to fill the schema fields. \"Return JSON\" sometimes arrives with a \"Sure! Here is the JSON:\" preamble and the parser breaks silently."
+    },
+    {
+      "question": "What temperature should an agent use when classifying inbound emails into categories?",
+      "options": [
+        "0 — the same email must always land in the same category",
+        "0.7 — variety helps catch unusual cases",
+        "1.0 — maximum classification flexibility",
+        "Temperature does not affect classification"
+      ],
+      "answer": 0,
+      "explanation": "In classification, variety is harmful: if the same email lands in \"interested\" today and \"junk\" tomorrow, the user stops trusting the folders. Variety helps only where a human reads the output and picks the best option."
+    },
+    {
+      "question": "A CRM row reads: company \"LLC\", role \"n/a\", no trigger event. What do you do with it?",
+      "options": [
+        "Send it to the model — it will figure something generic out",
+        "Filter it out with validation before the model call and spend nothing on it",
+        "Send it flagged as \"sparse data\" and lower the temperature",
+        "Fill the missing fields with default values"
+      ],
+      "answer": 1,
+      "explanation": "Filtering before the model is thousands of times cheaper and more honest: with no role and no trigger there is nothing to personalize, and \"Hello, n/a!\" is worse than no email. Filter bad data before the call rather than dealing with consequences after."
+    },
+    {
+      "question": "Which error should NOT be retried?",
+      "options": [
+        "A connection timeout",
+        "HTTP 529 from the provider",
+        "The model returned a response that does not match the schema",
+        "HTTP 401 — invalid API key"
+      ],
+      "answer": 3,
+      "explanation": "Retries only help with transient problems. An invalid key does not become valid on repeat — it is a configuration error to fix, not to wait out. Timeouts and 5xx are retried with growing backoff; a schema error is worth one retry."
+    },
+    {
+      "question": "While processing a batch of 340 leads, one lead raises an exception. How should the system behave?",
+      "options": [
+        "Stop the whole batch and require intervention",
+        "Retry that lead until it succeeds",
+        "Record the error for that lead and continue with the rest — the unit of work is the unit of failure",
+        "Skip the entire batch and rerun it later"
+      ],
+      "answer": 2,
+      "explanation": "The unit of work is one lead, so the unit of failure is one lead too. A single bad lead must not block 339 good ones. The ready / skipped / rejected counters at the end of a batch become your first quality metric."
+    }
+  ],
+  "a03": [
+    {
+      "question": "Why define inbox categories as an enum in the schema instead of asking the model to invent a fitting one?",
+      "options": [
+        "An enum saves response tokens",
+        "A closed list guarantees you never get a zoo of \"Interest\", \"interested\", \"Interested\"",
+        "An enum lets you use a cheaper model",
+        "The JSON Schema specification requires it"
+      ],
+      "answer": 1,
+      "explanation": "A free-form category produces spelling variants of the same thing and the routing code breaks. An enum physically prevents values outside the list. The list must include \"other\", or strange emails will silently land in the nearest-looking category."
+    },
+    {
+      "question": "Which inbox misclassification costs the company the most?",
+      "options": [
+        "An unsubscribe read as an auto-reply, so you keep emailing the person",
+        "An auto-reply read as interest — the manager lost 10 seconds",
+        "Junk landing in \"other\" and waiting for the weekly review",
+        "Interest filed as not_now and contacted a month later"
+      ],
+      "answer": 0,
+      "explanation": "Ignoring a direct request to stop means complaints, fines and reputation damage; in several jurisdictions it also breaks the law. The others cost time or a missed deal. That is why an unsubscribe is never guessed: the faintest hint sends it to the stop list."
+    },
+    {
+      "question": "How should an unsubscribe be handled in an inbox triage system?",
+      "options": [
+        "Rely fully on the model's classification — it was trained on such examples",
+        "Show every possible unsubscribe to a human and never automate it",
+        "Duplicate the model's decision with a simple keyword check in code: either one triggers",
+        "Set temperature to 0 — that is enough"
+      ],
+      "answer": 2,
+      "explanation": "This is the classic asymmetric-error case: missing an unsubscribe is catastrophically more expensive than over-detecting one. A plain keyword check outside the model plus the model's decision gives two independent chances to catch it. A false positive costs one warm lead — an acceptable price."
+    },
+    {
+      "question": "Why add a confidence field to the triage schema?",
+      "options": [
+        "To show the user a confidence percentage next to the category",
+        "To make the model think harder about its answer",
+        "To track average confidence as a quality metric",
+        "To route low-confidence emails to manual review instead of failing silently"
+      ],
+      "answer": 3,
+      "explanation": "A confidence threshold turns a potentially silent error into an explicit human task. Showing the bare number to users is of little use (see A18), and average confidence as a quality metric is misleading — a model can be confidently wrong."
+    },
+    {
+      "question": "What is the best way to explain the difference between not_now and rejected to the model?",
+      "options": [
+        "Write a detailed two-paragraph definition of each category",
+        "Give a few short borderline examples of real emails for each category",
+        "Increase max_tokens so the model can reason at length",
+        "Split it into two separate model calls"
+      ],
+      "answer": 1,
+      "explanation": "Borderline examples beat explanations, especially ones drawn from real mail and from cases the model already got wrong. Two paragraphs of definitions consume context and still leave a grey zone that one example closes."
+    }
+  ],
+  "a04": [
+    {
+      "question": "Why should a prompt not live in an f-string in the middle of a function?",
+      "options": [
+        "It slows down code execution",
+        "Models perform worse with prompts from code",
+        "It cannot be versioned, diffed or rolled back — and editing a prompt changes product behavior",
+        "Provider prompt-length limits require it"
+      ],
+      "answer": 2,
+      "explanation": "A prompt defines system behavior exactly like code, so it needs a version, history, review and rollback. A prompt in an f-string cannot answer \"which version ran yesterday\" and turns a rollback into a panicked dig through git history."
+    },
+    {
+      "question": "Which of these belongs in the system message rather than the user message?",
+      "options": [
+        "The ban on quoting prices that are not in the price list",
+        "The text of the customer's inbound email",
+        "Retrieved fragments from the knowledge base",
+        "The CRM row with the lead data"
+      ],
+      "answer": 0,
+      "explanation": "System is the versioned artifact: role, prohibitions, format, examples. User is one run's data. The moment a rule migrates into the user message alongside data, it stops being versioned and starts depending on input — the most common way to break an agent unnoticed."
+    },
+    {
+      "question": "The model still occasionally mentions a price even though the prompt forbids it. What do you do?",
+      "options": [
+        "Write the prohibition in caps and repeat it three times",
+        "Lower the temperature to zero",
+        "Switch to a larger model",
+        "Add a check in code: a regex for currency and digits rejects the draft"
+      ],
+      "answer": 3,
+      "explanation": "The prompt is the weakest protection layer because the model may not comply. Anything expensive is checked in code after the response: that layer is fully under your control and fires regardless of the model's obedience."
+    },
+    {
+      "question": "What should a prompt regression suite check?",
+      "options": [
+        "That the generated text exactly matches a reference text",
+        "Output properties: no price, contains a question, under 120 words, references the lead's trigger",
+        "Model latency and token counts",
+        "That the model uses every word from the instruction"
+      ],
+      "answer": 1,
+      "explanation": "No two emails are identical, so checking reference text is pointless. You check properties that must hold under any phrasing. A dozen named cases like that catch most regressions in a minute."
+    },
+    {
+      "question": "Why does the regression run return a non-zero exit code on failure?",
+      "options": [
+        "So the developer sees the error in the terminal",
+        "To automatically roll the prompt back to the previous version",
+        "So the run plugs into CI and a failure blocks shipping the prompt",
+        "To record the result in a monitoring system"
+      ],
+      "answer": 2,
+      "explanation": "A check that can be ignored eventually stops being run. A non-zero exit code turns the suite from an optional ritual into a barrier: checks fail, the prompt does not ship."
+    }
+  ],
+  "a05": [
+    {
+      "question": "The agent wrote about a product capability that does not exist. Why did that happen?",
+      "options": [
+        "The model deliberately exaggerated to make the email persuasive",
+        "The fact was absent from context while the task demanded a claim — so it produced a statistically plausible one",
+        "The temperature was too high",
+        "The prompt was too short"
+      ],
+      "answer": 1,
+      "explanation": "A model predicts a plausible continuation. With no fact in context and a task demanding specifics, it assembles a claim from general knowledge about such products. The cure is not \"don't make things up\" but grounding: the fact must physically be in the context."
+    },
+    {
+      "question": "Users complain that the RAG agent invents things. Where do you start debugging?",
+      "options": [
+        "Rewrite the system prompt with a stronger ban on inventing",
+        "Switch to a bigger model",
+        "Print the retrieved fragments and check whether the right one made the top-k",
+        "Lower the temperature to zero"
+      ],
+      "answer": 2,
+      "explanation": "RAG quality is capped by retrieval, not by the model's intelligence: if the right chunk is missing, even the strongest model answers from general knowledge. So debugging always starts at the retrieval step — that is where the problem usually is."
+    },
+    {
+      "question": "Why add a section path like \"Pricing › Plans › Enterprise\" into each chunk's text?",
+      "options": [
+        "Otherwise a chunk reading \"Includes 5 seats\" will never match a query about the Enterprise plan",
+        "To reduce the embedding size",
+        "So the model can cite the source in its answer",
+        "Most vector databases require it"
+      ],
+      "answer": 0,
+      "explanation": "A chunk without context loses meaning for retrieval: \"Includes 5 seats\" on its own connects to no plan. The section path inside the text makes the chunk self-contained. The source is stored as a separate field for links and verification."
+    },
+    {
+      "question": "What is the main sign of a working RAG agent?",
+      "options": [
+        "It answers any question about the product",
+        "It answers faster than without RAG",
+        "It uses every retrieved fragment in the answer",
+        "It refuses to answer when the knowledge base has no answer"
+      ],
+      "answer": 3,
+      "explanation": "The ability to say \"I don't know\" is the most valuable behavior. It needs two independent conditions: the model's insufficient_context flag and a similarity threshold in code. Without the second the first fails: under task pressure the model writes something anyway."
+    },
+    {
+      "question": "Why require every product claim to carry a source reference?",
+      "options": [
+        "So the customer can click the link in the email",
+        "So the email can be verified in a minute and any unsourced claim counts as a defect",
+        "To reduce the token count of the answer",
+        "So the model refuses to answer less often"
+      ],
+      "answer": 1,
+      "explanation": "A claim linked to a documentation chunk is verified instantly, and rejecting unsourced claims is a cheap automatic check in code. That check is exactly what would have caught the \"1C integration\" before sending."
+    }
+  ],
+  "a06": [
+    {
+      "question": "What is a golden set for an email-writing agent?",
+      "options": [
+        "A set of reference emails to compare generated ones against",
+        "A list of correct answers to customer questions",
+        "A set of inputs with reference output properties: trigger mentioned, no price, contains a question",
+        "A sample of the best emails sent this month"
+      ],
+      "answer": 2,
+      "explanation": "No two emails are identical, so reference text is useless. You fix the properties that must hold. Fifty cases suffice to catch regressions, and the most valuable part of them comes from real incidents."
+    },
+    {
+      "question": "Which condition is mandatory before trusting an LLM judge's numbers?",
+      "options": [
+        "The judge must be the same model as the generator",
+        "Scoring must use a 1–10 scale for granularity",
+        "The judge must see several answers at once",
+        "Judge–human agreement has been measured on labeled examples"
+      ],
+      "answer": 3,
+      "explanation": "An uncalibrated judge is one more unverified model in the pipeline. Measure agreement with a human on twenty cases: 8 out of 10 means it can be trusted, 5 out of 10 means you are measuring noise. The scale should be short, and the judge should not be the same model as the generator."
+    },
+    {
+      "question": "What is the most effective way to grow a golden set over time?",
+      "options": [
+        "Add every case where an email turned out bad as a named case — permanently",
+        "Generate a hundred new synthetic cases each quarter",
+        "Copy cases from public datasets for similar tasks",
+        "Grow the set to a thousand cases for statistical significance"
+      ],
+      "answer": 0,
+      "explanation": "Incidents are the most valuable part of the set: they already happened and already cost money. A named case like \"v2 regression: boilerplate opener\" becomes the team's memory. Synthetic data and other people's sets do not reflect your real data, and a thousand cases only makes each run more expensive."
+    },
+    {
+      "question": "Which of these should NOT be delegated to an LLM judge?",
+      "options": [
+        "Assessing whether the hook relies on the lead's trigger",
+        "Checking that the email is under 120 words",
+        "Assessing whether product claims are supported by facts",
+        "Assessing whether the tone fits the recipient"
+      ],
+      "answer": 1,
+      "explanation": "Length is computed by code instantly and for free — spending a model call on it is pointless. A judge is for judgments of meaning: grounding, personalization, tone. The three check levels complement each other rather than replace one another."
+    },
+    {
+      "question": "Why keep offline metrics if you already have the product metric \"share of emails sent without edits\"?",
+      "options": [
+        "Offline metrics are more accurate than product metrics",
+        "The product metric depends on the manager's mood",
+        "The product metric arrives weeks later, while prompt decisions are made today",
+        "Offline metrics are required for reporting"
+      ],
+      "answer": 2,
+      "explanation": "The product metric decides who was right but arrives late and carries market noise. An offline set answers in minutes and filters out clearly worse versions before rollout. You need both: one for speed, one for correctness."
+    }
+  ],
+  "a07": [
+    {
+      "question": "You know exactly the order of steps for gathering lead research. How should you implement it?",
+      "options": [
+        "Give the agent tools and a goal — it will choose the optimal order itself",
+        "Hard-code the order: cheaper, more predictable and easier to fix",
+        "Give the order in the prompt as a recommendation",
+        "Use an autonomous agent but with a low temperature"
+      ],
+      "answer": 1,
+      "explanation": "Autonomy is not a maturity level, it is the price of not knowing the route. If the route is known you pay in money, variance and debugging difficulty for nothing. A graph of known steps is typically 2–4× cheaper and an order of magnitude more stable."
+    },
+    {
+      "question": "When is an autonomous loop genuinely justified?",
+      "options": [
+        "When many similar records must be processed",
+        "When the task is important and should not be economized on",
+        "When several different APIs must be called",
+        "When step two depends on step one's result in an unpredictable way"
+      ],
+      "answer": 3,
+      "explanation": "The signature of an autonomy task: you cannot write the list of steps in advance because the route follows the findings. That means research, debugging and the long tail of rare cases. Volume, importance and API count have nothing to do with it."
+    },
+    {
+      "question": "The agent hit the step limit without completing the task. How do you treat that?",
+      "options": [
+        "As a normal outcome: return the partial result and record why it stopped",
+        "As an error: rerun it with a higher limit",
+        "As a sign the limit was set incorrectly",
+        "As an infrastructure failure"
+      ],
+      "answer": 0,
+      "explanation": "A budget is part of the design, not an emergency brake. Hitting the limit is logged as an ordinary outcome with a partial result; the frequency of such stops tells you where the route is genuinely hard. Auto-raising the limit takes you back to 34 calls on one company."
+    },
+    {
+      "question": "Why does an autonomous agent with web search need a domain allowlist?",
+      "options": [
+        "To speed up page loading",
+        "To reduce token spend on long pages",
+        "So the agent does not gather data from a competitor's site that happened to rank",
+        "To comply with robots.txt"
+      ],
+      "answer": 2,
+      "explanation": "An autonomous agent follows wherever the results lead and does not grasp business context. An allowlist is a structural limit: it cannot be talked around by a prompt. The same principle as tool permissions in A9."
+    },
+    {
+      "question": "Context gathering found neither job openings nor news for a lead. What should the graph do?",
+      "options": [
+        "Write about the industry in general — something is better than nothing",
+        "Refuse to generate and hand the lead to a human with the reason",
+        "Launch an autonomous agent for a deeper search",
+        "Use data from a similar company in the same industry"
+      ],
+      "answer": 1,
+      "explanation": "An email \"about your industry in general\" is noise that lowers trust in the whole campaign. An honest refusal with a reason (\"no hook: no openings found, no news\") protects reputation and gives a clear signal about data quality."
+    }
+  ],
+  "a08": [
+    {
+      "question": "Why does a single \"write a 1200-word article\" request produce smooth text about nothing?",
+      "options": [
+        "Models cannot write long texts",
+        "There is not enough context about the topic",
+        "The model juggles four different jobs at once — structure, style, facts and length — and averages them",
+        "The temperature is too low for a creative task"
+      ],
+      "answer": 2,
+      "explanation": "One large task forces the model to balance incompatible criteria. Splitting into roles gives each step one checkable criterion, its own settings and — crucially — a visible point of failure: bad plan, bad prose or a missed fact."
+    },
+    {
+      "question": "Why should the fact-checker in a pipeline not fix the problems it finds?",
+      "options": [
+        "Whoever fixes tends to justify the text — checking and fixing are separated",
+        "It adds the cost of one more call",
+        "Models write worse while also checking",
+        "The tool schema requires it"
+      ],
+      "answer": 0,
+      "explanation": "Merging the checker and fixer roles removes independence: an agent that just rewrote a paragraph is inclined to approve it. The fact-checker issues a verdict; a different call does the rewriting, receiving a concrete problem list."
+    },
+    {
+      "question": "What must a writer ↔ critic revision loop always have?",
+      "options": [
+        "The same model for both roles, for consistency",
+        "The ability for the critic to rewrite the text directly",
+        "A separate prompt for each iteration",
+        "An iteration limit and a third outcome — hand the article to a human"
+      ],
+      "answer": 3,
+      "explanation": "Without a limit two agents argue until the money runs out. The third outcome is mandatory: if the article is not ready after two passes, the problem runs deeper than the text — it is in the plan or the knowledge base, and a human should see it."
+    },
+    {
+      "question": "The planner returned a two-section plan instead of the expected five. What happens without validation?",
+      "options": [
+        "The writer will ask for the missing sections itself",
+        "The writer produces a short article and looks like the culprit",
+        "The pipeline stops with a schema error",
+        "The editor fills in the missing sections"
+      ],
+      "answer": 1,
+      "explanation": "Each role's output is validated before it moves on, otherwise the error migrates down the pipeline and surfaces where its cause is not. A minItems constraint in the plan schema is the cheapest way to prevent it."
+    },
+    {
+      "question": "When is a multi-agent pipeline NOT justified?",
+      "options": [
+        "For a blog article written once a week",
+        "For a report read by executives",
+        "For a support chat reply expected within seconds",
+        "For a document where factual accuracy matters"
+      ],
+      "answer": 2,
+      "explanation": "Splitting into roles costs latency and money: four calls instead of one. For a weekly article that is irrelevant; for an interactive reply it is fatal. The architecture choice is driven by the latency requirement as much as by quality."
+    }
+  ],
+  "a09": [
+    {
+      "question": "A lawyer asks: \"What if the agent deletes a deal in the CRM?\" Which answer is correct?",
+      "options": [
+        "The prompt says deleting is forbidden",
+        "It has no such tool and no such permission — it is impossible",
+        "We review the agent's actions afterwards in the log",
+        "The model is reliable enough not to do that"
+      ],
+      "answer": 1,
+      "explanation": "The most reliable prohibition is an absent capability. A prompt can be bypassed by injection (A15); a log records what already happened. Permissions are designed from the worst case: whatever must never happen has no tool and is blocked by the service user's role."
+    },
+    {
+      "question": "Where should the CRM API key used by the agent be stored?",
+      "options": [
+        "In the system prompt so the model can use it",
+        "In the tool description as a default parameter",
+        "In your service: the model calls the tool with lead_id and the code attaches the token",
+        "In the agent's memory with a short TTL"
+      ],
+      "answer": 2,
+      "explanation": "The model must never see a secret: otherwise it can quote it into an email or hand it over under injection. The agent works with identifiers, not keys and contacts; only the personal data the task needs enters the context."
+    },
+    {
+      "question": "A CRM write request was sent but the response did not arrive in time, so the code retries. What prevents a duplicate record?",
+      "options": [
+        "An idempotency key derived from business meaning: lead_id + message_id",
+        "Reducing the timeout so a retry is not needed",
+        "Checking before writing whether such a note already exists",
+        "Forbidding retries for write operations"
+      ],
+      "answer": 0,
+      "explanation": "A \"does it already exist\" check is racy, and forbidding retries loses data on ordinary failures. An idempotency key moves responsibility to the server: a repeat with the same key returns the first record. The key comes from the operation's meaning, not from time or uuid4()."
+    },
+    {
+      "question": "A tool returned \"lead not found\". How should that reach the model?",
+      "options": [
+        "As an exception that aborts the run",
+        "Not at all — the code handles it and continues",
+        "As an empty result, so as not to confuse the model",
+        "As the tool call's textual result, so the model sees the reason and tries differently"
+      ],
+      "answer": 3,
+      "explanation": "An error returned as a result lets the model adapt: try another identifier or report the problem. An exception kills the run; an empty result looks like \"nothing found\" and invites invention."
+    },
+    {
+      "question": "When does an MCP server genuinely help compared with a 20-line function of your own?",
+      "options": [
+        "Always — it is the industry standard",
+        "When several agents share the same tools, or the integration owner differs from the agent owner",
+        "When operations need idempotency",
+        "When tool security matters"
+      ],
+      "answer": 1,
+      "explanation": "MCP saves you from rewriting the same integrations for every agent. For one or two narrow operations your own function is simpler. And crucially: MCP removes neither permissions, nor idempotency, nor logging — it is transport, not security policy."
+    }
+  ],
+  "a10": [
+    {
+      "question": "A customer wrote \"not before December\" in January and received a fresh first-touch email in March. Why?",
+      "options": [
+        "The model ignored an instruction in the prompt",
+        "The fact was recorded in the CRM in the wrong format",
+        "The agent had no long-term memory: it received a CRM row and wrote as if for the first time",
+        "The temperature was too high"
+      ],
+      "answer": 2,
+      "explanation": "An agent without memory introduces itself anew every time — to a human that reads as disrespect. Working context lives for minutes, company knowledge is shared by everyone, and per-customer facts must be stored separately and injected into context."
+    },
+    {
+      "question": "Why not simply put the whole correspondence into context, given a 200k-token window?",
+      "options": [
+        "Cost rises, accuracy of finding the relevant part falls, and personal data spreads through the logs",
+        "Providers cap the number of messages in a dialogue",
+        "The model starts answering more slowly",
+        "Correspondence history compresses badly"
+      ],
+      "answer": 0,
+      "explanation": "Every token is billed on every call; models are worse at finding what matters in long contexts, especially in the middle; and everything that enters context enters traces and potentially the email. The right path is extracting facts, not storing transcripts."
+    },
+    {
+      "question": "What lifetime should the fact \"the customer unsubscribed\" have?",
+      "options": [
+        "30 days — then you may try again",
+        "1 year, like most role facts",
+        "Until the date the customer specified",
+        "No expiry — otherwise you will write to them again"
+      ],
+      "answer": 3,
+      "explanation": "Lifetime depends on the fact kind, and an unsubscribe is the one kind that has none. This is not a storage optimization but a requirement: an expired unsubscribe means violating a direct request, with fines and reputation damage attached."
+    },
+    {
+      "question": "In January a customer said \"not before December\", in May they wrote \"let's talk now\". What happens to the old fact?",
+      "options": [
+        "Delete it — it is no longer relevant",
+        "Mark it superseded by the new one but keep it: it explains the relationship history",
+        "Keep both active and show them to the model together",
+        "Extend the old fact's lifetime"
+      ],
+      "answer": 1,
+      "explanation": "The fresher fact wins, but the old one is not erased: it explains the relationship context and helps resolve disputes. The superseded_by mechanic gives you currency and history at the same time."
+    },
+    {
+      "question": "Where should the hard block \"the customer unsubscribed\" be enforced?",
+      "options": [
+        "In the prompt: \"do not write to people who unsubscribed\"",
+        "In the send tool schema as a required field",
+        "In code before generation: can_contact() stops the email without asking the model",
+        "In the output filter after generation"
+      ],
+      "answer": 2,
+      "explanation": "The model must not \"decide\" whether to respect a direct customer request. A check in code before generation is also cheaper: you do not pay for a call whose result cannot be sent anyway. The output filter is the last line of defense, not the first."
+    }
+  ],
+  "a11": [
+    {
+      "question": "How should autonomy be granted to an agent as trust grows?",
+      "options": [
+        "Raise the global confidence threshold above which sending is automatic",
+        "Per action type: a CRM note is auto, an email to a customer with an open deal is human-only",
+        "Per user: auto-send for experienced managers, approval for new ones",
+        "By time of day: approval during the day, automatic at night"
+      ],
+      "answer": 1,
+      "explanation": "The cost of a mistake varies by action type, not by user or time. Splitting by action lets you grow gradually instead of jumping from \"check everything\" to \"check nothing\", and answers precisely where the risk sits."
+    },
+    {
+      "question": "A manager approves twenty emails in two minutes without opening them. What does that mean?",
+      "options": [
+        "Quality has reached the point where review is unnecessary",
+        "The manager is experienced enough to judge emails by subject line",
+        "Auto-send share should be increased — the gate is in the way",
+        "The gate became fiction: responsibility formally moved, nobody actually reviewed"
+      ],
+      "answer": 3,
+      "explanation": "This is the worst possible outcome: the system believes a human reviewed, and nobody read anything. The cause is usually the interface — approval takes too long, or every email looks equally confident (see A18). A gate people click through is worse than no gate."
+    },
+    {
+      "question": "Which human-in-the-loop mode best fits high-volume reversible actions?",
+      "options": [
+        "Delayed send with a cancel window",
+        "Approval of every action before execution",
+        "A 10% sample reviewed after sending",
+        "Fully automatic sending with alerts"
+      ],
+      "answer": 0,
+      "explanation": "A cancel window gives almost the speed of automation while keeping the brake: the human sees the queue and can pull any email. Per-action approval is for irreversible actions; sampled review is for cheap, frequent ones."
+    },
+    {
+      "question": "What must an audit trail have to carry evidentiary weight a year later?",
+      "options": [
+        "A PDF export signed by the responsible person",
+        "Storage in a separate database with daily backups",
+        "Append-only with verifiable integrity: retroactive edits are detectable",
+        "Duplicated records in the monitoring system"
+      ],
+      "answer": 2,
+      "explanation": "A log that can be edited retroactively proves nothing. A hash chain makes any substitution detectable. Plus the mandatory fields: what was sent, who authorized it (human or rule), on what basis, and which prompt version ran."
+    },
+    {
+      "question": "An email went out automatically after the cancel window expired. What goes in the \"authorized by\" field?",
+      "options": [
+        "The name of the manager the lead is assigned to",
+        "The auto-send rule — so a year later it is clear no human looked",
+        "The name of the engineer who configured the system",
+        "It can be left empty — no human was involved"
+      ],
+      "answer": 1,
+      "explanation": "A missing record is a gap, not proof. An explicit \"rule:auto_send_after_hold\" honestly shows an auditor that a rule decided, not a person. Attributing it to the manager is a distortion that surfaces at the first dispute."
+    }
+  ],
+  "a12": [
+    {
+      "question": "Which cost lever delivers the most for the least work?",
+      "options": [
+        "Model routing: classification and extraction on the small model",
+        "Batching all requests",
+        "Shortening the system prompt",
+        "Reducing max_tokens in responses"
+      ],
+      "answer": 0,
+      "explanation": "The stricter the output contract, the smaller the model you need: enum classification and field extraction work well on the small one. Verify on the golden set: 1% quality loss for a 5× saving is a yes; a 15% loss is not."
+    },
+    {
+      "question": "Why did prefix caching not work even though you enabled it?",
+      "options": [
+        "Caching only works for models in the same family",
+        "The variable part of the context came first and the stable part after",
+        "The prefix was below the minimum size threshold",
+        "A non-zero temperature disables caching"
+      ],
+      "answer": 1,
+      "explanation": "It is the prefix that gets cached, so the start of the request must be stable. The order is: system with examples and shared docs → customer memory → lead data. Putting variable content first is the most common mistake here."
+    },
+    {
+      "question": "What does the escalation pattern buy you in model routing?",
+      "options": [
+        "Automatic failover to another provider",
+        "Faster answers through parallel calls",
+        "Large-model quality at small-model prices for most cases",
+        "Fewer tokens in the prompt"
+      ],
+      "answer": 2,
+      "explanation": "The small model answers and returns a confidence; below a threshold the task escalates to the large one. Expensive calls are spent only on hard cases, which are usually the minority. Failover on outages is the circuit breaker from A13."
+    },
+    {
+      "question": "What should you NOT economize on when optimizing agent cost?",
+      "options": [
+        "The length of conversation history in context",
+        "The model used for inbox classification",
+        "Caching of shared documentation",
+        "The fact-checker and the evals"
+      ],
+      "answer": 3,
+      "explanation": "Checks and evals cost pennies against the consequences: one claim about a non-existent integration costs more than a month of fact-checking. Refusing to generate is the cheapest call of all. Economize on context, on models for simple tasks, and on paying repeatedly for an identical prefix."
+    },
+    {
+      "question": "Why keep a daily spend budget if you already optimized cost?",
+      "options": [
+        "Providers require you to declare a limit",
+        "It turns a future surprise invoice into a clear error today",
+        "It speeds up queue processing",
+        "It qualifies you for a predictable-volume discount"
+      ],
+      "answer": 1,
+      "explanation": "Optimization lowers the average cost but does not protect against a loop that suddenly makes ten times more calls. The cap is a fuse: it stops the spend the same day rather than revealing it at month's end."
+    }
+  ],
+  "a13": [
+    {
+      "question": "The model provider is answering every other request and three thousand tasks started retrying at once. What should have stopped this?",
+      "options": [
+        "Longer pauses between retries",
+        "A cap on the number of workers",
+        "A circuit breaker: after a run of failures the circuit opens and requests stop entirely",
+        "Failover to a backup provider"
+      ],
+      "answer": 2,
+      "explanation": "Backoff retries protect against a single failure, but in a mass outage they only finish off both the provider and you. A breaker counts recent failures, stops trying for a minute past the threshold, then lets one probe through."
+    },
+    {
+      "question": "A worker died after sending the email but before recording \"sent\". The next worker picks up the task. What prevents a second email?",
+      "options": [
+        "A business-meaning task key (lead + campaign) claimed before acting",
+        "A transaction wrapping the send and the record",
+        "A longer worker timeout",
+        "Checking the mailbox for whether it was already sent"
+      ],
+      "answer": 0,
+      "explanation": "A transaction does not span the external system, and a mailbox check is subject to delays. A key claimed before acting closes 99% of duplicates. Crucially it derives from the task's meaning: a uuid4() per run protects against nothing."
+    },
+    {
+      "question": "What should the system do in \"stopped\" mode when models are unavailable?",
+      "options": [
+        "Reject incoming tasks with a clear error",
+        "Keep accepting tasks and queue them — nothing is lost",
+        "Fall back to template replies without a model",
+        "Halt all processes until recovery"
+      ],
+      "answer": 1,
+      "explanation": "Losing an inbound email is worse than triaging it two hours later. Even in the worst mode, intake continues and processing is deferred. Between \"everything works\" and \"everything is down\" there must be a third mode: degraded, with partial functionality."
+    },
+    {
+      "question": "Why does a task need an overall time budget if every call already has a timeout?",
+      "options": [
+        "So the provider does not reject long requests",
+        "To fit within queue limits",
+        "So retries can happen inside the budget",
+        "Because a sum of reasonable timeouts becomes minutes: five steps at 30 seconds is two and a half minutes"
+      ],
+      "answer": 3,
+      "explanation": "Individual timeouts do not add up to an acceptable total. The budget is checked mid-flight: if context gathering ate 60% of the time, the task is queued rather than starting a generation that will not finish anyway."
+    },
+    {
+      "question": "How do you confirm that failure handling actually works?",
+      "options": [
+        "Review the code and cover it with unit tests",
+        "Run a drill: stub the provider and push a hundred tasks through",
+        "Wait for the next real outage and observe the behavior",
+        "Set up alerts for every error type"
+      ],
+      "answer": 1,
+      "explanation": "A drill is the only way to measure three numbers: wasted requests after the breaker tripped (near zero), tasks lost (zero), duplicates created in external systems (zero). Code review cannot show you that."
+    }
+  ],
+  "a14": [
+    {
+      "question": "Why are ordinary \"input — output — exception\" logs not enough for an agent?",
+      "options": [
+        "Logs take up too much space",
+        "Ordinary logs do not support structured data",
+        "Agents are non-deterministic and the fault may lie in any step: retrieval, memory, prompt or model",
+        "Logs are written asynchronously and lose ordering"
+      ],
+      "answer": 2,
+      "explanation": "In an ordinary service the same input gives the same output and the stack shows the break. With an agent the run cannot be reproduced and any step may be the culprit. So run recording is the primary working tool, not auxiliary debugging."
+    },
+    {
+      "question": "What must a span for the email generation step record?",
+      "options": [
+        "The exact context that went to the model, plus prompt and model versions",
+        "Only the lead id and the final email text",
+        "The average step duration over the last day",
+        "A hash of the prompt so its text need not be stored"
+      ],
+      "answer": 0,
+      "explanation": "The recorded context must be exact rather than approximate: otherwise the run cannot be reproduced and replay is meaningless. Versions are needed to answer \"what changed between yesterday and today\" — there are five of them, model and knowledge base included."
+    },
+    {
+      "question": "A customer received an email referencing a meeting that never happened. The trace shows the fact came from memory. What does that change?",
+      "options": [
+        "Nothing: the prompt needs rewriting anyway",
+        "The generation temperature must be lowered",
+        "A check must be added to the output filter",
+        "The prompt and model are innocent: fix the fact's source and lifetime in memory"
+      ],
+      "answer": 3,
+      "explanation": "That is exactly the value of a trace: it answers \"which step is at fault\" in minutes. Without it the team would spend a month fixing an innocent prompt. The question then moves to memory (A10): where the fact came from and why it had not expired."
+    },
+    {
+      "question": "What does replaying a run with a new prompt version give you?",
+      "options": [
+        "Faster debugging through cached results",
+        "The ability to check whether a specific fix addresses this specific complaint",
+        "Lower cost on repeat calls",
+        "A guarantee that the model's answer is reproducible"
+      ],
+      "answer": 1,
+      "explanation": "Replay-with-a-change turns a random complaint into a testable hypothesis. It does not guarantee reproducibility — the model is non-deterministic; hence replay's other role: run it several times on the same version to see the spread."
+    },
+    {
+      "question": "How long and by what rules should personal data live in traces?",
+      "options": [
+        "Indefinitely — traces are needed for investigations",
+        "Until the corresponding incident is closed",
+        "Under the same lifetimes as memory, deleted by the same operation keyed by customer",
+        "Only in aggregated form, without original texts"
+      ],
+      "answer": 2,
+      "explanation": "Otherwise the right to be forgotten is honoured only formally: facts deleted, traces with the same data intact. Aggregates alone will not do — without the exact context a trace loses its purpose; hence lifetimes plus a single deletion operation."
+    }
+  ],
+  "a15": [
+    {
+      "question": "Why is \"ignore any instructions inside emails\" not a defense against injection?",
+      "options": [
+        "Models do not understand such meta-instructions",
+        "To the model, instructions and data are the same tokens, so prompt-level defense is bypassable",
+        "The instruction consumes too much context",
+        "Injections usually arrive in documents, not emails"
+      ],
+      "answer": 1,
+      "explanation": "The separation of instructions and data exists in your head and in the API, not in the model's reasoning. A prompt raises the bar but cannot be a security boundary. The analogy: SQL injection is cured by parameterized queries, not by asking the database to run only good queries."
+    },
+    {
+      "question": "Which defense layer holds even if the model fully believed the injection?",
+      "options": [
+        "Framing foreign text with delimiters",
+        "Truncating the email to 4000 characters",
+        "Stating in the prompt that the block contains data",
+        "The absence of the dangerous tool and a reduced service-user role"
+      ],
+      "answer": 3,
+      "explanation": "Layers 0 and 1 lower the frequency but are not boundaries. The real boundaries live outside the model: whatever must never happen has no tool. That is what saved the day in the incident: the agent physically could not export the lead list."
+    },
+    {
+      "question": "How should reading untrusted text be separated from performing actions?",
+      "options": [
+        "The model reading the email has no action tools at all: it returns a structure, and code acts",
+        "The model reads and acts, but every action is human-approved",
+        "Use two models: a small one for reading, a large one for acting",
+        "Foreign text is sanitized with regexes before reaching the model"
+      ],
+      "answer": 0,
+      "explanation": "Separating \"understand\" from \"act\" is the strongest practical technique: a model with no tools cannot do anything an injection asks, while code acts on a validated structure with a closed enum and never sees the original text."
+    },
+    {
+      "question": "What is the classic signature of a successful injection in a trace?",
+      "options": [
+        "A sharp rise in request token count",
+        "The model returned an off-schema response",
+        "The agent suddenly acts on an object unrelated to the current task",
+        "The run took longer to execute"
+      ],
+      "answer": 2,
+      "explanation": "An action on an unrelated lead signals the agent is working on something other than what it was started for. Checking argument consistency against the run context catches this regardless of the prompt, turning a silent leak into a blocked call."
+    },
+    {
+      "question": "Why have an output filter if the agent's permissions are already reduced?",
+      "options": [
+        "It duplicates the permission check in case of misconfiguration",
+        "Permissions limit actions, while the filter catches data leaking through the reply text itself",
+        "It speeds up sending through pre-validation",
+        "Security standards require it"
+      ],
+      "answer": 1,
+      "explanation": "An injection may ask not for actions but for context contents to be included in the reply: other customers' memory, identifiers, internal addresses. The output filter checks the text for secrets and foreign ids before sending — the last line before the customer."
+    }
+  ],
+  "a16": [
+    {
+      "question": "What gets versioned in an agentic system besides code?",
+      "options": [
+        "Only the prompt",
+        "The prompt and tool schemas",
+        "The prompt, model version, tool schemas and the RAG knowledge base",
+        "The prompt and temperature settings"
+      ],
+      "answer": 2,
+      "explanation": "Five independent things define behavior, and two of them change without you: the provider can update the model and marketing can update the knowledge base. So pin the model version explicitly and write all five into the trace, or \"what changed\" has no answer."
+    },
+    {
+      "question": "In the canary, the refusal rate dropped from 12% to 1% while golden-set quality rose. What do you do?",
+      "options": [
+        "Stop the rollout and investigate: the agent probably stopped admitting ignorance",
+        "Roll out to 100% — both metrics improved",
+        "Hold the current share and observe for a week",
+        "Raise the confidence threshold and continue"
+      ],
+      "answer": 0,
+      "explanation": "A sharp improvement is a reason to investigate, not to celebrate. A collapse in refusals usually means lost caution: the agent started writing where it previously refused honestly. That is exactly what v4 did on leads with no trigger."
+    },
+    {
+      "question": "Why is a new version enabled by config rather than by deploy?",
+      "options": [
+        "Deploys take too long",
+        "Rollback needs no deploy and takes seconds, and one build serves both versions so the comparison is fair",
+        "Continuous integration practice requires it",
+        "Config is easier to version than code"
+      ],
+      "answer": 1,
+      "explanation": "Deploy and release are separated because you switch agent versions often: quality is not binary. Plus one build for both branches removes environment differences that would make the comparison unreliable."
+    },
+    {
+      "question": "You rolled the canary back, but tasks started on the new version remain in the queue. How should they finish?",
+      "options": [
+        "Restart them from scratch on the stable version",
+        "Cancel them and requeue as new tasks",
+        "Wait and process them manually",
+        "Finish on the version pinned at the task's start"
+      ],
+      "answer": 3,
+      "explanation": "The version is pinned when the task starts and lives with it, or you get a hybrid result: context gathered under one set of rules, the email written under another. Restarting is possible but costs more and risks breaking idempotency."
+    },
+    {
+      "question": "What does pinning an explicit model version instead of \"latest\" mean?",
+      "options": [
+        "Higher request costs",
+        "No access to provider improvements",
+        "Your behavior does not change until you decide to upgrade",
+        "A mandatory manual update every month"
+      ],
+      "answer": 2,
+      "explanation": "\"Latest\" means the provider can change your system's behavior without you — and you learn about it from users. An explicit version makes the upgrade your deliberate step, going through the canary like any other change."
+    }
+  ],
+  "a17": [
+    {
+      "question": "Which quality feedback source is the cheapest and most precise?",
+      "options": [
+        "A monthly survey of managers",
+        "The edits a human makes to a draft before sending",
+        "👍/👎 buttons under each email",
+        "The reply rate from customers"
+      ],
+      "answer": 1,
+      "explanation": "An edit is ready-made labeling of \"before / after / who / when\" that requires no asking. Not everyone clicks buttons, a survey yields impressions, and outcomes arrive weeks later with market noise. Edits simply need to be stored."
+    },
+    {
+      "question": "What makes an error taxonomy useful?",
+      "options": [
+        "Having as many types as possible for granularity",
+        "Matching the categories of customer complaints",
+        "Having the model define them from its analysis",
+        "Having 5–8 of them, distinguished by how they are fixed"
+      ],
+      "answer": 3,
+      "explanation": "\"Bad email\" is not a type because the fix is unclear. \"The hook is unrelated to the lead's trigger\" is a type: fix the context collector or require a source for the hook. An over-fragmented taxonomy gives no statistics for any single type."
+    },
+    {
+      "question": "Error type A occurs in 15% of cases, type B in 6%, but B costs twenty times more per occurrence. What do you fix first?",
+      "options": [
+        "B: priority is frequency × cost",
+        "A: it happens more often, so it affects more customers",
+        "Both at once, to save time",
+        "Whichever gets complained about loudest"
+      ],
+      "answer": 0,
+      "explanation": "6 × 20 = 120 versus 15 × 1 = 15. Priority is computed, not debated, and complaint volume has nothing to do with it. Fixing two things in parallel removes your ability to tell which one helped."
+    },
+    {
+      "question": "Why does the weekly review read five random runs in full, good ones included?",
+      "options": [
+        "To verify that the metrics are correct",
+        "To train new team members",
+        "That is where you find what no metric shows",
+        "To collect examples for the golden set"
+      ],
+      "answer": 2,
+      "explanation": "Metrics show what you already thought to measure. Reading in full is the only way to notice something new: an odd tone in a specific industry, an awkward signature format, a repeated phrase. Good runs are read to understand what is actually working."
+    },
+    {
+      "question": "When is the improvement loop considered closed?",
+      "options": [
+        "When every edit automatically becomes a prompt change",
+        "When everything is automated except deciding what to fix",
+        "When the unedited-email share stops growing",
+        "When the model proposes prompt improvements itself"
+      ],
+      "answer": 1,
+      "explanation": "Collecting edits, classifying them, growing the golden set, the canary and the measurement are all automated. Deciding what to fix stays human: it is a business-priority question, not a data question. Auto-converting edits into prompt changes is a direct path to uncontrolled behavior drift."
+    }
+  ],
+  "a18": [
+    {
+      "question": "Two managers approve everything without looking, two rewrite every email. What is the cause?",
+      "options": [
+        "Different experience levels — more training is needed",
+        "Email quality genuinely differs across segments",
+        "Every email looks equally confident, so people pick one strategy for all cases",
+        "The interface is too complex for quick assessment"
+      ],
+      "answer": 2,
+      "explanation": "Both extremes follow from one defect: the interface does not distinguish \"I am sure\" from \"I assembled this from nothing\". The goal is not to raise trust but to make it accurate: attention should go where the system is unsure."
+    },
+    {
+      "question": "What is the most effective way to convey an agent's uncertainty to a human?",
+      "options": [
+        "A confidence number next to the email",
+        "Colour-coding the email text",
+        "A detailed explanation of why the model is unsure",
+        "Changing interface behavior: confident ones in a batch, doubtful ones one at a time with highlighting"
+      ],
+      "answer": 3,
+      "explanation": "People are not calibrated on probabilities and soon stop noticing numbers. Changing the interface itself acts before the person starts reading: batch approval is simply unavailable for doubtful emails."
+    },
+    {
+      "question": "Why is showing the model's \"chain of thought\" more dangerous than showing evidence?",
+      "options": [
+        "Coherent reasoning raises trust regardless of whether the conclusion is right",
+        "Reasoning takes up too much screen space",
+        "Users do not read long explanations",
+        "Reasoning exposes prompt details"
+      ],
+      "answer": 0,
+      "explanation": "A convincing explanation of a wrong email is more dangerous than none. Evidence — a hook linked to the careers page, claims linked to documentation, check results — is verifiable in seconds, while reasoning can only be believed."
+    },
+    {
+      "question": "How do you verify that the interface's confidence signal is useful at all?",
+      "options": [
+        "Ask managers whether the indicator helps them",
+        "Compare edit rates in the confident and attention groups: if equal, the signal is useless",
+        "Measure how often users open emails from the confident group",
+        "Check the signal's correlation with customer replies"
+      ],
+      "answer": 1,
+      "explanation": "A signal is useful only if it separates cases by actual quality. If \"confident\" gets edited as much as \"needs attention\", you drew decoration. User opinion is secondary here: they judge convenience, not calibration."
+    },
+    {
+      "question": "Why does accessible undo build more trust than explanations?",
+      "options": [
+        "It lets more errors be corrected",
+        "It reduces the review workload",
+        "Someone who knows they can stop an action is calmer about automation and intervenes less",
+        "Regulators require it"
+      ],
+      "answer": 2,
+      "explanation": "A paradox confirmed in practice: the ability to cancel lowers intervention frequency. Undo changes the relationship from \"I must check everything\" to \"I can step in if needed\" — which frees attention for the genuinely doubtful cases."
+    }
+  ],
+  "a19": [
+    {
+      "question": "What is most often left out of an agentic solution's cost?",
+      "options": [
+        "Infrastructure and storage spend",
+        "Token costs at peak load",
+        "Amortized build cost",
+        "People's time: engineer support and manager review"
+      ],
+      "answer": 3,
+      "explanation": "The provider invoice is less than half the spend. The rule: if a human does it, it is part of the cost. Reviewing emails is not free just because no invoice arrives, and it must be subtracted from the claimed saving."
+    },
+    {
+      "question": "Why are saved hours and projected incremental revenue shown in separate lines?",
+      "options": [
+        "Accounting standards require it",
+        "They carry different reliability: hours you measured, revenue you only estimated",
+        "Revenue belongs to a different budget period",
+        "It is easier to align with the sales department"
+      ],
+      "answer": 1,
+      "explanation": "A blended figure reads like an attempt to sell the project, and the finance person stops trusting the whole model. Separating them shows you understand the difference between measured and estimated — which raises trust in the rest."
+    },
+    {
+      "question": "How should the value of freed manager time be phrased correctly?",
+      "options": [
+        "\"We freed 64 hours a month that went into working meetings\"",
+        "\"We save $1600 a month in salary\"",
+        "\"We reduced headcount need by one person\"",
+        "\"We raised the department's productivity by 40%\""
+      ],
+      "answer": 0,
+      "explanation": "Igor is not leaving and his salary does not shrink — he spends the time elsewhere. The engineer reports measured hours and where they went; the finance person converts to money by their own rules. A salary-saving claim destroys trust in the model at the first question."
+    },
+    {
+      "question": "Why include a risk section in the CFO memo?",
+      "options": [
+        "Internal policy requires it",
+        "To pre-justify possible incidents",
+        "\"Worst case and what holds it back\" raises trust in the rest of the numbers",
+        "To justify a request for extra budget"
+      ],
+      "answer": 2,
+      "explanation": "The finance person will ask anyway — better to bring the answer yourself. An honestly named risk with its controls shows you understand the whole system; dodging the topic casts doubt on the pleasant numbers too."
+    },
+    {
+      "question": "Which criterion most strongly favours \"build\" over \"buy\"?",
+      "options": [
+        "Having your own engineering team",
+        "Quality depends on your data, processes and context",
+        "The vendor subscription costs more than your estimate",
+        "Security policy forbids external vendors"
+      ],
+      "answer": 1,
+      "explanation": "If the task is common and the data generic — buy. If quality is determined by your data, integrations and processes, a vendor cannot reproduce them. The honest answer is often hybrid: buy the platform, build what depends on your data."
+    }
+  ],
+  "a20": [
+    {
+      "question": "What is most often underestimated when turning an internal agent into a product?",
+      "options": [
+        "The cost of billing and subscriptions",
+        "The need for user documentation",
+        "Data isolation between customers and configurability for their context",
+        "Response-time requirements"
+      ],
+      "answer": 2,
+      "explanation": "A product is not the internal tool plus billing. Multi-tenancy and configurability usually take more work than everything built in a year: someone else's CRM, their knowledge base, their prohibitions, their tone, plus SLA and onboarding."
+    },
+    {
+      "question": "How should an architecture review with the CTO begin?",
+      "options": [
+        "With the most likely failure scenario and what holds it back",
+        "With a component diagram of the system",
+        "With quality and cost metrics",
+        "With a description of what the system can do"
+      ],
+      "answer": 0,
+      "explanation": "A review where the engineer names the main risk goes faster: the risk gets discussed rather than hunted. The \"what the system does not do\" section works the same way — explicit limits show understanding, not weakness."
+    },
+    {
+      "question": "Which pricing model best suits the first sales of an agentic product?",
+      "options": [
+        "Per seat only — predictable for the customer",
+        "A platform fee plus metered volume with a cap",
+        "Outcome-only — the customer pays per meeting",
+        "A one-off licence with support"
+      ],
+      "answer": 1,
+      "explanation": "The cap removes the buyer's main fear — \"what if it generates ten thousand dollars' worth\". Outcome-only pricing runs into attribution disputes, and per-seat reflects value poorly when the agent works without daily human involvement."
+    },
+    {
+      "question": "Which condition is critical for a pilot that ends in a purchase?",
+      "options": [
+        "Covering as much product functionality as possible",
+        "Being free for the customer throughout",
+        "Daily involvement of your engineer",
+        "A success criterion written and agreed before the start, run on the customer's data"
+      ],
+      "answer": 3,
+      "explanation": "A pilot without a written criterion ends in an argument about whether it succeeded. Demo data hides the crucial thing: that your RAG cannot digest their documentation. And you need a named owner on the customer side — a pilot without one ends in nothing."
+    },
+    {
+      "question": "Why prepare security-questionnaire answers before the first deal?",
+      "options": [
+        "SOC 2 certification requires them",
+        "Without them you cannot onboard a model provider",
+        "The questionnaire arrives when the deal is already in flight and delays it by months without prepared answers",
+        "They must be attached to the commercial proposal"
+      ],
+      "answer": 2,
+      "explanation": "The questions are predictable: storage and jurisdiction, employee access, deletion on termination, DPA and sub-processors (the model provider is one!), training on customer data, tenant isolation, SOC 2 plans. Prepared in advance, they turn months into days."
+    }
   ]
 }

@@ -25,7 +25,7 @@
       "ретраи"
     ],
     "free": true,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a03",
@@ -39,7 +39,7 @@
       "маршрутизация"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a04",
@@ -53,7 +53,7 @@
       "guardrails"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a05",
@@ -67,7 +67,7 @@
       "поиск"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a06",
@@ -81,7 +81,7 @@
       "LLM-as-judge"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a07",
@@ -95,7 +95,7 @@
       "автономия"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a08",
@@ -109,7 +109,7 @@
       "критик"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a09",
@@ -123,7 +123,7 @@
       "интеграции"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a10",
@@ -137,7 +137,7 @@
       "приватность"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a11",
@@ -151,7 +151,7 @@
       "гейты"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a12",
@@ -165,7 +165,7 @@
       "роутинг"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a13",
@@ -179,7 +179,7 @@
       "fallback"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a14",
@@ -193,7 +193,7 @@
       "отладка"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a15",
@@ -207,7 +207,7 @@
       "изоляция"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a16",
@@ -221,7 +221,7 @@
       "откат"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a17",
@@ -235,7 +235,7 @@
       "процесс"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a18",
@@ -249,7 +249,7 @@
       "продукт"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a19",
@@ -263,7 +263,7 @@
       "бизнес"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "a20",
@@ -277,6 +277,6 @@
       "архитектура"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   }
 ]
