@@ -511,5 +511,233 @@
       "answer": 1,
       "explanation": "Searching the original name alone misses calls that go through wrappers. The guide describes the two-step technique: collect all exported names first, then run a search for each of them."
     }
+  ],
+  "c10": [
+    {
+      "question": "A new team member does not receive the testing conventions, although they work for the person who wrote them. The most likely cause?",
+      "options": [
+        "The conventions are in ~/.claude/CLAUDE.md — user level, which does not reach version control",
+        "The new member did not run /memory after cloning",
+        "The CLAUDE.md file is too large and gets truncated on load",
+        "Conventions must be duplicated in every subdirectory"
+      ],
+      "answer": 0,
+      "explanation": "User-level settings apply only to their owner and are not shared with teammates via version control. Team standards belong in the project CLAUDE.md or .claude/CLAUDE.md in the repository."
+    },
+    {
+      "question": "Test files are spread across the codebase next to their components. How do you apply shared conventions to them?",
+      "options": [
+        "Create a CLAUDE.md in every directory that contains tests",
+        "A file in .claude/rules/ with frontmatter paths: [\"**/*.test.tsx\"]",
+        "Add the conventions to the root CLAUDE.md so they always load",
+        "Use @import from every directory-level CLAUDE.md"
+      ],
+      "answer": 1,
+      "explanation": "Rules with glob patterns in the paths field apply to files by type regardless of directory. The guide recommends them over directory CLAUDE.md files exactly when conventions cover files spread across the codebase."
+    },
+    {
+      "question": "The root CLAUDE.md has grown to 900 lines and loads in full in every session. What do you do?",
+      "options": [
+        "Shorten it by dropping the less important rules",
+        "Split it into topic files in .claude/rules/ and scope them with paths or wire them with @import",
+        "Move some of the rules to user level",
+        "Increase the model context window"
+      ],
+      "answer": 1,
+      "explanation": "Modular organisation solves both problems: the rules become readable, and path scoping keeps irrelevant rules out of the session, saving context and tokens."
+    },
+    {
+      "question": "An agent behaves inconsistently across sessions and it is unclear which instructions apply. Where do you start?",
+      "options": [
+        "Clear the context and start a fresh session",
+        "Run /memory and see which memory files are loaded",
+        "Check the Claude Code version",
+        "Delete the user-level CLAUDE.md"
+      ],
+      "answer": 1,
+      "explanation": "The /memory command shows the memory files actually loaded. It is the direct way to see which hierarchy levels took effect and to explain the divergence."
+    },
+    {
+      "question": "In a monorepo each package has its own standards. How do you wire the relevant standards files into a package CLAUDE.md?",
+      "options": [
+        "Copy the relevant sections into each package CLAUDE.md",
+        "Use @import to include only the standards files relevant to that package domain",
+        "Put every standard in the root CLAUDE.md",
+        "Create one paths rule per file in the package"
+      ],
+      "answer": 1,
+      "explanation": "The @import syntax keeps CLAUDE.md modular: the package maintainer selectively includes the standards files for their domain, without copying text or loading other teams rules."
+    }
+  ],
+  "c11": [
+    {
+      "question": "A codebase-analysis skill produces two hundred lines of output that clutter the main session. What do you configure?",
+      "options": [
+        "context: fork in the frontmatter — the skill runs in an isolated sub-agent context",
+        "Add a request to be more concise to the skill body",
+        "allowed-tools restricted to Read",
+        "Invoke the skill in a separate session and copy the result over manually"
+      ],
+      "answer": 0,
+      "explanation": "The context: fork option exists for exactly this: the skill runs in an isolated context and its verbose or exploratory output never reaches the main conversation."
+    },
+    {
+      "question": "You need to guarantee a migration skill cannot execute commands and can only write files. How?",
+      "options": [
+        "State the prohibition on executing commands in the skill body",
+        "Set allowed-tools in the frontmatter, leaving only file operations",
+        "Run the skill with context: fork",
+        "Add a rule to the project CLAUDE.md"
+      ],
+      "answer": 1,
+      "explanation": "allowed-tools restricts tool access for the duration of skill execution — a guarantee at the configuration level. A prohibition in text remains a request with a non-zero failure rate."
+    },
+    {
+      "question": "A changelog command must be available to every developer on the project. Where does it go?",
+      "options": [
+        "~/.claude/commands/changelog.md",
+        ".claude/commands/changelog.md in the repository",
+        ".claude/skills/changelog/SKILL.md with context: fork",
+        "Into the root CLAUDE.md as an instructions section"
+      ],
+      "answer": 1,
+      "explanation": "Project-scoped slash commands live in .claude/commands/ and are shared via version control. The user scope ~/.claude/commands/ is for personal commands and is invisible to colleagues."
+    },
+    {
+      "question": "You want to tune a shared review skill for yourself without breaking colleagues. The correct way?",
+      "options": [
+        "Change the shared skill in the repository and warn the team",
+        "Create a personal variant in ~/.claude/skills/ under a different name",
+        "Create a personal variant in ~/.claude/skills/ with the same name so it overrides the shared one",
+        "Copy the skill into a separate repository branch"
+      ],
+      "answer": 1,
+      "explanation": "Personal customisation is a variant in the user scope, and specifically under a different name: identical names make it ambiguous which skill actually ran."
+    },
+    {
+      "question": "The standard \"every service logs errors with structured context\" must always apply. Where does it belong?",
+      "options": [
+        "In a skill with an argument-hint, invoked before edits",
+        "In CLAUDE.md — it is a universal, always-loaded standard",
+        "In a slash command invoked before each commit",
+        "In the allowed-tools of every project skill"
+      ],
+      "answer": 1,
+      "explanation": "The distinction is how they activate: CLAUDE.md is always-loaded universal standards, while skills and commands are on-demand invocation for a specific task. A permanently applicable rule belongs to the former."
+    }
+  ],
+  "c12": [
+    {
+      "question": "There is a clear stack trace: the function crashes on an empty date value, a two-line fix in a single file. What do you choose?",
+      "options": [
+        "Plan mode — any change is safer when planned",
+        "Direct execution — a simple change with clear scope",
+        "Plan mode followed by direct execution",
+        "An Explore subagent for a full module analysis"
+      ],
+      "answer": 1,
+      "explanation": "Direct execution suits simple, well-scoped changes: a clear cause, one file, an obvious fix. Planning here adds time without reducing risk."
+    },
+    {
+      "question": "A library migration touches 45 files and there are two integration approaches with different infrastructure requirements. What do you do?",
+      "options": [
+        "Direct execution: describe the task in detail and run it",
+        "Plan mode to investigate and choose the approach, then direct execution of the chosen plan",
+        "Split into 45 per-file tasks and work through them sequentially",
+        "Start with direct execution and switch to plan mode at the first problem"
+      ],
+      "answer": 1,
+      "explanation": "Every plan mode signal is present: scale, many files, multiple valid approaches, architectural implications. The guide separately describes the combination: planning for investigation, direct execution for implementing the choice."
+    },
+    {
+      "question": "The discovery phase of a multi-phase task produces a lot of output and risks exhausting the context. What do you apply?",
+      "options": [
+        "The Explore subagent: isolate verbose discovery and return a summary to the main session",
+        "Raise the iteration limit of the main agent",
+        "Split the task across several sessions and carry the conclusions over by hand",
+        "Disable file reading and work from search alone"
+      ],
+      "answer": 0,
+      "explanation": "The Explore subagent exists precisely to isolate verbose discovery output: a summary returns to the main conversation and the context window survives into implementation."
+    },
+    {
+      "question": "A prose description of a transformation is interpreted differently from iteration to iteration. What works best?",
+      "options": [
+        "Rewrite the description in more detail and more strictly",
+        "Give 2–3 concrete input/output examples",
+        "Lower the model temperature",
+        "Break the description into numbered steps"
+      ],
+      "answer": 1,
+      "explanation": "The guide names concrete input/output examples as the most effective way to communicate an expected transformation when prose is read inconsistently. A longer description usually introduces new ambiguities."
+    },
+    {
+      "question": "Four problems are found in the code: two that interact (a date format and the sorting that depends on it) and two independent ones. How do you hand them over?",
+      "options": [
+        "All four in one message — it is faster",
+        "All four one at a time — it is safer",
+        "The interacting ones in a single detailed message, the independent ones sequentially",
+        "The independent ones together first, then the interacting ones one at a time"
+      ],
+      "answer": 2,
+      "explanation": "The rule depends on interaction: if fixing one problem changes the conditions for another, describe them together or the work will be redone. Independent problems dumped into one message dilute attention."
+    }
+  ],
+  "c13": [
+    {
+      "question": "The automated review job sometimes hangs until timeout: the log shows the agent asked a clarifying question. What do you fix?",
+      "options": [
+        "Raise the job timeout",
+        "Run Claude Code with the -p (--print) flag for non-interactive mode",
+        "Add a request to the prompt not to ask questions",
+        "Move the job to a self-hosted runner with a longer time limit"
+      ],
+      "answer": 1,
+      "explanation": "The -p (--print) flag puts Claude Code in non-interactive mode: it performs the task and prints the result without requesting input. A prompt request leaves a non-zero chance of a question, and a longer timeout merely delays the hang."
+    },
+    {
+      "question": "Review results must be posted as inline PR comments, but the free-text parser breaks whenever the wording changes. What do you apply?",
+      "options": [
+        "--output-format json together with --json-schema for machine-parseable structured output",
+        "More robust regular expressions and text normalisation",
+        "A prompt request to always keep one format",
+        "A second model call to post-process the output"
+      ],
+      "answer": 0,
+      "explanation": "The --output-format json and --json-schema flags produce output of a known shape suitable for automated posting. That removes prose parsing as a class of problem."
+    },
+    {
+      "question": "After three consecutive commits the review posted the same findings three times. How is that fixed?",
+      "options": [
+        "Run the review only on the final commit before merge",
+        "Delete the bot previous comments before each new run",
+        "Include prior findings in the context and instruct it to report only new or still-unaddressed issues",
+        "Hash the finding text and drop repeats in the posting script"
+      ],
+      "answer": 2,
+      "explanation": "The guide describes exactly this: when re-running after new commits, include prior findings in context with an instruction to report only what is new or unaddressed. The model then avoids duplicating, rather than a script cleaning up after it."
+    },
+    {
+      "question": "The test generator proposes getter tests and duplicates scenarios that already exist. What do you do?",
+      "options": [
+        "Document testing standards, valuable test criteria and available fixtures in CLAUDE.md, and put the existing tests in context",
+        "Cap the number of proposed tests at ten",
+        "Run test generation only for new files",
+        "Lower the temperature and raise max_tokens"
+      ],
+      "answer": 0,
+      "explanation": "CLAUDE.md is the mechanism for providing project context to a CI run. Documented standards and criteria cut low-value tests, and existing tests in context stop it proposing already-covered scenarios."
+    },
+    {
+      "question": "Why should the review of changes not be handed to the same session that generated the code?",
+      "options": [
+        "Because the context window is exhausted after generation",
+        "The session that generated the code is less effective at reviewing its own changes than an independent instance",
+        "Because the system prompt cannot be changed within one session",
+        "Because generation results cannot be passed on in a structured form"
+      ],
+      "answer": 1,
+      "explanation": "This is a distinct point in the guide about session context isolation: its own decisions and justifications sit in the context and bias it toward confirming them. Review runs as an independent instance with a clean context."
+    }
   ]
 }
