@@ -62,6 +62,9 @@ const PRODUCT_FACTS = [
   'There is a built-in interview simulator: Junior, Middle and ML System Design tracks with model answers.',
   'Full access is $20/month — modules 3–23, Middle + System Design interview tracks, certificate.',
   '3 advanced modules are based on the book "Machine Learning System Design" (Babushkin & Kravchenko, Manning).',
+  'There is a second track — Agentic Engineering: 20 cases on building LLM-agent systems in a real company and taking them to market, from Junior to Senior AI Engineer.',
+  'The agentic engineering track is included in the same $20/month subscription and earns a separate AI Agent Engineer certificate.',
+  'The course covers two skills at once: classic ML and agentic automation — the combination enterprises are short of.',
 ];
 
 // ---------- состояние ротации ----------

@@ -1,0 +1,282 @@
+[
+  {
+    "id": "a01",
+    "order": 1,
+    "title": "The CEO’s Monday idea: “let’s build a marketing factory”",
+    "subtitle": "From a one-line wish to a scoped slice: unit of work, success metric, cost of a mistake and the autonomy ladder",
+    "level": "Junior AI",
+    "tags": [
+      "scoping",
+      "design doc",
+      "autonomy"
+    ],
+    "free": true,
+    "status": "ready"
+  },
+  {
+    "id": "a02",
+    "order": 2,
+    "title": "Your first agent: a draft email from one CRM row",
+    "subtitle": "LLM plus tool calling, structured output, retries, determinism and the cost of a single run",
+    "level": "Junior AI",
+    "tags": [
+      "tool calling",
+      "structured output",
+      "retries"
+    ],
+    "free": true,
+    "status": "soon"
+  },
+  {
+    "id": "a03",
+    "order": 3,
+    "title": "The inbox simulator: an agent triages campaign replies",
+    "subtitle": "Classification, entity extraction, routing and what to do with junk mail",
+    "level": "Junior AI",
+    "tags": [
+      "classification",
+      "extraction",
+      "routing"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "a04",
+    "order": 4,
+    "title": "Prompts are code",
+    "subtitle": "Versioning, the system/user split, guardrails and prompt regressions",
+    "level": "Junior AI",
+    "tags": [
+      "prompts",
+      "versioning",
+      "guardrails"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "a05",
+    "order": 5,
+    "title": "Grounding in company knowledge",
+    "subtitle": "RAG: chunking, embeddings, retrieval quality and killing invented product facts",
+    "level": "Junior AI",
+    "tags": [
+      "RAG",
+      "embeddings",
+      "retrieval"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "a06",
+    "order": 6,
+    "title": "How do you know it works",
+    "subtitle": "Golden sets, LLM-as-judge, offline evals and a regression suite before release",
+    "level": "Junior AI",
+    "tags": [
+      "evals",
+      "golden set",
+      "LLM-as-judge"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "a07",
+    "order": 7,
+    "title": "Workflow or agent?",
+    "subtitle": "A deterministic graph vs an autonomous loop: when freedom hurts",
+    "level": "Middle AI",
+    "tags": [
+      "architecture",
+      "workflow",
+      "autonomy"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "a08",
+    "order": 8,
+    "title": "The content factory: planner, writer, editor, fact-checker",
+    "subtitle": "Multi-agent orchestration, shared state and loop protection",
+    "level": "Middle AI",
+    "tags": [
+      "multi-agent",
+      "orchestration",
+      "critic"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "a09",
+    "order": 9,
+    "title": "Tools and integrations",
+    "subtitle": "CRM, email and calendar APIs, MCP servers, secrets and least privilege",
+    "level": "Middle AI",
+    "tags": [
+      "tools",
+      "MCP",
+      "integrations"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "a10",
+    "order": 10,
+    "title": "Agent memory",
+    "subtitle": "Context vs long-term storage, per-account memory and privacy",
+    "level": "Middle AI",
+    "tags": [
+      "memory",
+      "context",
+      "privacy"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "a11",
+    "order": 11,
+    "title": "Human in the loop",
+    "subtitle": "Approval gates, draft-vs-send and an audit trail in a regulated company",
+    "level": "Middle AI",
+    "tags": [
+      "human-in-the-loop",
+      "audit",
+      "gates"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "a12",
+    "order": 12,
+    "title": "The $12,000 invoice",
+    "subtitle": "Token economics: model routing, caching, batching and budgets",
+    "level": "Middle AI",
+    "tags": [
+      "cost",
+      "caching",
+      "routing"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "a13",
+    "order": 13,
+    "title": "When the agent breaks",
+    "subtitle": "Timeouts, runaway loops, idempotency, fallbacks and degraded mode",
+    "level": "Middle AI",
+    "tags": [
+      "reliability",
+      "idempotency",
+      "fallback"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "a14",
+    "order": 14,
+    "title": "Debugging a bad run",
+    "subtitle": "Tracing, spans and replay: observability for non-deterministic systems",
+    "level": "Senior AI",
+    "tags": [
+      "observability",
+      "tracing",
+      "debugging"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "a15",
+    "order": 15,
+    "title": "The malicious email",
+    "subtitle": "Prompt injection, data exfiltration through tools, isolation and sandboxing",
+    "level": "Senior AI",
+    "tags": [
+      "security",
+      "injection",
+      "isolation"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "a16",
+    "order": 16,
+    "title": "Shipping agents",
+    "subtitle": "Environments, prompt and model versions, canary releases and rollback",
+    "level": "Senior AI",
+    "tags": [
+      "deploy",
+      "canary",
+      "rollback"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "a17",
+    "order": 17,
+    "title": "The improvement loop",
+    "subtitle": "Feedback capture, an error taxonomy and the weekly quality review",
+    "level": "Senior AI",
+    "tags": [
+      "feedback",
+      "quality",
+      "process"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "a18",
+    "order": 18,
+    "title": "Designing for trust",
+    "subtitle": "Agent UX: uncertainty, explaining actions, undo and the limits of automation",
+    "level": "Senior AI",
+    "tags": [
+      "UX",
+      "trust",
+      "product"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "a19",
+    "order": 19,
+    "title": "Unit economics and the CFO memo",
+    "subtitle": "Cost per run vs hours saved, ROI and build vs buy",
+    "level": "Senior AI",
+    "tags": [
+      "economics",
+      "ROI",
+      "business"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "a20",
+    "order": 20,
+    "title": "Capstone: defending the platform",
+    "subtitle": "An architecture review with the CTO plus go-to-market: packaging, price, pilot, procurement",
+    "level": "Senior AI",
+    "tags": [
+      "capstone",
+      "go-to-market",
+      "architecture"
+    ],
+    "free": false,
+    "status": "soon"
+  }
+]

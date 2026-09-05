@@ -1,0 +1,59 @@
+{
+  "a01": [
+    {
+      "question": "The CEO asks for a \"marketing factory by the end of the quarter\". What do you do first?",
+      "options": [
+        "Pick an agent framework and start prototyping an autonomous system",
+        "Define the unit of work and a measurable metric, then ship one narrow lane with human approval",
+        "Collect requirements from all three stakeholders and put them all into the first release",
+        "Commit to the quarter the CEO asked for and start with the integrations"
+      ],
+      "answer": 1,
+      "explanation": "A \"factory\" is a wish, not a task. Without a unit of work (\"one email to one lead\") and a metric a script can compute, the project cannot be estimated or defended. The first release is a thin end-to-end slice, not a broad horizon."
+    },
+    {
+      "question": "What most determines how much autonomy an agent may be given?",
+      "options": [
+        "The quality and size of the chosen model",
+        "Whether a convenient orchestration framework is available",
+        "The cost of a mistake: what a wrong action by the agent costs the company",
+        "The token budget allocated by the CFO"
+      ],
+      "answer": 2,
+      "explanation": "The cost of a mistake is the one argument that works in both the engineering and the business conversation. A typo in a draft costs nothing; an email to 5,000 customers quoting a non-existent price costs money and reputation. Model capability sets the quality ceiling, not the right to act without a human."
+    },
+    {
+      "question": "Which is a valid success metric for an outbound email agent?",
+      "options": [
+        "Share of drafts a human sent without edits",
+        "Average number of tokens per email",
+        "The CMO’s subjective rating of content quality",
+        "Number of emails the agent generated per day"
+      ],
+      "answer": 0,
+      "explanation": "A metric must be computable by a script and reflect value. \"Sent without edits\" measures both quality and the human time actually saved. Tokens are cost, not value; a subjective rating is not reproducible; generated volume grows even when every draft is bad."
+    },
+    {
+      "question": "What must be in the \"Never do\" section of the Agent Design Doc for this agent?",
+      "options": [
+        "A requirement to write politely and on brand",
+        "A cap on the model’s response time",
+        "The list of models that are allowed",
+        "A ban on quoting prices or terms not in the price list, and on sending without approval"
+      ],
+      "answer": 3,
+      "explanation": "\"Never do\" holds checkable rules that go into the system prompt verbatim and become test cases. \"Write politely\" cannot be verified; timeouts and model choice belong to failure modes and budget, not to what the agent is forbidden to do to the outside world."
+    },
+    {
+      "question": "The team wants to enable fully autonomous sending right away. Which argument will land with the CEO?",
+      "options": [
+        "The model is not good enough for this task yet",
+        "Autonomous agents are harder to build and will take longer",
+        "One wrong email to thousands of customers costs more than a month of approvals; we unlock autonomy once the quality statistics support it",
+        "Legal will never approve automatic sending anyway"
+      ],
+      "answer": 2,
+      "explanation": "A CEO thinks in risk and money, not model properties. The argument that works ties the cost of a mistake to a plan for removing it: start with approval, gather statistics, raise autonomy on the numbers. \"Not good enough\" and \"legal will refuse\" sound like excuses and offer no way forward."
+    }
+  ]
+}

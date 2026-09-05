@@ -64,12 +64,25 @@ const CONTENT_DIR = path.join(__dirname, 'content');
 const LOCALES = ['ru', 'en'];
 const DEFAULT_LOCALE = 'ru';
 const CONTENT = {};
+// У базового курса поведение прежнее: битый файл — падаем на старте.
+// У агентного трека есть фолбэк: сломанный новый файл не должен ронять живой курс.
+function readContent(p, fallback) {
+  try {
+    return JSON.parse(fs.readFileSync(p, 'utf8'));
+  } catch (e) {
+    if (fallback === undefined) throw e;
+    console.warn(`[content] ${p}: ${e.message} — используем пустой фолбэк`);
+    return fallback;
+  }
+}
 for (const loc of LOCALES) {
   const dir = path.join(CONTENT_DIR, loc);
   CONTENT[loc] = {
-    modules: JSON.parse(fs.readFileSync(path.join(dir, 'modules.json'), 'utf8')),
-    quizzes: JSON.parse(fs.readFileSync(path.join(dir, 'quizzes.json'), 'utf8')),
-    interviews: JSON.parse(fs.readFileSync(path.join(dir, 'interviews.json'), 'utf8')),
+    modules: readContent(path.join(dir, 'modules.json')),
+    quizzes: readContent(path.join(dir, 'quizzes.json')),
+    interviews: readContent(path.join(dir, 'interviews.json')),
+    agents: readContent(path.join(dir, 'agents.json'), []),
+    agentQuizzes: readContent(path.join(dir, 'agent-quizzes.json'), {}),
   };
 }
 const MODULES = CONTENT[DEFAULT_LOCALE].modules;   // структура/порядок общие для локалей
@@ -83,6 +96,8 @@ function getLang(req) {
 function localeModules(lang) { return CONTENT[lang].modules; }
 function localeQuizzes(lang) { return CONTENT[lang].quizzes; }
 function localeInterviews(lang) { return CONTENT[lang].interviews; }
+function localeAgents(lang) { return CONTENT[lang].agents; }
+function localeAgentQuizzes(lang) { return CONTENT[lang].agentQuizzes; }
 function moduleMarkdownPath(lang, id) {
   const p = path.join(CONTENT_DIR, lang, `${id}.md`);
   return fs.existsSync(p) ? p : path.join(CONTENT_DIR, DEFAULT_LOCALE, `${id}.md`);
@@ -91,6 +106,39 @@ function moduleMarkdownPath(lang, id) {
 const FREE_MODULES = 2;          // первые N модулей бесплатны
 const PASS_SCORE = 0.7;          // порог прохождения квиза
 const CERT_REQUIRED = 20;        // сертификат — базовый курс (модули 21+ — бонус-трек Advanced)
+const AGENT_CERT_REQUIRED = 20;  // сертификат агентного трека — все 20 модулей
+
+// Модуль без markdown не должен доходить до readFileSync: помечаем «скоро» на старте.
+for (const loc of LOCALES) {
+  for (const m of CONTENT[loc].agents) {
+    if (m.status !== 'soon' && !fs.existsSync(path.join(CONTENT_DIR, DEFAULT_LOCALE, `${m.id}.md`))) {
+      console.warn(`[content] ${loc}/${m.id}: нет markdown — статус переключён на "soon"`);
+      m.status = 'soon';
+    }
+  }
+}
+
+// Прогресс обоих треков лежит в одной плоской карте user.progress, поэтому
+// пересечение id ломало бы подсчёт сертификатов. Падаем на старте, а не в проде.
+const AGENT_MODULES = CONTENT[DEFAULT_LOCALE].agents;
+const ML_MODULE_IDS = new Set(MODULES.map((m) => m.id));
+const AGENT_MODULE_IDS = new Set(AGENT_MODULES.map((m) => m.id));
+if (AGENT_MODULE_IDS.size !== AGENT_MODULES.length) throw new Error('agents.json: повторяющиеся id');
+for (const id of AGENT_MODULE_IDS) {
+  if (!/^a\d{2}$/.test(id)) throw new Error(`agents.json: некорректный id "${id}" (ожидается aNN)`);
+  if (ML_MODULE_IDS.has(id)) throw new Error(`agents.json: id "${id}" пересекается с modules.json`);
+}
+
+const TRACKS = {
+  ml: { ids: ML_MODULE_IDS, required: CERT_REQUIRED, salt: '|ml-simulator-cert' },
+  agent: { ids: AGENT_MODULE_IDS, required: AGENT_CERT_REQUIRED, salt: '|ai-agent-cert' },
+};
+
+// Считаем пройденные модули только своего трека: иначе агентные квизы
+// открывали бы ML-сертификат и наоборот.
+function countPassed(progress, ids) {
+  return Object.entries(progress || {}).filter(([id, p]) => p && p.passed && ids.has(id)).length;
+}
 
 // ---------------------------------------------------------------- хранилище
 function loadDB() {
@@ -264,14 +312,17 @@ app.get('/api/me', (req, res) => {
 });
 
 function publicUser(u) {
-  const passed = Object.values(u.progress).filter((p) => p.passed).length;
+  const passed = countPassed(u.progress, TRACKS.ml.ids);
+  const agentPassed = countPassed(u.progress, TRACKS.agent.ids);
   return {
     name: u.name,
     email: u.email,
     subscribed: u.subscribed,
     progress: u.progress,
     passedCount: passed,
-    certificateReady: passed >= CERT_REQUIRED
+    certificateReady: passed >= CERT_REQUIRED,
+    agentPassedCount: agentPassed,
+    agentCertificateReady: agentPassed >= AGENT_CERT_REQUIRED
   };
 }
 
@@ -500,6 +551,26 @@ app.get('/api/module/:id', requireAuth, (req, res) => {
 });
 
 // ---------------------------------------------------------------- квизы
+// Общая механика для обоих треков: «пройден» и passedAt не сбрасываются при пересдаче.
+function gradeQuiz(quiz, answers) {
+  let correct = 0;
+  const review = quiz.map((q, i) => {
+    const ok = Number(answers[i]) === q.answer;
+    if (ok) correct++;
+    return { index: i, correct: ok, answer: q.answer, explanation: q.explanation };
+  });
+  return { correct, review, passed: correct / quiz.length >= PASS_SCORE };
+}
+
+function recordProgress(user, id, r, total) {
+  const prev = user.progress[id] || { attempts: 0 };
+  user.progress[id] = {
+    score: r.correct, total, passed: r.passed || !!prev.passed,
+    attempts: (prev.attempts || 0) + 1,
+    passedAt: r.passed ? new Date().toISOString() : prev.passedAt || null
+  };
+}
+
 app.post('/api/quiz/:id', requireAuth, (req, res) => {
   const lang = getLang(req);
   const mod = MODULES.find((m) => m.id === req.params.id);
@@ -514,24 +585,12 @@ app.post('/api/quiz/:id', requireAuth, (req, res) => {
     return res.status(400).json({ error: 'Ответьте на все вопросы' });
   }
 
-  let correct = 0;
-  const review = quiz.map((q, i) => {
-    const ok = Number(answers[i]) === q.answer;
-    if (ok) correct++;
-    return { index: i, correct: ok, answer: q.answer, explanation: q.explanation };
-  });
-
-  const passed = correct / quiz.length >= PASS_SCORE;
+  const r = gradeQuiz(quiz, answers);
   const { db, user } = req.ctx;
-  const prev = user.progress[mod.id] || { attempts: 0 };
-  user.progress[mod.id] = {
-    score: correct, total: quiz.length, passed: passed || !!prev.passed,
-    attempts: (prev.attempts || 0) + 1,
-    passedAt: passed ? new Date().toISOString() : prev.passedAt || null
-  };
+  recordProgress(user, mod.id, r, quiz.length);
   saveDB(db);
 
-  res.json({ correct, total: quiz.length, passed, review, user: publicUser(user) });
+  res.json({ correct: r.correct, total: quiz.length, passed: r.passed, review: r.review, user: publicUser(user) });
 });
 
 // ---------------------------------------------------------------- собеседования
@@ -560,10 +619,93 @@ app.get('/api/interview/:track', requireAuth, (req, res) => {
   });
 });
 
+// ---------------------------------------------------------------- трек «Агентная инженерия»
+// Второй курс: 20 модулей от Junior до Senior AI Engineer. Доступ решается
+// декларативным флагом free у модуля (как у треков собеседований), а не
+// позиционным правилом базового курса — треки не должны влиять друг на друга.
+function agentAccess(user, mod) {
+  return !!mod.free || !!(user && user.subscribed);
+}
+
+app.get('/api/agent-modules', (req, res) => {
+  const ctx = currentUser(req);
+  const user = ctx ? ctx.user : null;
+  res.json({
+    modules: localeAgents(getLang(req)).map((m) => ({
+      id: m.id, order: m.order, title: m.title, subtitle: m.subtitle,
+      level: m.level, tags: m.tags, free: !!m.free,
+      status: m.status || 'ready',
+      unlocked: m.status !== 'soon' && agentAccess(user, m),
+      progress: user ? user.progress[m.id] || null : null
+    })),
+    total: AGENT_MODULES.length,
+    certRequired: AGENT_CERT_REQUIRED
+  });
+});
+
+app.get('/api/agent-module/:id', requireAuth, (req, res) => {
+  const lang = getLang(req);
+  const mod = localeAgents(lang).find((m) => m.id === req.params.id);
+  if (!mod) return res.status(404).json({ error: 'Модуль не найден' });
+  // «Скоро» проверяем до пейволла: нельзя продавать доступ к ненаписанному модулю
+  if (mod.status === 'soon') {
+    return res.status(409).json({ error: 'Модуль ещё готовится', comingSoon: true });
+  }
+  if (!agentAccess(req.ctx.user, mod)) {
+    return res.status(402).json({ error: 'Модуль доступен по подписке', needSubscription: true });
+  }
+  const markdown = fs.readFileSync(moduleMarkdownPath(lang, mod.id), 'utf8');
+  const quiz = (localeAgentQuizzes(lang)[mod.id] || []).map((q, i) => ({ index: i, question: q.question, options: q.options }));
+  res.json({
+    module: { id: mod.id, order: mod.order, title: mod.title, subtitle: mod.subtitle, level: mod.level, tags: mod.tags },
+    html: marked.parse(markdown),
+    quiz
+  });
+});
+
+app.post('/api/agent-quiz/:id', requireAuth, (req, res) => {
+  const lang = getLang(req);
+  const mod = AGENT_MODULES.find((m) => m.id === req.params.id);
+  if (!mod) return res.status(404).json({ error: 'Модуль не найден' });
+  if (mod.status === 'soon') return res.status(409).json({ error: 'Модуль ещё готовится', comingSoon: true });
+  if (!agentAccess(req.ctx.user, mod)) return res.status(402).json({ error: 'Модуль доступен по подписке' });
+
+  const quiz = localeAgentQuizzes(lang)[mod.id] || [];
+  if (!quiz.length) return res.status(409).json({ error: 'Квиз ещё готовится', comingSoon: true });
+  const answers = (req.body || {}).answers;
+  if (!Array.isArray(answers) || answers.length !== quiz.length) {
+    return res.status(400).json({ error: 'Ответьте на все вопросы' });
+  }
+
+  const r = gradeQuiz(quiz, answers);
+  const { db, user } = req.ctx;
+  recordProgress(user, mod.id, r, quiz.length);
+  saveDB(db);
+
+  res.json({ correct: r.correct, total: quiz.length, passed: r.passed, review: r.review, user: publicUser(user) });
+});
+
+app.get('/api/agent-certificate', requireAuth, (req, res) => {
+  const user = req.ctx.user;
+  const passed = countPassed(user.progress, TRACKS.agent.ids);
+  if (passed < AGENT_CERT_REQUIRED) {
+    return res.status(403).json({ error: `Сертификат доступен после прохождения всех ${AGENT_CERT_REQUIRED} модулей трека. Пройдено: ${passed}.` });
+  }
+  const certId = crypto.createHash('sha256').update(user.email + TRACKS.agent.salt).digest('hex').slice(0, 12).toUpperCase();
+  res.json({
+    name: user.name,
+    email: user.email,
+    certId,
+    date: new Date().toISOString().slice(0, 10),
+    modules: AGENT_CERT_REQUIRED,
+    track: 'agent'
+  });
+});
+
 // ---------------------------------------------------------------- сертификат
 app.get('/api/certificate', requireAuth, (req, res) => {
   const user = req.ctx.user;
-  const passed = Object.values(user.progress).filter((p) => p.passed).length;
+  const passed = countPassed(user.progress, TRACKS.ml.ids);
   if (passed < CERT_REQUIRED) {
     return res.status(403).json({ error: `Сертификат доступен после прохождения всех ${CERT_REQUIRED} модулей. Пройдено: ${passed}.` });
   }
@@ -629,7 +771,8 @@ app.get('/admin', requireAdmin, (req, res) => {
 app.get('/api/admin/users', requireAdmin, (req, res) => {
   const db = loadDB();
   const users = Object.values(db.users).map((u) => {
-    const passed = Object.values(u.progress || {}).filter((p) => p.passed).length;
+    const passed = countPassed(u.progress, TRACKS.ml.ids);
+    const agentPassed = countPassed(u.progress, TRACKS.agent.ids);
     return {
       name: u.name,
       email: u.email,
@@ -639,6 +782,8 @@ app.get('/api/admin/users', requireAdmin, (req, res) => {
       subscribedAt: u.subscribedAt || null,
       passedCount: passed,
       certificateReady: passed >= CERT_REQUIRED,
+      agentPassedCount: agentPassed,
+      agentCertificateReady: agentPassed >= AGENT_CERT_REQUIRED,
     };
   }).sort((x, y) => new Date(y.createdAt || 0) - new Date(x.createdAt || 0));
 

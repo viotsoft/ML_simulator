@@ -38,6 +38,20 @@ const I18N = {
     welcomeToast: 'Добро пожаловать в Datacore! Начните с модуля 1.',
     navModules: '📚 Модули',
     navInterviews: '🎤 Собеседования',
+    navAgents: '🤖 Агенты',
+    agentsTitle: '🤖 Агентная инженерия',
+    agentsIntro: 'Второй трек: от Junior до Senior AI Engineer. Двадцать кейсов о том, как строить агентные системы в реальной компании — и как выводить их на рынок. Сквозная история: CEO просит «маркетинговую фабрику», вы превращаете идею в работающую систему.',
+    agentsRoadmap: (ready, total) => `Открыто ${ready} из ${total} модулей. Остальные выходят по мере готовности — без доплат.`,
+    agentModuleN: (n) => `Модуль A${n}`,
+    agentSoonTag: 'Скоро',
+    agentSoonToast: 'Модуль ещё готовится — он появится здесь автоматически.',
+    agentQuizTitle: (n) => `📝 Квиз модуля A${n}`,
+    agentBackModules: '← Все модули трека «Агенты»',
+    agentGrades: { start: 'Начинающий AI Engineer', junior: 'Junior AI Engineer', middle: 'Middle AI Engineer', senior: 'Senior AI Engineer 🏆' },
+    agentCertBtn: '🎓 Сертификат AI Agent Engineer',
+    agentCertHint: (n) => `Сертификат откроется после всех ${n} модулей трека`,
+    agentCertHeader: 'ML Career Simulator · Сертификат AI Agent Engineer',
+    agentCertBody: (n) => `успешно прошёл(ла) ${n} модулей трека агентной инженерии и подтвердил(а) уровень <b>AI Agent Engineer</b>: проектирование, запуск и вывод на рынок агентных систем.`,
     grade: (g) => `Ваш грейд: ${g}`,
     grades: { advanced: 'Middle+ · Advanced complete 🏆', middle: 'Middle ML Engineer 🎉', almost: 'Middle (почти!)', track: 'Middle-track', juniorPlus: 'Junior+', junior: 'Junior' },
     passedOf: (p, n) => `Пройдено ${p} из ${n} модулей`,
@@ -115,6 +129,20 @@ const I18N = {
     welcomeToast: 'Welcome to Datacore! Start with Module 1.',
     navModules: '📚 Modules',
     navInterviews: '🎤 Interviews',
+    navAgents: '🤖 Agents',
+    agentsTitle: '🤖 Agentic Engineering',
+    agentsIntro: 'The second track: from Junior to Senior AI Engineer. Twenty cases on building agentic systems inside a real company — and taking them to market. One storyline: the CEO asks for a "marketing factory", you turn the idea into a working system.',
+    agentsRoadmap: (ready, total) => `${ready} of ${total} modules are live. The rest ship as they are written — at no extra cost.`,
+    agentModuleN: (n) => `Module A${n}`,
+    agentSoonTag: 'Soon',
+    agentSoonToast: 'This module is still being written — it will appear here automatically.',
+    agentQuizTitle: (n) => `📝 Module A${n} quiz`,
+    agentBackModules: '← All agent modules',
+    agentGrades: { start: 'Getting started in AI', junior: 'Junior AI Engineer', middle: 'Middle AI Engineer', senior: 'Senior AI Engineer 🏆' },
+    agentCertBtn: '🎓 AI Agent Engineer certificate',
+    agentCertHint: (n) => `The certificate unlocks after all ${n} track modules`,
+    agentCertHeader: 'ML Career Simulator · AI Agent Engineer Certificate',
+    agentCertBody: (n) => `has successfully completed ${n} modules of the agentic engineering track and demonstrated the level of an <b>AI Agent Engineer</b>: designing, shipping and commercializing agentic systems.`,
     grade: (g) => `Your grade: ${g}`,
     grades: { advanced: 'Middle+ · Advanced complete 🏆', middle: 'Middle ML Engineer 🎉', almost: 'Middle (almost!)', track: 'Middle-track', juniorPlus: 'Junior+', junior: 'Junior' },
     passedOf: (p, n) => `${p} of ${n} modules completed`,
@@ -177,8 +205,9 @@ const I18N = {
   },
 };
 const t = (key, ...args) => {
-  const v = I18N[LANG][key];
-  return typeof v === 'function' ? v(...args) : v;
+  // фолбэк на основную локаль: забытый ключ не должен печатать "undefined"
+  const v = I18N[LANG][key] !== undefined ? I18N[LANG][key] : I18N.ru[key];
+  return typeof v === 'function' ? v(...args) : (v === undefined ? '' : v);
 };
 
 function setLang(lang) {
@@ -188,7 +217,7 @@ function setLang(lang) {
   location.reload();
 }
 
-let state = { user: null, modules: [], paymentsMode: 'demo' };
+let state = { user: null, modules: [], agentModules: [], paymentsMode: 'demo' };
 
 const api = async (path, opts = {}) => {
   const res = await fetch(path, {
@@ -319,13 +348,16 @@ function sectionTabs(active) {
     <div class="section-tabs">
       <button class="${active === 'modules' ? 'active' : ''}" id="navModules">${t('navModules')}</button>
       <button class="${active === 'interviews' ? 'active' : ''}" id="navInterviews">${t('navInterviews')}</button>
+      <button class="${active === 'agents' ? 'active' : ''}" id="navAgents">${t('navAgents')}</button>
     </div>`;
 }
 function bindSectionTabs() {
   const m = document.getElementById('navModules');
   const i = document.getElementById('navInterviews');
+  const a = document.getElementById('navAgents');
   if (m) m.onclick = renderDashboard;
   if (i) i.onclick = renderInterviews;
+  if (a) a.onclick = renderAgents;
 }
 
 // ---------------------------------------------------------------- дашборд
@@ -549,21 +581,48 @@ function renderPaywall() {
 }
 
 // ---------------------------------------------------------------- модуль + квиз
-async function renderModule(id) {
+// Различия треков в одном месте: пути API, возврат, список для «следующего модуля»
+// и сертификат. Сама механика модуля и квиза — общая.
+const TRACK_UI = {
+  ml: {
+    modulePath: (id) => `/api/module/${id}`,
+    quizPath: (id) => `/api/quiz/${id}`,
+    back: () => renderDashboard(),
+    list: () => state.modules,
+    certReady: (u) => u.certificateReady,
+    cert: () => renderCertificate(),
+    backLabel: () => t('backModules'),
+    quizTitle: (n) => t('quizTitle', n),
+  },
+  agent: {
+    modulePath: (id) => `/api/agent-module/${id}`,
+    quizPath: (id) => `/api/agent-quiz/${id}`,
+    back: () => renderAgents(),
+    list: () => state.agentModules,
+    certReady: (u) => u.agentCertificateReady,
+    cert: () => renderAgentCertificate(),
+    backLabel: () => t('agentBackModules'),
+    quizTitle: (n) => t('agentQuizTitle', n),
+  },
+};
+
+async function renderModule(id, track = 'ml') {
+  const T = TRACK_UI[track];
   let data;
   try {
-    data = await api(`/api/module/${id}`);
+    data = await api(T.modulePath(id));
   } catch (e) {
     if (e.status === 402) return renderPaywall();
+    if (e.status === 409) return toast(t('agentSoonToast'));
     return toast(e.message);
   }
   const { module: mod, html, quiz } = data;
   view.innerHTML = `
     <div class="module-view">
-      <a class="back-link" id="backLink">${t('backModules')}</a>
+      <a class="back-link" id="backLink">${T.backLabel()}</a>
       <div class="md-content">${html}</div>
       <div class="quiz-box" id="quizBox">
-        <h2>${t('quizTitle', mod.order)}</h2>
+        <h2>${T.quizTitle(mod.order)}</h2>
         <div class="quiz-sub">${t('quizSub')}</div>
         <form id="quizForm">
           ${quiz.map((q, i) => `
@@ -580,7 +639,7 @@ async function renderModule(id) {
         <div id="quizResult"></div>
       </div>
     </div>`;
-  document.getElementById('backLink').onclick = renderDashboard;
+  document.getElementById('backLink').onclick = T.back;
   window.scrollTo(0, 0);
 
   document.getElementById('quizForm').onsubmit = async (e) => {
@@ -595,7 +654,7 @@ async function renderModule(id) {
       errEl.textContent = t('quizAnswerAll');
       return;
     }
-    const result = await api(`/api/quiz/${id}`, { method: 'POST', body: JSON.stringify({ answers }) });
+    const result = await api(T.quizPath(id), { method: 'POST', body: JSON.stringify({ answers }) });
     state.user = result.user;
     renderUserPanel();
 
@@ -614,7 +673,7 @@ async function renderModule(id) {
     });
     e.target.querySelector('button[type=submit]').style.display = 'none';
 
-    const passedAll = state.user.certificateReady;
+    const passedAll = T.certReady(state.user);
     document.getElementById('quizResult').innerHTML = `
       <div class="quiz-result ${result.passed ? 'pass' : 'fail'}">
         ${result.passed ? t('quizPassed', result.correct, result.total) : t('quizFailed', result.correct, result.total)}
@@ -627,36 +686,105 @@ async function renderModule(id) {
           : `<button class="btn btn-primary" id="retryQuiz">${t('quizRetry')}</button>`}
         <button class="btn btn-ghost" id="toDash">${t('quizAll')}</button>
       </div>`;
-    document.getElementById('toDash').onclick = renderDashboard;
+    document.getElementById('toDash').onclick = T.back;
     const retry = document.getElementById('retryQuiz');
-    if (retry) retry.onclick = () => renderModule(id);
+    if (retry) retry.onclick = () => renderModule(id, track);
     const next = document.getElementById('toNext');
     if (next) next.onclick = () => {
-      const cur = state.modules.find((m) => m.id === id);
-      const nx = state.modules.find((m) => m.order === cur.order + 1);
-      if (!nx) return renderDashboard();
-      if (nx.unlocked) renderModule(nx.id); else renderPaywall();
+      const list = T.list();
+      const cur = list.find((m) => m.id === id);
+      const nx = list.find((m) => m.order === cur.order + 1);
+      if (!nx) return T.back();
+      if (nx.status === 'soon') return toast(t('agentSoonToast'));
+      if (nx.unlocked) renderModule(nx.id, track); else renderPaywall();
     };
     const toCert = document.getElementById('toCert');
-    if (toCert) toCert.onclick = renderCertificate;
+    if (toCert) toCert.onclick = T.cert;
     document.getElementById('quizResult').scrollIntoView({ behavior: 'smooth' });
   };
 }
 
+// ---------------------------------------------------------------- агентный трек
+async function renderAgents() {
+  const { modules, certRequired } = await api('/api/agent-modules');
+  state.agentModules = modules;
+  const u = state.user;
+  const passed = modules.filter((m) => m.progress && m.progress.passed).length;
+  const ready = modules.filter((m) => m.status !== 'soon').length;
+  const pct = Math.round((passed / modules.length) * 100);
+
+  const g = I18N[LANG].agentGrades;
+  const grade = passed >= modules.length ? g.senior
+    : passed >= 13 ? g.middle
+    : passed >= 6 ? g.junior
+    : g.start;
+
+  view.innerHTML = `
+    ${sectionTabs('agents')}
+    <div class="interview-intro" style="margin-bottom:22px">
+      <h2 style="font-size:22px;margin-bottom:8px">${t('agentsTitle')}</h2>
+      <p style="color:var(--muted);font-size:15px;max-width:760px">${t('agentsIntro')}</p>
+    </div>
+    <div class="progress-panel">
+      <div class="info">
+        <div style="font-weight:700;font-size:18px">${t('grade', grade)}</div>
+        <div style="color:var(--muted);font-size:14px;margin-top:2px">${t('passedOf', passed, modules.length)} · ${t('agentsRoadmap', ready, modules.length)}</div>
+        <div class="progress-bar"><div style="width:${pct}%"></div></div>
+      </div>
+      ${u.agentCertificateReady
+        ? `<button class="btn btn-primary" id="agentCertBtn">${t('agentCertBtn')}</button>`
+        : `<div style="color:var(--muted);font-size:13px;max-width:200px">${t('agentCertHint', certRequired)}</div>`}
+      ${!u.subscribed ? `<button class="btn btn-ghost" id="subBtn">${t('subBtn')}</button>` : ''}
+    </div>
+    <div class="module-list">
+      ${modules.map((m) => {
+        const soon = m.status === 'soon';
+        const done = m.progress && m.progress.passed;
+        const icon = done ? '✅' : soon ? '🕓' : m.unlocked ? '📂' : '🔒';
+        const status = done
+          ? t('quizScore', m.progress.score, m.progress.total)
+          : soon ? t('agentSoonTag')
+          : m.unlocked ? (m.free ? t('freeTag') : t('availableTag')) : t('proTag');
+        return `
+        <div class="module-card ${m.unlocked ? '' : 'locked'}" data-id="${m.id}" data-unlocked="${m.unlocked}" data-soon="${soon}">
+          <div class="module-status">${icon}</div>
+          <div>
+            <div class="m-title">${t('agentModuleN', m.order)}. ${esc(m.title)}</div>
+            <div class="m-sub">${esc(m.subtitle)}</div>
+          </div>
+          <div class="module-meta">${esc(m.level)}<br>${status}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  view.querySelectorAll('.module-card').forEach((card) => {
+    card.onclick = () => {
+      if (card.dataset.soon === 'true') return toast(t('agentSoonToast'));
+      if (card.dataset.unlocked === 'true') renderModule(card.dataset.id, 'agent');
+      else renderPaywall();
+    };
+  });
+  const certBtn = document.getElementById('agentCertBtn');
+  if (certBtn) certBtn.onclick = renderAgentCertificate;
+  const subBtn = document.getElementById('subBtn');
+  if (subBtn) subBtn.onclick = renderPaywall;
+  bindSectionTabs();
+}
+
 // ---------------------------------------------------------------- сертификат
-async function renderCertificate() {
+async function renderCertificateView(cfg) {
   let cert;
   try {
-    cert = await api('/api/certificate');
+    cert = await api(cfg.endpoint);
   } catch (e) { return toast(e.message); }
   view.innerHTML = `
-    <a class="back-link" id="backLink">${t('backModules')}</a>
+    <a class="back-link" id="backLink">${t(cfg.backKey)}</a>
     <div class="certificate">
-      <div class="c-title">${t('certHeader')}</div>
+      <div class="c-title">${t(cfg.headerKey)}</div>
       <h1>${t('certTitle')}</h1>
       <div style="font-size:14px;color:#77778c">${t('certConfirms')}</div>
       <div class="c-name">${esc(cert.name)}</div>
-      <div class="c-text">${t('certBody', cert.modules)}</div>
+      <div class="c-text">${t(cfg.bodyKey, cert.modules)}</div>
       <div class="c-meta">
         <span>ID: ${esc(cert.certId)}</span>
         <span>${t('certDate')}: ${esc(cert.date)}</span>
@@ -666,7 +794,17 @@ async function renderCertificate() {
     <div style="text-align:center;margin-top:22px">
       <button class="btn btn-primary" onclick="window.print()">${t('certPrint')}</button>
     </div>`;
-  document.getElementById('backLink').onclick = renderDashboard;
+  document.getElementById('backLink').onclick = cfg.back;
+}
+
+async function renderCertificate() {
+  return renderCertificateView({ endpoint: '/api/certificate', backKey: 'backModules',
+    headerKey: 'certHeader', bodyKey: 'certBody', back: renderDashboard });
+}
+
+async function renderAgentCertificate() {
+  return renderCertificateView({ endpoint: '/api/agent-certificate', backKey: 'agentBackModules',
+    headerKey: 'agentCertHeader', bodyKey: 'agentCertBody', back: renderAgents });
 }
 
 // ---------------------------------------------------------------- старт
