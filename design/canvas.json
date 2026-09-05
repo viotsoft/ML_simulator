@@ -1,0 +1,7 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1440, "h": 2260, "title": "Landing — desktop", "print": "flow" },
+    { "file": "Mobile.dc.html", "x": 1580, "y": 0, "w": 390, "h": 2980, "title": "Landing — mobile", "print": "flow" }
+  ],
+  "launch": { "view": "canvas" }
+}

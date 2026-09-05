@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; }
+    a { color: #6c8cff; text-decoration: none; }
+    a:hover { color: #8ea6ff; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; background: #0b1020; color: #e8ecf8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; gap: 70px; padding-bottom: 1px">
+
+  <!-- nav -->
+  <div style="max-width: 1080px; width: 100%; margin: 0 auto; padding: 0 24px; box-sizing: border-box">
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 18px 0">
+      <div style="font-weight: 800; font-size: 20px; letter-spacing: -0.02em">ML<span style="color: #6c8cff">Simulator</span></div>
+      <div style="display: flex; gap: 20px; align-items: center">
+        <a href="#case" style="color: #93a0c4; font-size: 15px">Sample case</a>
+        <a href="#how" style="color: #93a0c4; font-size: 15px">What's inside</a>
+        <a href="/" style="color: #93a0c4; font-size: 15px">RU</a>
+        <a href="/app.html" style="display: inline-block; padding: 9px 20px; border-radius: 10px; font-size: 15px; font-weight: 600; background: #4f6ef7; color: #ffffff">Sign in</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- hero -->
+  <div style="max-width: 1080px; width: 100%; margin: 0 auto; padding: 20px 24px 0; box-sizing: border-box; text-align: center">
+    <div style="display: inline-block; padding: 6px 16px; border-radius: 999px; background: rgba(108,140,255,.12); color: #6c8cff; font-size: 13px; font-weight: 600; letter-spacing: .04em; margin-bottom: 24px">INTERVIEW PREP · REAL BUSINESS CASES</div>
+    <h1 style="font-size: 58px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.12; margin: 0 0 22px; text-wrap: balance">Practice <span style="color: #6c8cff">real-world ML cases</span><br>before your next interview.</h1>
+    <p style="font-size: 19px; color: #93a0c4; max-width: 680px; margin: 0 auto 36px; text-wrap: pretty">Solve business problems as an ML Engineer — from ML decisions to business impact.</p>
+    <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap">
+      <a href="/app.html" style="display: inline-block; padding: 16px 36px; border-radius: 10px; font-size: 17px; font-weight: 600; background: #4f6ef7; color: #ffffff">Start 2 Cases Free</a>
+      <a href="#case" style="display: inline-block; padding: 16px 36px; border-radius: 10px; font-size: 17px; font-weight: 600; background: transparent; color: #e8ecf8; border: 1px solid #263056">See a sample case</a>
+    </div>
+    <div style="margin-top: 16px; font-size: 14px; color: #93a0c4">The first 2 cases are free, no card required. All 23 for $20/month.</div>
+  </div>
+
+  <!-- one case, end to end -->
+  <div id="case" style="max-width: 1080px; width: 100%; margin: 0 auto; padding: 40px 24px 0; box-sizing: border-box">
+    <h2 style="font-size: 38px; font-weight: 800; letter-spacing: -0.02em; text-align: center; margin: 0 0 14px">What one case looks like</h2>
+    <p style="text-align: center; color: #93a0c4; max-width: 640px; margin: 0 auto 48px; font-size: 17px; text-wrap: pretty">Every case follows the same arc: a situation lands on your desk at Datacore, you make the ML decisions, and you answer for what they cost or save the business.</p>
+
+    <div style="background: #161d38; border: 1px solid #263056; border-radius: 14px; overflow: hidden">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 18px 26px; border-bottom: 1px solid #263056; background: rgba(108,140,255,.06)">
+        <span style="color: #6c8cff; font-weight: 700; font-size: 13px; letter-spacing: .08em">CASE 11</span>
+        <span style="font-size: 16px; font-weight: 600">Fraud: 1 fraudster per 1,000 honest users</span>
+        <span style="margin-left: auto; font-size: 13px; color: #93a0c4">Datacore · anti-fraud team</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr))">
+        <div style="padding: 28px 26px; border-right: 1px solid #263056; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <span style="flex: 0 0 34px; height: 34px; border-radius: 50%; background: rgba(108,140,255,.15); color: #6c8cff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px">1</span>
+            <span style="font-size: 17px; font-weight: 700">The situation</span>
+          </div>
+          <p style="margin: 0; color: #93a0c4; font-size: 15px; text-wrap: pretty">The model you inherited reports 99% accuracy, and the team is celebrating. Predicting “not fraud” every single time would score 99.9%. The metric is lying to everyone in the room.</p>
+        </div>
+
+        <div style="padding: 28px 26px; border-right: 1px solid #263056; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <span style="flex: 0 0 34px; height: 34px; border-radius: 50%; background: rgba(108,140,255,.15); color: #6c8cff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px">2</span>
+            <span style="font-size: 17px; font-weight: 700">Your ML decisions</span>
+          </div>
+          <p style="margin: 0; color: #93a0c4; font-size: 15px; text-wrap: pretty">Choose metrics that survive a 1:1000 imbalance — precision, recall, ROC-AUC. Weight the classes or resample. Then move the decision threshold on purpose instead of leaving it at 0.5.</p>
+        </div>
+
+        <div style="padding: 28px 26px; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <span style="flex: 0 0 34px; height: 34px; border-radius: 50%; background: rgba(52,211,153,.15); color: #34d399; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px">3</span>
+            <span style="font-size: 17px; font-weight: 700">Business impact</span>
+          </div>
+          <p style="margin: 0; color: #93a0c4; font-size: 15px; text-wrap: pretty">Every threshold trades blocked honest customers against fraud that gets through. You pick a number, and you defend it — exactly the way an interviewer will ask you to.</p>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px; padding: 16px 26px; border-top: 1px solid #263056; background: rgba(52,211,153,.04)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 6 9 17l-5-5"></path>
+        </svg>
+        <span style="font-size: 14px; color: #93a0c4">Ends with a quiz and a written debrief you can reuse as an interview answer.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- what's inside -->
+  <div id="how" style="max-width: 1080px; width: 100%; margin: 0 auto; padding: 0 24px; box-sizing: border-box">
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px">
+
+      <div style="background: #161d38; border: 1px solid #263056; border-radius: 14px; padding: 26px; display: flex; flex-direction: column; gap: 10px">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6c8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="7" width="18" height="13" rx="2"></rect>
+          <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <path d="M3 12h18"></path>
+        </svg>
+        <h3 style="font-size: 18px; margin: 4px 0 0">23 hands-on cases</h3>
+        <p style="color: #93a0c4; font-size: 15px; margin: 0; text-wrap: pretty">From your first EDA report to a model in production and a project defended in front of the CTO. The first two are free, no card.</p>
+      </div>
+
+      <div style="background: #161d38; border: 1px solid #263056; border-radius: 14px; padding: 26px; display: flex; flex-direction: column; gap: 10px">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6c8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="9" y="2" width="6" height="11" rx="3"></rect>
+          <path d="M5 11a7 7 0 0 0 14 0"></path>
+          <path d="M12 18v4"></path>
+        </svg>
+        <h3 style="font-size: 18px; margin: 4px 0 0">Interview simulator</h3>
+        <p style="color: #93a0c4; font-size: 15px; margin: 0; text-wrap: pretty">Junior, Middle and ML System Design tracks: answer out loud, then compare with a full model answer. The Junior track is free.</p>
+      </div>
+
+      <div style="background: #161d38; border: 1px solid #263056; border-radius: 14px; padding: 26px; display: flex; flex-direction: column; gap: 10px">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6c8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="9" r="6"></circle>
+          <path d="M8.5 14.5 7 22l5-2.5L17 22l-1.5-7.5"></path>
+        </svg>
+        <h3 style="font-size: 18px; margin: 4px 0 0">Certificate</h3>
+        <p style="color: #93a0c4; font-size: 15px; margin: 0; text-wrap: pretty">Pass the quizzes for all 20 core cases at 70% or better and you finish with a Middle-track ML Engineer certificate.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- closing cta -->
+  <div style="max-width: 1080px; width: 100%; margin: 0 auto; padding: 0 24px; box-sizing: border-box">
+    <div style="background: #161d38; border: 1px solid #6c8cff; border-radius: 14px; padding: 48px 34px; text-align: center; box-shadow: 0 0 40px rgba(108,140,255,.15)">
+      <h2 style="font-size: 32px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 12px; text-wrap: balance">Interviewers ask what you have built, not what you have watched.</h2>
+      <p style="color: #93a0c4; font-size: 17px; max-width: 620px; margin: 0 auto 28px; text-wrap: pretty">Start with two full cases today and walk into your next interview with real decisions to talk about.</p>
+      <a href="/app.html" style="display: inline-block; padding: 16px 36px; border-radius: 10px; font-size: 17px; font-weight: 600; background: #4f6ef7; color: #ffffff">Start 2 Cases Free</a>
+      <div style="margin-top: 16px; font-size: 14px; color: #93a0c4">First 2 cases free · $20/month for all 23 · cancel anytime</div>
+    </div>
+  </div>
+
+  <!-- footer -->
+  <div style="border-top: 1px solid #263056; padding: 34px 24px; text-align: center; color: #93a0c4; font-size: 14px">
+    ML Career Simulator © 2026 · <a href="/terms.html">Terms of Service</a> · <a href="/privacy.html">Privacy Policy</a>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

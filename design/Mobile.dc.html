@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; }
+    a { color: #6c8cff; text-decoration: none; }
+    a:hover { color: #8ea6ff; }
+  </style>
+</helmet>
+
+<div style="width: 390px; background: #0b1020; color: #e8ecf8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; gap: 48px; padding-bottom: 1px">
+
+  <!-- nav -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 20px">
+    <div style="font-weight: 800; font-size: 19px; letter-spacing: -0.02em">ML<span style="color: #6c8cff">Simulator</span></div>
+    <div style="display: flex; align-items: center; gap: 8px">
+      <a href="/" style="display: inline-block; padding: 12px 12px; font-size: 15px; color: #93a0c4">RU</a>
+      <a href="/app.html" style="display: inline-block; padding: 12px 18px; border-radius: 10px; font-size: 15px; font-weight: 600; background: #4f6ef7; color: #ffffff">Sign in</a>
+    </div>
+  </div>
+
+  <!-- hero -->
+  <div style="padding: 0 20px; text-align: center">
+    <div style="display: inline-block; padding: 6px 14px; border-radius: 999px; background: rgba(108,140,255,.12); color: #6c8cff; font-size: 12px; font-weight: 600; letter-spacing: .04em; margin-bottom: 20px">INTERVIEW PREP · REAL CASES</div>
+    <h1 style="font-size: 36px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.14; margin: 0 0 18px; text-wrap: balance">Practice <span style="color: #6c8cff">real-world ML cases</span> before your next interview.</h1>
+    <p style="font-size: 17px; color: #93a0c4; margin: 0 0 28px; text-wrap: pretty">Solve business problems as an ML Engineer — from ML decisions to business impact.</p>
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <a href="/app.html" style="display: block; padding: 16px 24px; border-radius: 10px; font-size: 17px; font-weight: 600; background: #4f6ef7; color: #ffffff">Start 2 Cases Free</a>
+      <a href="#case" style="display: block; padding: 16px 24px; border-radius: 10px; font-size: 17px; font-weight: 600; background: transparent; color: #e8ecf8; border: 1px solid #263056">See a sample case</a>
+    </div>
+    <div style="margin-top: 16px; font-size: 14px; color: #93a0c4">The first 2 cases are free, no card required. All 23 for $20/month.</div>
+  </div>
+
+  <!-- one case, end to end -->
+  <div id="case" style="padding: 0 20px">
+    <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.02em; text-align: center; margin: 0 0 12px; text-wrap: balance">What one case looks like</h2>
+    <p style="text-align: center; color: #93a0c4; margin: 0 0 28px; font-size: 16px; text-wrap: pretty">A situation lands on your desk at Datacore, you make the ML decisions, and you answer for what they cost or save.</p>
+
+    <div style="background: #161d38; border: 1px solid #263056; border-radius: 14px; overflow: hidden">
+      <div style="display: flex; flex-direction: column; gap: 4px; padding: 16px 20px; border-bottom: 1px solid #263056; background: rgba(108,140,255,.06)">
+        <span style="color: #6c8cff; font-weight: 700; font-size: 12px; letter-spacing: .08em">CASE 11 · ANTI-FRAUD</span>
+        <span style="font-size: 16px; font-weight: 600; text-wrap: pretty">Fraud: 1 fraudster per 1,000 honest users</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column">
+        <div style="padding: 22px 20px; border-bottom: 1px solid #263056; display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <span style="flex: 0 0 32px; height: 32px; border-radius: 50%; background: rgba(108,140,255,.15); color: #6c8cff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px">1</span>
+            <span style="font-size: 16px; font-weight: 700">The situation</span>
+          </div>
+          <p style="margin: 0; color: #93a0c4; font-size: 15px; text-wrap: pretty">The model you inherited reports 99% accuracy. Predicting “not fraud” every time would score 99.9%. The metric is lying to everyone in the room.</p>
+        </div>
+
+        <div style="padding: 22px 20px; border-bottom: 1px solid #263056; display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <span style="flex: 0 0 32px; height: 32px; border-radius: 50%; background: rgba(108,140,255,.15); color: #6c8cff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px">2</span>
+            <span style="font-size: 16px; font-weight: 700">Your ML decisions</span>
+          </div>
+          <p style="margin: 0; color: #93a0c4; font-size: 15px; text-wrap: pretty">Pick metrics that survive a 1:1000 imbalance — precision, recall, ROC-AUC. Weight the classes. Move the threshold on purpose, not by default.</p>
+        </div>
+
+        <div style="padding: 22px 20px; display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <span style="flex: 0 0 32px; height: 32px; border-radius: 50%; background: rgba(52,211,153,.15); color: #34d399; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px">3</span>
+            <span style="font-size: 16px; font-weight: 700">Business impact</span>
+          </div>
+          <p style="margin: 0; color: #93a0c4; font-size: 15px; text-wrap: pretty">Every threshold trades blocked honest customers against fraud that gets through. You pick a number and defend it — as an interviewer will ask you to.</p>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: flex-start; gap: 10px; padding: 16px 20px; border-top: 1px solid #263056; background: rgba(52,211,153,.04)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: 0 0 18px; margin-top: 3px" aria-hidden="true">
+          <path d="M20 6 9 17l-5-5"></path>
+        </svg>
+        <span style="font-size: 14px; color: #93a0c4">Ends with a quiz and a written debrief you can reuse as an interview answer.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- what's inside -->
+  <div style="padding: 0 20px; display: flex; flex-direction: column; gap: 16px">
+
+    <div style="background: #161d38; border: 1px solid #263056; border-radius: 14px; padding: 22px; display: flex; flex-direction: column; gap: 10px">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6c8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="7" width="18" height="13" rx="2"></rect>
+        <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        <path d="M3 12h18"></path>
+      </svg>
+      <h3 style="font-size: 18px; margin: 2px 0 0">23 hands-on cases</h3>
+      <p style="color: #93a0c4; font-size: 15px; margin: 0; text-wrap: pretty">From your first EDA report to a model in production and a project defended in front of the CTO. The first two are free.</p>
+    </div>
+
+    <div style="background: #161d38; border: 1px solid #263056; border-radius: 14px; padding: 22px; display: flex; flex-direction: column; gap: 10px">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6c8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="9" y="2" width="6" height="11" rx="3"></rect>
+        <path d="M5 11a7 7 0 0 0 14 0"></path>
+        <path d="M12 18v4"></path>
+      </svg>
+      <h3 style="font-size: 18px; margin: 2px 0 0">Interview simulator</h3>
+      <p style="color: #93a0c4; font-size: 15px; margin: 0; text-wrap: pretty">Junior, Middle and ML System Design tracks: answer out loud, then compare with a full model answer. Junior is free.</p>
+    </div>
+
+    <div style="background: #161d38; border: 1px solid #263056; border-radius: 14px; padding: 22px; display: flex; flex-direction: column; gap: 10px">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6c8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="9" r="6"></circle>
+        <path d="M8.5 14.5 7 22l5-2.5L17 22l-1.5-7.5"></path>
+      </svg>
+      <h3 style="font-size: 18px; margin: 2px 0 0">Certificate</h3>
+      <p style="color: #93a0c4; font-size: 15px; margin: 0; text-wrap: pretty">Pass the quizzes for all 20 core cases at 70% or better and finish with a Middle-track ML Engineer certificate.</p>
+    </div>
+
+  </div>
+
+  <!-- closing cta -->
+  <div style="padding: 0 20px">
+    <div style="background: #161d38; border: 1px solid #6c8cff; border-radius: 14px; padding: 32px 22px; text-align: center; box-shadow: 0 0 40px rgba(108,140,255,.15)">
+      <h2 style="font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 12px; text-wrap: balance">Interviewers ask what you have built, not what you have watched.</h2>
+      <p style="color: #93a0c4; font-size: 16px; margin: 0 0 24px; text-wrap: pretty">Start with two full cases today and walk in with real decisions to talk about.</p>
+      <a href="/app.html" style="display: block; padding: 16px 24px; border-radius: 10px; font-size: 17px; font-weight: 600; background: #4f6ef7; color: #ffffff">Start 2 Cases Free</a>
+      <div style="margin-top: 14px; font-size: 13px; color: #93a0c4">First 2 cases free · $20/month for all 23 · cancel anytime</div>
+    </div>
+  </div>
+
+  <!-- footer -->
+  <div style="border-top: 1px solid #263056; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #93a0c4; font-size: 13px">
+    <span>ML Career Simulator © 2026</span>
+    <div style="display: flex; align-items: center; gap: 4px">
+      <a href="/terms.html" style="display: inline-block; padding: 12px 10px; font-size: 13px">Terms</a>
+      <span aria-hidden="true">·</span>
+      <a href="/privacy.html" style="display: inline-block; padding: 12px 10px; font-size: 13px">Privacy</a>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>
