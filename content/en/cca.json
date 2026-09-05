@@ -1,0 +1,302 @@
+[
+  {
+    "id": "c01",
+    "order": 1,
+    "title": "The loop that decides when to stop",
+    "subtitle": "The agentic loop: stop_reason, feeding tool results back, and termination anti-patterns",
+    "level": "Foundations",
+    "ts": "1.1",
+    "tags": [
+      "agentic loop",
+      "stop_reason",
+      "tool use"
+    ],
+    "free": true,
+    "status": "ready"
+  },
+  {
+    "id": "c02",
+    "order": 2,
+    "title": "Coordinator and subagents",
+    "subtitle": "Hub-and-spoke: isolated context, decomposition, delegation and result aggregation",
+    "level": "Foundations",
+    "ts": "1.2",
+    "tags": [
+      "multi-agent",
+      "coordinator",
+      "decomposition"
+    ],
+    "free": true,
+    "status": "soon"
+  },
+  {
+    "id": "c03",
+    "order": 3,
+    "title": "Invoking a subagent and what to hand it",
+    "subtitle": "Invocation config, context passing, spawning; sessions: state, resumption, forking",
+    "level": "Foundations",
+    "ts": "1.3, 1.7",
+    "tags": [
+      "subagents",
+      "context",
+      "sessions"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c04",
+    "order": 4,
+    "title": "Multi-step workflows with enforced order",
+    "subtitle": "Step enforcement and handoff: when order is mandatory and when the model decides",
+    "level": "Foundations",
+    "ts": "1.4",
+    "tags": [
+      "workflow",
+      "handoff",
+      "enforcement"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c05",
+    "order": 5,
+    "title": "Agent SDK hooks",
+    "subtitle": "Tool call interception, data normalization, audit and blocking — where a hook beats a prompt",
+    "level": "Foundations",
+    "ts": "1.5",
+    "tags": [
+      "hooks",
+      "Agent SDK",
+      "audit"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c06",
+    "order": 6,
+    "title": "Decomposing a complex task",
+    "subtitle": "Decomposition strategies: depth vs coverage and the price of an extra step",
+    "level": "Foundations",
+    "ts": "1.6",
+    "tags": [
+      "decomposition",
+      "planning",
+      "cost"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c07",
+    "order": 7,
+    "title": "A tool the model gets right the first time",
+    "subtitle": "Descriptions, parameter schemas and structured MCP errors so the agent self-corrects",
+    "level": "Practitioner",
+    "ts": "2.1, 2.2",
+    "tags": [
+      "tool design",
+      "MCP",
+      "errors"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c08",
+    "order": 8,
+    "title": "Distributing tools and wiring MCP servers",
+    "subtitle": "Tool distribution across agents, access limits, MCP integration in Claude Code",
+    "level": "Practitioner",
+    "ts": "2.3, 2.4",
+    "tags": [
+      "MCP",
+      "permissions",
+      "configuration"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c09",
+    "order": 9,
+    "title": "The built-in tools",
+    "subtitle": "Read, Write, Edit, Bash, Grep, Glob: what solves what, and the usual wrong picks",
+    "level": "Practitioner",
+    "ts": "2.5",
+    "tags": [
+      "built-in tools",
+      "Grep",
+      "Bash"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c10",
+    "order": 10,
+    "title": "CLAUDE.md: hierarchy and scoping",
+    "subtitle": "File levels and precedence, path-specific rules and conditional convention loading",
+    "level": "Practitioner",
+    "ts": "3.1, 3.3",
+    "tags": [
+      "CLAUDE.md",
+      "conventions",
+      "scoping"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c11",
+    "order": 11,
+    "title": "Slash commands and skills",
+    "subtitle": "Creating and configuring both: when a command, when a skill, and where the line is",
+    "level": "Practitioner",
+    "ts": "3.2",
+    "tags": [
+      "slash commands",
+      "skills",
+      "automation"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c12",
+    "order": 12,
+    "title": "Plan mode vs direct execution",
+    "subtitle": "Choosing the mode, and progressive refinement one iteration at a time",
+    "level": "Practitioner",
+    "ts": "3.4, 3.5",
+    "tags": [
+      "plan mode",
+      "iteration",
+      "Claude Code"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c13",
+    "order": 13,
+    "title": "Claude Code in CI/CD",
+    "subtitle": "Automated PR review, test generation and keeping false positives down",
+    "level": "Practitioner",
+    "ts": "3.6",
+    "tags": [
+      "CI/CD",
+      "code review",
+      "automation"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c14",
+    "order": 14,
+    "title": "Explicit criteria and few-shot",
+    "subtitle": "Criteria instead of \"do it well\", example selection and its effect on consistency",
+    "level": "Architect",
+    "ts": "4.1, 4.2",
+    "tags": [
+      "prompting",
+      "few-shot",
+      "criteria"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c15",
+    "order": 15,
+    "title": "Structured output via tool use and JSON Schema",
+    "subtitle": "Enforcing a schema: types, required fields, and why it beats parsing prose",
+    "level": "Architect",
+    "ts": "4.3",
+    "tags": [
+      "structured output",
+      "JSON Schema",
+      "tool use"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c16",
+    "order": 16,
+    "title": "Validation, retries and feedback loops in extraction",
+    "subtitle": "The validate → feed back → retry loop, and handling edge cases",
+    "level": "Architect",
+    "ts": "4.4",
+    "tags": [
+      "validation",
+      "retry",
+      "extraction"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c17",
+    "order": 17,
+    "title": "Batching and multi-pass review",
+    "subtitle": "Message Batches API, custom_id, multi-instance and multi-pass review architectures",
+    "level": "Architect",
+    "ts": "4.5, 4.6",
+    "tags": [
+      "batches",
+      "review",
+      "architecture"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c18",
+    "order": 18,
+    "title": "Context in long conversations and large codebases",
+    "subtitle": "What to preserve when compacting, and exploring a big repo without blowing the window",
+    "level": "Architect",
+    "ts": "5.1, 5.4",
+    "tags": [
+      "context",
+      "compaction",
+      "codebase"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c19",
+    "order": 19,
+    "title": "Escalation, ambiguity and error propagation",
+    "subtitle": "When the agent must ask a human, and how failures travel between agents",
+    "level": "Architect",
+    "ts": "5.2, 5.3",
+    "tags": [
+      "escalation",
+      "errors",
+      "reliability"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c20",
+    "order": 20,
+    "title": "Human review, confidence calibration and provenance",
+    "subtitle": "The review threshold, honest confidence, and provenance in multi-agent answers",
+    "level": "Architect",
+    "ts": "5.5, 5.6",
+    "tags": [
+      "human review",
+      "calibration",
+      "provenance"
+    ],
+    "free": false,
+    "status": "soon"
+  }
+]

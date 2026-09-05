@@ -1,0 +1,302 @@
+[
+  {
+    "id": "c01",
+    "order": 1,
+    "title": "Цикл, который сам решает, когда остановиться",
+    "subtitle": "Агентный цикл: stop_reason, возврат tool results в историю и антипаттерны завершения",
+    "level": "Foundations",
+    "ts": "1.1",
+    "tags": [
+      "агентный цикл",
+      "stop_reason",
+      "tool use"
+    ],
+    "free": true,
+    "status": "ready"
+  },
+  {
+    "id": "c02",
+    "order": 2,
+    "title": "Координатор и субагенты",
+    "subtitle": "Hub-and-spoke: изолированный контекст, декомпозиция, делегирование и сборка результата",
+    "level": "Foundations",
+    "ts": "1.2",
+    "tags": [
+      "мультиагентность",
+      "координатор",
+      "декомпозиция"
+    ],
+    "free": true,
+    "status": "soon"
+  },
+  {
+    "id": "c03",
+    "order": 3,
+    "title": "Как вызывать субагента и что ему передать",
+    "subtitle": "Конфигурация вызова, передача контекста, спавн; сессии: сохранение, возобновление, форк",
+    "level": "Foundations",
+    "ts": "1.3, 1.7",
+    "tags": [
+      "субагенты",
+      "контекст",
+      "сессии"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c04",
+    "order": 4,
+    "title": "Многошаговый workflow с гарантией порядка",
+    "subtitle": "Enforcement шагов и handoff между этапами: когда порядок обязателен, а когда решает модель",
+    "level": "Foundations",
+    "ts": "1.4",
+    "tags": [
+      "workflow",
+      "handoff",
+      "enforcement"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c05",
+    "order": 5,
+    "title": "Хуки Agent SDK",
+    "subtitle": "Перехват tool call, нормализация данных, аудит и блокировка — где хук сильнее промпта",
+    "level": "Foundations",
+    "ts": "1.5",
+    "tags": [
+      "hooks",
+      "Agent SDK",
+      "аудит"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c06",
+    "order": 6,
+    "title": "Декомпозиция сложной задачи",
+    "subtitle": "Стратегии разбиения: глубина против охвата и цена лишнего шага",
+    "level": "Foundations",
+    "ts": "1.6",
+    "tags": [
+      "декомпозиция",
+      "планирование",
+      "стоимость"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c07",
+    "order": 7,
+    "title": "Инструмент, который модель понимает с первого раза",
+    "subtitle": "Описания, схемы параметров и структурированные ошибки MCP: чтобы агент чинился сам",
+    "level": "Practitioner",
+    "ts": "2.1, 2.2",
+    "tags": [
+      "tool design",
+      "MCP",
+      "ошибки"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c08",
+    "order": 8,
+    "title": "Раздача инструментов и подключение MCP-серверов",
+    "subtitle": "Распределение инструментов по агентам, ограничение доступа, интеграция MCP в Claude Code",
+    "level": "Practitioner",
+    "ts": "2.3, 2.4",
+    "tags": [
+      "MCP",
+      "права",
+      "конфигурация"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c09",
+    "order": 9,
+    "title": "Встроенные инструменты",
+    "subtitle": "Read, Write, Edit, Bash, Grep, Glob: что чем решается и типичные ошибки выбора",
+    "level": "Practitioner",
+    "ts": "2.5",
+    "tags": [
+      "built-in tools",
+      "Grep",
+      "Bash"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c10",
+    "order": 10,
+    "title": "CLAUDE.md: иерархия и область действия",
+    "subtitle": "Уровни файлов и приоритет, path-specific правила и условная загрузка конвенций",
+    "level": "Practitioner",
+    "ts": "3.1, 3.3",
+    "tags": [
+      "CLAUDE.md",
+      "конвенции",
+      "scoping"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c11",
+    "order": 11,
+    "title": "Слэш-команды и скиллы",
+    "subtitle": "Создание и конфигурация: когда команда, когда скилл и где проходит граница",
+    "level": "Practitioner",
+    "ts": "3.2",
+    "tags": [
+      "slash commands",
+      "skills",
+      "автоматизация"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c12",
+    "order": 12,
+    "title": "Plan mode против прямого исполнения",
+    "subtitle": "Критерии выбора режима и итеративное уточнение результата шаг за шагом",
+    "level": "Practitioner",
+    "ts": "3.4, 3.5",
+    "tags": [
+      "plan mode",
+      "итерации",
+      "Claude Code"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c13",
+    "order": 13,
+    "title": "Claude Code в CI/CD",
+    "subtitle": "Автоматическое ревью PR, генерация тестов и борьба с ложными срабатываниями",
+    "level": "Practitioner",
+    "ts": "3.6",
+    "tags": [
+      "CI/CD",
+      "код-ревью",
+      "автоматизация"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c14",
+    "order": 14,
+    "title": "Явные критерии и few-shot",
+    "subtitle": "Критерии вместо «сделай хорошо», подбор примеров и их влияние на стабильность вывода",
+    "level": "Architect",
+    "ts": "4.1, 4.2",
+    "tags": [
+      "промптинг",
+      "few-shot",
+      "критерии"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c15",
+    "order": 15,
+    "title": "Structured output через tool use и JSON Schema",
+    "subtitle": "Принуждение к схеме: типы, обязательные поля и почему это надёжнее парсинга текста",
+    "level": "Architect",
+    "ts": "4.3",
+    "tags": [
+      "structured output",
+      "JSON Schema",
+      "tool use"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c16",
+    "order": 16,
+    "title": "Валидация, ретраи и обратная связь при извлечении",
+    "subtitle": "Цикл «валидация → фидбек в модель → повтор» и обработка краевых случаев",
+    "level": "Architect",
+    "ts": "4.4",
+    "tags": [
+      "валидация",
+      "retry",
+      "извлечение данных"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c17",
+    "order": 17,
+    "title": "Батчи и многопроходное ревью",
+    "subtitle": "Message Batches API, custom_id, мульти-инстанс и многопроходные архитектуры проверки",
+    "level": "Architect",
+    "ts": "4.5, 4.6",
+    "tags": [
+      "batches",
+      "ревью",
+      "архитектура"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c18",
+    "order": 18,
+    "title": "Контекст в длинном диалоге и в большой кодовой базе",
+    "subtitle": "Что сохранять при сжатии и как исследовать большой репозиторий без переполнения",
+    "level": "Architect",
+    "ts": "5.1, 5.4",
+    "tags": [
+      "контекст",
+      "компакция",
+      "кодовая база"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c19",
+    "order": 19,
+    "title": "Эскалация, неоднозначность и распространение ошибок",
+    "subtitle": "Когда агент обязан спросить человека и как пробрасывать сбой между агентами",
+    "level": "Architect",
+    "ts": "5.2, 5.3",
+    "tags": [
+      "эскалация",
+      "ошибки",
+      "надёжность"
+    ],
+    "free": false,
+    "status": "soon"
+  },
+  {
+    "id": "c20",
+    "order": 20,
+    "title": "Ревью человеком, калибровка уверенности и происхождение данных",
+    "subtitle": "Порог отправки на ревью, честная уверенность и provenance в мультиагентных ответах",
+    "level": "Architect",
+    "ts": "5.5, 5.6",
+    "tags": [
+      "human review",
+      "калибровка",
+      "provenance"
+    ],
+    "free": false,
+    "status": "soon"
+  }
+]

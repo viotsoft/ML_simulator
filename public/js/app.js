@@ -52,6 +52,25 @@ const I18N = {
     agentCertHint: (n) => `Сертификат откроется после всех ${n} модулей трека`,
     agentCertHeader: 'ML Career Simulator · Сертификат AI Agent Engineer',
     agentCertBody: (n) => `успешно прошёл(ла) ${n} модулей трека агентной инженерии и подтвердил(а) уровень <b>AI Agent Engineer</b>: проектирование, запуск и вывод на рынок агентных систем.`,
+    navCca: '🏛 Claude Architect',
+    ccaTitle: '🏛 Подготовка к Claude Certified Architect',
+    ccaIntro: 'Третий трек: подготовка к экзамену CCAR-F (Claude Certified Architect – Foundations). Двадцать модулей закрывают все 30 официальных целей экзамена, распределение — по весам доменов. В конце — пробный экзамен: 60 вопросов за 120 минут и отчёт по доменам, как в настоящем.',
+    ccaDisclaimer: 'Независимая подготовка. Курс не аффилирован с Anthropic и не является официальной сертификацией; сам экзамен сдаётся отдельно.',
+    ccaRoadmap: (ready, total) => `Открыто ${ready} из ${total} модулей. Остальные выходят по мере готовности — без доплат.`,
+    ccaModuleN: (n) => `Модуль C${n}`,
+    ccaSoonTag: 'Скоро',
+    ccaSoonToast: 'Модуль ещё готовится — он появится здесь автоматически.',
+    ccaQuizTitle: (n) => `📝 Квиз модуля C${n}`,
+    ccaBackModules: '← Все модули трека «Claude Architect»',
+    ccaGrades: { start: 'Начало подготовки', foundations: 'Foundations', practitioner: 'Practitioner', ready: 'Готов к экзамену 🏆' },
+    ccaTs: (ts) => `Цели экзамена: ${ts}`,
+    ccaExamBtn: (n, m) => `🎯 Пробный экзамен · ${n} вопросов / ${m} мин`,
+    ccaExamSoon: 'Пробный экзамен откроется, когда банк вопросов будет набран.',
+    ccaExamBest: (n) => `Лучший результат: ${n} из 1000`,
+    ccaCertBtn: '🎓 Сертификат CCAR-F Exam Ready',
+    ccaCertHint: (n) => `Сертификат откроется после всех ${n} модулей и пробного экзамена от 720`,
+    ccaCertHeader: 'ML Career Simulator · CCAR-F Exam Ready',
+    ccaCertBody: (n) => `успешно прошёл(ла) ${n} модулей трека подготовки к экзамену Claude Certified Architect – Foundations и сдал(а) пробный экзамен с результатом не ниже 720. Это внутренний сертификат ML Career Simulator, а не официальная сертификация Anthropic.`,
     grade: (g) => `Ваш грейд: ${g}`,
     grades: { advanced: 'Middle+ · Advanced complete 🏆', middle: 'Middle ML Engineer 🎉', almost: 'Middle (почти!)', track: 'Middle-track', juniorPlus: 'Junior+', junior: 'Junior' },
     passedOf: (p, n) => `Пройдено ${p} из ${n} модулей`,
@@ -143,6 +162,25 @@ const I18N = {
     agentCertHint: (n) => `The certificate unlocks after all ${n} track modules`,
     agentCertHeader: 'ML Career Simulator · AI Agent Engineer Certificate',
     agentCertBody: (n) => `has successfully completed ${n} modules of the agentic engineering track and demonstrated the level of an <b>AI Agent Engineer</b>: designing, shipping and commercializing agentic systems.`,
+    navCca: '🏛 Claude Architect',
+    ccaTitle: '🏛 Claude Certified Architect prep',
+    ccaIntro: 'The third track: preparation for the CCAR-F exam (Claude Certified Architect – Foundations). Twenty modules cover all 30 official exam objectives, weighted the way the domains are. It ends with a mock exam: 60 questions in 120 minutes and a per-domain report, just like the real one.',
+    ccaDisclaimer: 'Independent preparation. This course is not affiliated with Anthropic and is not an official certification; the exam itself is taken separately.',
+    ccaRoadmap: (ready, total) => `${ready} of ${total} modules are live. The rest ship as they are written — at no extra cost.`,
+    ccaModuleN: (n) => `Module C${n}`,
+    ccaSoonTag: 'Soon',
+    ccaSoonToast: 'This module is still being written — it will appear here automatically.',
+    ccaQuizTitle: (n) => `📝 Module C${n} quiz`,
+    ccaBackModules: '← All Claude Architect modules',
+    ccaGrades: { start: 'Getting started', foundations: 'Foundations', practitioner: 'Practitioner', ready: 'Exam ready 🏆' },
+    ccaTs: (ts) => `Exam objectives: ${ts}`,
+    ccaExamBtn: (n, m) => `🎯 Mock exam · ${n} questions / ${m} min`,
+    ccaExamSoon: 'The mock exam opens once the question bank is complete.',
+    ccaExamBest: (n) => `Best score: ${n} of 1000`,
+    ccaCertBtn: '🎓 CCAR-F Exam Ready certificate',
+    ccaCertHint: (n) => `Unlocks after all ${n} modules and a mock exam of 720 or higher`,
+    ccaCertHeader: 'ML Career Simulator · CCAR-F Exam Ready',
+    ccaCertBody: (n) => `has completed ${n} modules of the Claude Certified Architect – Foundations preparation track and passed the mock exam with a score of 720 or higher. This is an internal ML Career Simulator certificate, not an official Anthropic certification.`,
     grade: (g) => `Your grade: ${g}`,
     grades: { advanced: 'Middle+ · Advanced complete 🏆', middle: 'Middle ML Engineer 🎉', almost: 'Middle (almost!)', track: 'Middle-track', juniorPlus: 'Junior+', junior: 'Junior' },
     passedOf: (p, n) => `${p} of ${n} modules completed`,
@@ -217,7 +255,7 @@ function setLang(lang) {
   location.reload();
 }
 
-let state = { user: null, modules: [], agentModules: [], paymentsMode: 'demo' };
+let state = { user: null, modules: [], agentModules: [], ccaModules: [], paymentsMode: 'demo' };
 
 const api = async (path, opts = {}) => {
   const res = await fetch(path, {
@@ -343,21 +381,27 @@ function renderAuth(mode = 'register') {
 }
 
 // ---------------------------------------------------------------- навигация разделов
+// Разделы описаны списком: новая вкладка — одна строка, а не правка в двух функциях.
+const SECTIONS = [
+  { key: 'modules', id: 'navModules', label: 'navModules', render: () => renderDashboard() },
+  { key: 'interviews', id: 'navInterviews', label: 'navInterviews', render: () => renderInterviews() },
+  { key: 'agents', id: 'navAgents', label: 'navAgents', render: () => renderAgents() },
+  { key: 'cca', id: 'navCca', label: 'navCca', render: () => renderCca() },
+];
 function sectionTabs(active) {
+  const buttons = SECTIONS.map((sec) =>
+    `<button class="${active === sec.key ? 'active' : ''}" id="${sec.id}">${t(sec.label)}</button>`
+  ).join('\n      ');
   return `
     <div class="section-tabs">
-      <button class="${active === 'modules' ? 'active' : ''}" id="navModules">${t('navModules')}</button>
-      <button class="${active === 'interviews' ? 'active' : ''}" id="navInterviews">${t('navInterviews')}</button>
-      <button class="${active === 'agents' ? 'active' : ''}" id="navAgents">${t('navAgents')}</button>
+      ${buttons}
     </div>`;
 }
 function bindSectionTabs() {
-  const m = document.getElementById('navModules');
-  const i = document.getElementById('navInterviews');
-  const a = document.getElementById('navAgents');
-  if (m) m.onclick = renderDashboard;
-  if (i) i.onclick = renderInterviews;
-  if (a) a.onclick = renderAgents;
+  for (const sec of SECTIONS) {
+    const el = document.getElementById(sec.id);
+    if (el) el.onclick = sec.render;
+  }
 }
 
 // ---------------------------------------------------------------- дашборд
@@ -593,6 +637,7 @@ const TRACK_UI = {
     cert: () => renderCertificate(),
     backLabel: () => t('backModules'),
     quizTitle: (n) => t('quizTitle', n),
+    soonToast: 'agentSoonToast',
   },
   agent: {
     modulePath: (id) => `/api/agent-module/${id}`,
@@ -603,6 +648,18 @@ const TRACK_UI = {
     cert: () => renderAgentCertificate(),
     backLabel: () => t('agentBackModules'),
     quizTitle: (n) => t('agentQuizTitle', n),
+    soonToast: 'agentSoonToast',
+  },
+  cca: {
+    modulePath: (id) => `/api/cca-module/${id}`,
+    quizPath: (id) => `/api/cca-quiz/${id}`,
+    back: () => renderCca(),
+    list: () => state.ccaModules,
+    certReady: (u) => !!(u.tracks && u.tracks.cca && u.tracks.cca.certificateReady),
+    cert: () => renderCcaCertificate(),
+    backLabel: () => t('ccaBackModules'),
+    quizTitle: (n) => t('ccaQuizTitle', n),
+    soonToast: 'ccaSoonToast',
   },
 };
 
@@ -613,7 +670,7 @@ async function renderModule(id, track = 'ml') {
     data = await api(T.modulePath(id));
   } catch (e) {
     if (e.status === 402) return renderPaywall();
-    if (e.status === 409) return toast(t('agentSoonToast'));
+    if (e.status === 409) return toast(t(T.soonToast));
     return toast(e.message);
   }
   const { module: mod, html, quiz } = data;
@@ -695,7 +752,7 @@ async function renderModule(id, track = 'ml') {
       const cur = list.find((m) => m.id === id);
       const nx = list.find((m) => m.order === cur.order + 1);
       if (!nx) return T.back();
-      if (nx.status === 'soon') return toast(t('agentSoonToast'));
+      if (nx.status === 'soon') return toast(t(T.soonToast));
       if (nx.unlocked) renderModule(nx.id, track); else renderPaywall();
     };
     const toCert = document.getElementById('toCert');
@@ -771,6 +828,81 @@ async function renderAgents() {
   bindSectionTabs();
 }
 
+// ------------------------------------------------- трек «Claude Certified Architect»
+async function renderCca() {
+  const { modules, certRequired, exam } = await api('/api/cca-modules');
+  state.ccaModules = modules;
+  const u = state.user;
+  const tr = (u.tracks && u.tracks.cca) || { certificateReady: false, examBest: null };
+  const passed = modules.filter((m) => m.progress && m.progress.passed).length;
+  const ready = modules.filter((m) => m.status !== 'soon').length;
+  const pct = modules.length ? Math.round((passed / modules.length) * 100) : 0;
+
+  const g = I18N[LANG].ccaGrades;
+  const grade = passed >= modules.length ? g.ready
+    : passed >= Math.ceil(modules.length * 0.65) ? g.practitioner
+    : passed >= Math.ceil(modules.length * 0.3) ? g.foundations
+    : g.start;
+
+  view.innerHTML = `
+    ${sectionTabs('cca')}
+    <div class="interview-intro" style="margin-bottom:22px">
+      <h2 style="font-size:22px;margin-bottom:8px">${t('ccaTitle')}</h2>
+      <p style="color:var(--muted);font-size:15px;max-width:760px">${t('ccaIntro')}</p>
+      <p style="color:var(--muted);font-size:12.5px;max-width:760px;margin-top:10px;opacity:.8">${t('ccaDisclaimer')}</p>
+    </div>
+    <div class="progress-panel">
+      <div class="info">
+        <div style="font-weight:700;font-size:18px">${t('grade', grade)}</div>
+        <div style="color:var(--muted);font-size:14px;margin-top:2px">${t('passedOf', passed, modules.length)} · ${t('ccaRoadmap', ready, modules.length)}${tr.examBest !== null ? ' · ' + t('ccaExamBest', tr.examBest) : ''}</div>
+        <div class="progress-bar"><div style="width:${pct}%"></div></div>
+      </div>
+      ${exam && exam.ready
+        ? `<button class="btn btn-primary" id="ccaExamBtn">${t('ccaExamBtn', exam.items, exam.minutes)}</button>`
+        : `<div style="color:var(--muted);font-size:13px;max-width:200px">${t('ccaExamSoon')}</div>`}
+      ${tr.certificateReady
+        ? `<button class="btn btn-primary" id="ccaCertBtn">${t('ccaCertBtn')}</button>`
+        : `<div style="color:var(--muted);font-size:13px;max-width:200px">${t('ccaCertHint', certRequired)}</div>`}
+      ${!u.subscribed ? `<button class="btn btn-ghost" id="subBtn">${t('subBtn')}</button>` : ''}
+    </div>
+    <div class="module-list">
+      ${modules.map((m) => {
+        const soon = m.status === 'soon';
+        const done = m.progress && m.progress.passed;
+        const icon = done ? '✅' : soon ? '🕓' : m.unlocked ? '📂' : '🔒';
+        const status = done
+          ? t('quizScore', m.progress.score, m.progress.total)
+          : soon ? t('ccaSoonTag')
+          : m.unlocked ? (m.free ? t('freeTag') : t('availableTag')) : t('proTag');
+        return `
+        <div class="module-card ${m.unlocked ? '' : 'locked'}" data-id="${m.id}" data-unlocked="${m.unlocked}" data-soon="${soon}">
+          <div class="module-status">${icon}</div>
+          <div>
+            <div class="m-title">${t('ccaModuleN', m.order)}. ${esc(m.title)}</div>
+            <div class="m-sub">${esc(m.subtitle)}</div>
+            ${m.ts ? `<div class="m-sub" style="opacity:.7;font-size:12px;margin-top:3px">${t('ccaTs', esc(m.ts))}</div>` : ''}
+          </div>
+          <div class="module-meta">${esc(m.level)}<br>${status}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  view.querySelectorAll('.module-card').forEach((card) => {
+    card.onclick = () => {
+      if (card.dataset.soon === 'true') return toast(t('ccaSoonToast'));
+      if (card.dataset.unlocked === 'true') renderModule(card.dataset.id, 'cca');
+      else renderPaywall();
+    };
+  });
+  const certBtn = document.getElementById('ccaCertBtn');
+  if (certBtn) certBtn.onclick = renderCcaCertificate;
+  const examBtn = document.getElementById('ccaExamBtn');
+  if (examBtn) examBtn.onclick = () => renderExam();
+  const subBtn = document.getElementById('subBtn');
+  if (subBtn) subBtn.onclick = renderPaywall;
+  bindSectionTabs();
+}
+
 // ---------------------------------------------------------------- сертификат
 async function renderCertificateView(cfg) {
   let cert;
@@ -805,6 +937,11 @@ async function renderCertificate() {
 async function renderAgentCertificate() {
   return renderCertificateView({ endpoint: '/api/agent-certificate', backKey: 'agentBackModules',
     headerKey: 'agentCertHeader', bodyKey: 'agentCertBody', back: renderAgents });
+}
+
+async function renderCcaCertificate() {
+  return renderCertificateView({ endpoint: '/api/cca-certificate', backKey: 'ccaBackModules',
+    headerKey: 'ccaCertHeader', bodyKey: 'ccaCertBody', back: renderCca });
 }
 
 // ---------------------------------------------------------------- старт

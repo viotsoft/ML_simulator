@@ -1,0 +1,59 @@
+{
+  "c01": [
+    {
+      "question": "A support agent calls lookup_order with the same order number over and over until the iteration limit fires. What is most likely broken?",
+      "options": [
+        "The tool description is too short, so the model does not realise it already ran",
+        "Tool results are not appended to the message history, so the model sees identical context every time",
+        "The iteration limit is too low — it should be raised to 30",
+        "Temperature is set too high and the model makes random decisions"
+      ],
+      "answer": 1,
+      "explanation": "The model keeps no state between calls: it only sees the history you send. If the assistant response containing the tool_use block and the following tool_result are not appended to messages, every iteration starts from the same context and produces the same decision."
+    },
+    {
+      "question": "Which signal correctly drives continuation of an agentic loop?",
+      "options": [
+        "A marker word (\"done\", \"DONE\") appearing in the response text",
+        "The type of the first content block: text means completion",
+        "The stop_reason field: continue while it equals \"tool_use\"",
+        "The iteration counter: exit once the maximum is reached"
+      ],
+      "answer": 2,
+      "explanation": "stop_reason is the one explicit protocol field. \"tool_use\" means the model requested tools and is waiting for results; \"end_turn\" means it is finished. The other three infer protocol state from prose or from an external counter."
+    },
+    {
+      "question": "If stop_reason determines termination, why does a correct agentic loop still need MAX_ITERATIONS?",
+      "options": [
+        "It is the primary stopping mechanism: without it the agent never terminates",
+        "It is a safety net against an unbounded loop; hitting it is an anomaly worth logging as an incident and escalating",
+        "It saves tokens and should fire on most runs",
+        "It caps how many tools the model may call within a single iteration"
+      ],
+      "answer": 1,
+      "explanation": "The cap protects against pathological behaviour (a failing tool, a loop), but should not fire in normal operation. If it fires regularly the system is shipping half-finished answers — the correct reaction to exhausting the cap is an error and escalation, not returning whatever text is at hand."
+    },
+    {
+      "question": "The model returns a response with two blocks: text (\"Let me check your order\") and tool_use (lookup_order). What should the loop do?",
+      "options": [
+        "Treat the work as complete, since the response contains a text block",
+        "Execute the tool, return a tool_result with the same tool_use_id, and continue the loop",
+        "Drop the text block and skip appending the assistant response to history",
+        "Send the text to the user and start a new conversation with a clean history"
+      ],
+      "answer": 1,
+      "explanation": "The model routinely talks and acts in one response, and stop_reason will be \"tool_use\". The assistant response goes into history in full, the tool runs, the result comes back with the same tool_use_id, and the loop continues."
+    },
+    {
+      "question": "A team describes their system: \"the code always calls get_customer, then lookup_order, then asks the model to phrase the reply.\" How should this be classified?",
+      "options": [
+        "An agentic loop with model-driven decision making",
+        "A multi-agent system with a coordinator",
+        "A pre-configured workflow: the tool sequence is decided by code, not by the model",
+        "An agentic loop in which stop_reason is replaced by a step counter"
+      ],
+      "answer": 2,
+      "explanation": "The defining property of an agentic loop is that the model chooses the next tool from context. A call sequence hardcoded in code is a workflow. That is perfectly appropriate where the order is mandatory — but it should not be called an agent, and it does not need a stop_reason loop."
+    }
+  ]
+}

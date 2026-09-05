@@ -83,6 +83,10 @@ for (const loc of LOCALES) {
     interviews: readContent(path.join(dir, 'interviews.json')),
     agents: readContent(path.join(dir, 'agents.json'), []),
     agentQuizzes: readContent(path.join(dir, 'agent-quizzes.json'), {}),
+    cca: readContent(path.join(dir, 'cca.json'), []),
+    ccaQuizzes: readContent(path.join(dir, 'cca-quizzes.json'), {}),
+    ccaScenarios: readContent(path.join(dir, 'cca-scenarios.json'), []),
+    ccaExam: readContent(path.join(dir, 'cca-exam.json'), []),
   };
 }
 const MODULES = CONTENT[DEFAULT_LOCALE].modules;   // структура/порядок общие для локалей
@@ -98,6 +102,10 @@ function localeQuizzes(lang) { return CONTENT[lang].quizzes; }
 function localeInterviews(lang) { return CONTENT[lang].interviews; }
 function localeAgents(lang) { return CONTENT[lang].agents; }
 function localeAgentQuizzes(lang) { return CONTENT[lang].agentQuizzes; }
+function localeCca(lang) { return CONTENT[lang].cca; }
+function localeCcaQuizzes(lang) { return CONTENT[lang].ccaQuizzes; }
+function localeCcaScenarios(lang) { return CONTENT[lang].ccaScenarios; }
+function localeCcaExam(lang) { return CONTENT[lang].ccaExam; }
 function moduleMarkdownPath(lang, id) {
   const p = path.join(CONTENT_DIR, lang, `${id}.md`);
   return fs.existsSync(p) ? p : path.join(CONTENT_DIR, DEFAULT_LOCALE, `${id}.md`);
@@ -107,32 +115,53 @@ const FREE_MODULES = 2;          // первые N модулей бесплат
 const PASS_SCORE = 0.7;          // порог прохождения квиза
 const CERT_REQUIRED = 20;        // сертификат — базовый курс (модули 21+ — бонус-трек Advanced)
 const AGENT_CERT_REQUIRED = 20;  // сертификат агентного трека — все 20 модулей
+const CCA_CERT_REQUIRED = 20;    // сертификат трека подготовки к CCAR-F — все 20 модулей
+const CCA_EXAM_ITEMS = 60;       // как на настоящем экзамене
+const CCA_EXAM_MINUTES = 120;
+const CCA_EXAM_SCENARIOS = 4;    // 4 сценария из 6
+const CCA_PASS_SCALED = 720;     // порог по шкале 100–1000
+
+// Один список треков вместо попарных проверок: четвёртый трек добавляется
+// строкой здесь, а не новой веткой в каждой проверке ниже.
+const TRACK_DEFS = [
+  { key: 'ml', content: 'modules', prefix: /^m\d{2}$/, required: CERT_REQUIRED, salt: '|ml-simulator-cert', file: 'modules.json', soonable: false },
+  { key: 'agent', content: 'agents', prefix: /^a\d{2}$/, required: AGENT_CERT_REQUIRED, salt: '|ai-agent-cert', file: 'agents.json', soonable: true },
+  { key: 'cca', content: 'cca', prefix: /^c\d{2}$/, required: CCA_CERT_REQUIRED, salt: '|cca-architect-cert', file: 'cca.json', soonable: true },
+];
 
 // Модуль без markdown не должен доходить до readFileSync: помечаем «скоро» на старте.
 for (const loc of LOCALES) {
-  for (const m of CONTENT[loc].agents) {
-    if (m.status !== 'soon' && !fs.existsSync(path.join(CONTENT_DIR, DEFAULT_LOCALE, `${m.id}.md`))) {
-      console.warn(`[content] ${loc}/${m.id}: нет markdown — статус переключён на "soon"`);
-      m.status = 'soon';
+  for (const def of TRACK_DEFS) {
+    if (!def.soonable) continue;
+    for (const m of CONTENT[loc][def.content]) {
+      if (m.status !== 'soon' && !fs.existsSync(path.join(CONTENT_DIR, DEFAULT_LOCALE, `${m.id}.md`))) {
+        console.warn(`[content] ${loc}/${m.id}: нет markdown — статус переключён на "soon"`);
+        m.status = 'soon';
+      }
     }
   }
 }
 
-// Прогресс обоих треков лежит в одной плоской карте user.progress, поэтому
+// Прогресс всех треков лежит в одной плоской карте user.progress, поэтому
 // пересечение id ломало бы подсчёт сертификатов. Падаем на старте, а не в проде.
-const AGENT_MODULES = CONTENT[DEFAULT_LOCALE].agents;
-const ML_MODULE_IDS = new Set(MODULES.map((m) => m.id));
-const AGENT_MODULE_IDS = new Set(AGENT_MODULES.map((m) => m.id));
-if (AGENT_MODULE_IDS.size !== AGENT_MODULES.length) throw new Error('agents.json: повторяющиеся id');
-for (const id of AGENT_MODULE_IDS) {
-  if (!/^a\d{2}$/.test(id)) throw new Error(`agents.json: некорректный id "${id}" (ожидается aNN)`);
-  if (ML_MODULE_IDS.has(id)) throw new Error(`agents.json: id "${id}" пересекается с modules.json`);
+const TRACKS = {};
+const SEEN_IDS = new Map();  // id → ключ трека, который его занял
+for (const def of TRACK_DEFS) {
+  const list = CONTENT[DEFAULT_LOCALE][def.content];
+  const ids = new Set(list.map((m) => m.id));
+  if (ids.size !== list.length) throw new Error(`${def.file}: повторяющиеся id`);
+  for (const id of ids) {
+    if (!def.prefix.test(id)) throw new Error(`${def.file}: некорректный id "${id}" (ожидается ${def.prefix})`);
+    const owner = SEEN_IDS.get(id);
+    if (owner) throw new Error(`${def.file}: id "${id}" пересекается с треком "${owner}"`);
+    SEEN_IDS.set(id, def.key);
+  }
+  TRACKS[def.key] = { key: def.key, ids, required: def.required, salt: def.salt, modules: list };
 }
-
-const TRACKS = {
-  ml: { ids: ML_MODULE_IDS, required: CERT_REQUIRED, salt: '|ml-simulator-cert' },
-  agent: { ids: AGENT_MODULE_IDS, required: AGENT_CERT_REQUIRED, salt: '|ai-agent-cert' },
-};
+const AGENT_MODULES = TRACKS.agent.modules;
+const CCA_MODULES = TRACKS.cca.modules;
+const ML_MODULE_IDS = TRACKS.ml.ids;
+const AGENT_MODULE_IDS = TRACKS.agent.ids;
 
 // Считаем пройденные модули только своего трека: иначе агентные квизы
 // открывали бы ML-сертификат и наоборот.
@@ -322,8 +351,33 @@ function publicUser(u) {
     passedCount: passed,
     certificateReady: passed >= CERT_REQUIRED,
     agentPassedCount: agentPassed,
-    agentCertificateReady: agentPassed >= AGENT_CERT_REQUIRED
+    agentCertificateReady: agentPassed >= AGENT_CERT_REQUIRED,
+    // Аддитивно: новые треки живут здесь, плоские поля выше — для совместимости.
+    tracks: trackSummary(u)
   };
+}
+
+// Сводка по всем трекам одним циклом: четвёртый трек не потребует новых полей.
+function trackSummary(u) {
+  const out = {};
+  for (const key of Object.keys(TRACKS)) {
+    const tr = TRACKS[key];
+    const passed = countPassed(u.progress, tr.ids);
+    out[key] = { passed, total: tr.modules.length, required: tr.required, certificateReady: passed >= tr.required };
+  }
+  const best = ccaExamBest(u);
+  out.cca.examBest = best;
+  out.cca.examPassed = best !== null && best >= CCA_PASS_SCALED;
+  // Сертификат трека CCAR-F требует ещё и сданного пробного экзамена.
+  out.cca.certificateReady = out.cca.certificateReady && out.cca.examPassed;
+  return out;
+}
+
+// Лучший шкалированный балл среди сданных попыток пробного экзамена.
+function ccaExamBest(u) {
+  const history = Array.isArray(u.ccaExamHistory) ? u.ccaExamHistory : [];
+  const scores = history.filter((a) => a && typeof a.scaled === 'number').map((a) => a.scaled);
+  return scores.length ? Math.max(...scores) : null;
 }
 
 // ---------------------------------------------------------------- подписка
@@ -623,9 +677,10 @@ app.get('/api/interview/:track', requireAuth, (req, res) => {
 // Второй курс: 20 модулей от Junior до Senior AI Engineer. Доступ решается
 // декларативным флагом free у модуля (как у треков собеседований), а не
 // позиционным правилом базового курса — треки не должны влиять друг на друга.
-function agentAccess(user, mod) {
+function trackAccess(user, mod) {
   return !!mod.free || !!(user && user.subscribed);
 }
+const agentAccess = trackAccess;
 
 app.get('/api/agent-modules', (req, res) => {
   const ctx = currentUser(req);
@@ -702,6 +757,90 @@ app.get('/api/agent-certificate', requireAuth, (req, res) => {
   });
 });
 
+// ---------------------------------------------------------------- трек «Claude Certified Architect»
+// Третий курс: подготовка к экзамену CCAR-F. 20 модулей покрывают все 30
+// официальных task statements, распределение — по весам доменов.
+// Это независимая подготовка, не аффилированная с Anthropic.
+app.get('/api/cca-modules', (req, res) => {
+  const ctx = currentUser(req);
+  const user = ctx ? ctx.user : null;
+  res.json({
+    modules: localeCca(getLang(req)).map((m) => ({
+      id: m.id, order: m.order, title: m.title, subtitle: m.subtitle,
+      level: m.level, tags: m.tags, ts: m.ts || null, free: !!m.free,
+      status: m.status || 'ready',
+      unlocked: m.status !== 'soon' && trackAccess(user, m),
+      progress: user ? user.progress[m.id] || null : null
+    })),
+    total: CCA_MODULES.length,
+    certRequired: CCA_CERT_REQUIRED,
+    exam: { items: CCA_EXAM_ITEMS, minutes: CCA_EXAM_MINUTES, passScaled: CCA_PASS_SCALED, ready: localeCcaExam(getLang(req)).length >= CCA_EXAM_ITEMS }
+  });
+});
+
+app.get('/api/cca-module/:id', requireAuth, (req, res) => {
+  const lang = getLang(req);
+  const mod = localeCca(lang).find((m) => m.id === req.params.id);
+  if (!mod) return res.status(404).json({ error: 'Модуль не найден' });
+  if (mod.status === 'soon') {
+    return res.status(409).json({ error: 'Модуль ещё готовится', comingSoon: true });
+  }
+  if (!trackAccess(req.ctx.user, mod)) {
+    return res.status(402).json({ error: 'Модуль доступен по подписке', needSubscription: true });
+  }
+  const markdown = fs.readFileSync(moduleMarkdownPath(lang, mod.id), 'utf8');
+  const quiz = (localeCcaQuizzes(lang)[mod.id] || []).map((q, i) => ({ index: i, question: q.question, options: q.options }));
+  res.json({
+    module: { id: mod.id, order: mod.order, title: mod.title, subtitle: mod.subtitle, level: mod.level, tags: mod.tags, ts: mod.ts || null },
+    html: marked.parse(markdown),
+    quiz
+  });
+});
+
+app.post('/api/cca-quiz/:id', requireAuth, (req, res) => {
+  const lang = getLang(req);
+  const mod = CCA_MODULES.find((m) => m.id === req.params.id);
+  if (!mod) return res.status(404).json({ error: 'Модуль не найден' });
+  if (mod.status === 'soon') return res.status(409).json({ error: 'Модуль ещё готовится', comingSoon: true });
+  if (!trackAccess(req.ctx.user, mod)) return res.status(402).json({ error: 'Модуль доступен по подписке' });
+
+  const quiz = localeCcaQuizzes(lang)[mod.id] || [];
+  if (!quiz.length) return res.status(409).json({ error: 'Квиз ещё готовится', comingSoon: true });
+  const answers = (req.body || {}).answers;
+  if (!Array.isArray(answers) || answers.length !== quiz.length) {
+    return res.status(400).json({ error: 'Ответьте на все вопросы' });
+  }
+
+  const r = gradeQuiz(quiz, answers);
+  const { db, user } = req.ctx;
+  recordProgress(user, mod.id, r, quiz.length);
+  saveDB(db);
+
+  res.json({ correct: r.correct, total: quiz.length, passed: r.passed, review: r.review, user: publicUser(user) });
+});
+
+app.get('/api/cca-certificate', requireAuth, (req, res) => {
+  const user = req.ctx.user;
+  const passed = countPassed(user.progress, TRACKS.cca.ids);
+  if (passed < CCA_CERT_REQUIRED) {
+    return res.status(403).json({ error: `Сертификат доступен после прохождения всех ${CCA_CERT_REQUIRED} модулей трека. Пройдено: ${passed}.` });
+  }
+  const best = ccaExamBest(user);
+  if (best === null || best < CCA_PASS_SCALED) {
+    return res.status(403).json({ error: `Нужен пробный экзамен с результатом не ниже ${CCA_PASS_SCALED}. ${best === null ? 'Попыток пока нет.' : 'Лучший результат: ' + best + '.'}`, needExam: true });
+  }
+  const certId = crypto.createHash('sha256').update(user.email + TRACKS.cca.salt).digest('hex').slice(0, 12).toUpperCase();
+  res.json({
+    name: user.name,
+    email: user.email,
+    certId,
+    date: new Date().toISOString().slice(0, 10),
+    modules: CCA_CERT_REQUIRED,
+    examScore: best,
+    track: 'cca'
+  });
+});
+
 // ---------------------------------------------------------------- сертификат
 app.get('/api/certificate', requireAuth, (req, res) => {
   const user = req.ctx.user;
@@ -709,7 +848,7 @@ app.get('/api/certificate', requireAuth, (req, res) => {
   if (passed < CERT_REQUIRED) {
     return res.status(403).json({ error: `Сертификат доступен после прохождения всех ${CERT_REQUIRED} модулей. Пройдено: ${passed}.` });
   }
-  const certId = crypto.createHash('sha256').update(user.email + '|ml-simulator-cert').digest('hex').slice(0, 12).toUpperCase();
+  const certId = crypto.createHash('sha256').update(user.email + TRACKS.ml.salt).digest('hex').slice(0, 12).toUpperCase();
   res.json({
     name: user.name,
     email: user.email,

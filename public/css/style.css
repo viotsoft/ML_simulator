@@ -345,7 +345,7 @@ a:hover { text-decoration: underline; }
 .lang-switch button:not(.active):hover { color: var(--text); }
 
 /* section tabs */
-.section-tabs { display: flex; gap: 10px; margin-bottom: 26px; }
+.section-tabs { display: flex; flex-wrap: wrap; gap: 10px; row-gap: 8px; margin-bottom: 26px; }
 .section-tabs button {
   padding: 10px 22px; border-radius: 10px; border: 1px solid var(--border);
   background: var(--card); color: var(--muted); font-weight: 700; font-size: 14.5px; cursor: pointer;
