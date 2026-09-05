@@ -207,7 +207,7 @@
       "criteria"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "c15",
@@ -222,7 +222,7 @@
       "tool use"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "c16",
@@ -237,7 +237,7 @@
       "extraction"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "c17",
@@ -252,7 +252,7 @@
       "architecture"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "c18",

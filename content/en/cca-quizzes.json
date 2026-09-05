@@ -739,5 +739,233 @@
       "answer": 1,
       "explanation": "This is a distinct point in the guide about session context isolation: its own decisions and justifications sit in the context and bias it toward confirming them. Review runs as an independent instance with a clean context."
     }
+  ],
+  "c14": [
+    {
+      "question": "The \"stale comments\" category produces 87 findings, of which 4 are accepted. The prompt says \"check that comments are accurate\". What do you change?",
+      "options": [
+        "Add \"only report findings you are confident about\"",
+        "Replace it with an explicit criterion: flag only when the claimed behaviour contradicts the actual code behaviour",
+        "Lower the severity of that category to minor",
+        "Cap the category at ten findings per PR"
+      ],
+      "answer": 1,
+      "explanation": "The guide uses this exact pair as its canonical example: a vague instruction makes every imperfect comment a candidate, while an explicit categorical criterion demands a checkable condition — a contradiction with behaviour."
+    },
+    {
+      "question": "Why does \"be conservative and only report confident findings\" fail to improve precision?",
+      "options": [
+        "Because it conflicts with schema-enforced structured output",
+        "Because general confidence instructions fail to improve precision compared with specific categorical criteria",
+        "Because the model always ignores instructions at the end of a prompt",
+        "Because confidence must be set as a numeric threshold in the request parameters"
+      ],
+      "answer": 1,
+      "explanation": "The model has no calibrated confidence threshold that a word turns down. What works is defining what counts as a problem and what to skip — categorical criteria rather than confidence filtering."
+    },
+    {
+      "question": "One review category produces many false positives and developers now ignore every comment. Which skill does the guide describe?",
+      "options": [
+        "Temporarily disable the problem category to restore trust while improving its prompt",
+        "Remove the category permanently as unworkable",
+        "Lower every finding in that category to minor severity",
+        "Publish that category as a separate weekly report"
+      ],
+      "answer": 0,
+      "explanation": "A high false positive rate in one category undermines confidence in the accurate ones. The guide describes exactly this: temporary disabling combined with prompt improvement, not abandoning the category."
+    },
+    {
+      "question": "The output format instructions are detailed, yet the result is still inconsistent from run to run. What do you apply?",
+      "options": [
+        "An even more detailed instruction describing every field",
+        "2–4 targeted few-shot examples showing the desired format and the reasoning",
+        "Temperature lowered to zero",
+        "Splitting the task into two sequential calls"
+      ],
+      "answer": 1,
+      "explanation": "The guide names few-shot as the most effective technique precisely when detailed instructions alone produce inconsistent results. It speaks of 2–4 targeted examples, not of covering every case."
+    },
+    {
+      "question": "Why should a few-shot example show the reasoning for choosing one action over a plausible alternative?",
+      "options": [
+        "To lengthen the context and increase the model attention to the task",
+        "So the model generalises judgment to novel patterns rather than matching only the enumerated cases",
+        "To make the output conform to the JSON schema",
+        "To reduce the number of tokens in the response"
+      ],
+      "answer": 1,
+      "explanation": "The reasoning is what conveys the property behind the decision. Without it the example is a record of one case, and the model does not carry the judgment over to similar but new fragments."
+    }
+  ],
+  "c15": [
+    {
+      "question": "The document type is unknown upfront, three extraction schemas are declared, and structure must come back either way. Which tool_choice?",
+      "options": [
+        "\"auto\"",
+        "\"any\"",
+        "{\"type\": \"tool\", \"name\": \"extract_invoice\"}",
+        "Leave tool_choice unset — the model will work it out"
+      ],
+      "answer": 1,
+      "explanation": "The \"any\" mode requires the model to call a tool while letting it choose which — exactly what an unknown document type with several schemas needs. \"auto\" permits a text answer, and forced selection requires knowing the type in advance."
+    },
+    {
+      "question": "After moving to tool use with a strict JSON schema, which errors remain?",
+      "options": [
+        "None: the schema guarantees the extracted data is correct",
+        "Semantic ones: totals that do not sum, values in the wrong fields",
+        "Only JSON syntax errors",
+        "Only errors on documents longer than the context window"
+      ],
+      "answer": 1,
+      "explanation": "The guide stresses this separately: strict schemas via tool use eliminate syntax errors but do not prevent semantic ones — line items that do not sum to the total, or a value placed in the wrong field."
+    },
+    {
+      "question": "In 6% of cases the model returns a plausible supplier tax id that does not appear in the document. What do you change in the schema?",
+      "options": [
+        "Add a prohibition on inventing values to the field description",
+        "Make the field optional (nullable) so the model is not forced to fill it",
+        "Lower the request temperature to zero",
+        "Move the field into a separate extraction tool"
+      ],
+      "answer": 1,
+      "explanation": "A required field the source lacks forces the model to put something there. The skill from the guide is designing such fields as optional when source documents may not contain the information."
+    },
+    {
+      "question": "A payment-terms classifier sometimes meets wording that matches no enum value. What do you provide for?",
+      "options": [
+        "Extend the enum with a new value after each such case",
+        "Add an \"unclear\" value for ambiguous cases and the \"other\" + detail string pattern for extensible categories",
+        "Make the field a plain string with no enum",
+        "Return an extraction error so the document goes to manual processing"
+      ],
+      "answer": 1,
+      "explanation": "Without a \"cannot tell\" option the model picks the nearest value and you never learn it hesitated. The guide describes both patterns: \"unclear\" for ambiguity and \"other\" plus a detail field for extensible categories."
+    },
+    {
+      "question": "Dates appear in three different formats across documents. Where are the rules for normalising to YYYY-MM-DD stated?",
+      "options": [
+        "In the JSON schema, via a format constraint",
+        "In the prompt, alongside the strict output schema",
+        "In post-processing after the result comes back",
+        "In the tool description field of the tool itself"
+      ],
+      "answer": 1,
+      "explanation": "The schema handles types and structure, while rules for normalising inconsistent source formatting are included in the prompt alongside the strict schema — a separately named skill of this objective."
+    }
+  ],
+  "c16": [
+    {
+      "question": "An extraction failed validation because of a wrong date format. How do you build the retry?",
+      "options": [
+        "Send the same request again, perhaps with a lower temperature",
+        "Include the source document, the failed extraction and the specific validation errors in the retry",
+        "Split the document into parts and extract fragment by fragment",
+        "Switch to another model and retry"
+      ],
+      "answer": 1,
+      "explanation": "The technique is retry-with-error-feedback: the specific validation errors are appended to the prompt so the model corrects what was named. A repeat with the same prompt gives the model no new information."
+    },
+    {
+      "question": "In 30% of invoices the required \"contract number\" field is empty, because the number exists only in a separate annex the system cannot see. What do you do?",
+      "options": [
+        "Raise the extraction attempt count from three to five",
+        "Recognise that retries are ineffective: the information is absent from the source and a different document is required",
+        "Add an instruction to the prompt to look for the contract number more carefully",
+        "Lower the temperature so the model stops skipping the field"
+      ],
+      "answer": 1,
+      "explanation": "The guide asks you to distinguish situations where a retry succeeds (format mismatches, structural output errors) from those where the information is simply not in the source document. In the latter, no number of retries helps."
+    },
+    {
+      "question": "Invoice line items do not match the stated total and the system does not notice. Which technique does the guide describe?",
+      "options": [
+        "Add a request to check the arithmetic to the prompt",
+        "Extract calculated_total alongside stated_total so the discrepancy becomes a visible field",
+        "Re-extract any invoice above a threshold amount",
+        "Validate the total with a separate model call"
+      ],
+      "answer": 1,
+      "explanation": "The schema forces the model to write both values out explicitly, after which the discrepancy is checked in one line of code. That is the self-correction flow the guide describes, complemented by a conflict_detected boolean for inconsistent source data."
+    },
+    {
+      "question": "Developers dismiss review findings but no pattern is visible. What do you add to the finding structure?",
+      "options": [
+        "A confidence field with a numeric score",
+        "A detected_pattern field carrying a machine-readable label for the construct that triggered the finding",
+        "An author field naming the owner of the file",
+        "A timestamp field for sorting by time"
+      ],
+      "answer": 1,
+      "explanation": "The skill is stated directly: detected_pattern lets you group dismissed findings by construct and analyse false positives systematically. Without the label you are left with a set of unique texts and no pattern."
+    },
+    {
+      "question": "Which errors are NOT eliminated by moving to tool use with a strict schema and still require code validation?",
+      "options": [
+        "JSON syntax errors",
+        "Semantic ones: values that do not sum, data in the wrong fields, contradictions in the source",
+        "Context window overflow errors",
+        "Authorisation errors when calling the tool"
+      ],
+      "answer": 1,
+      "explanation": "Strict schemas via tool use eliminate syntax errors as a class, but semantics remain: that is a separate layer, closed by code validation and a retry loop carrying feedback."
+    }
+  ],
+  "c17": [
+    {
+      "question": "Which workload can NOT be moved to the Message Batches API for the savings?",
+      "options": [
+        "Nightly test generation for changed modules",
+        "A pre-merge PR check whose result a developer is waiting on",
+        "A weekly audit of three thousand supplier documents",
+        "Building an overnight report on support tickets"
+      ],
+      "answer": 1,
+      "explanation": "Batches suit non-blocking, latency-tolerant workloads: a processing window of up to 24 hours with no latency guarantee. A pre-merge check blocks a developer, so it stays on the synchronous API."
+    },
+    {
+      "question": "The SLA promises results within 30 hours and batch processing takes up to 24 hours. How often do you submit batches?",
+      "options": [
+        "Once a day — that is enough for a 30-hour SLA",
+        "Every 4 hours: a document must not wait more than 6 hours to be submitted, minus margin for resubmission",
+        "Every 30 hours, at the SLA boundary",
+        "Continuously, one document per batch"
+      ],
+      "answer": 1,
+      "explanation": "The frequency comes from the SLA: 30 hours minus up to 24 hours of processing leaves roughly 6 hours of waiting to be submitted. Submitting every 4 hours fits that window and leaves margin for resubmitting failures."
+    },
+    {
+      "question": "Some documents in a batch failed. What is the correct response?",
+      "options": [
+        "Resubmit the entire batch",
+        "Resubmit only the failed documents, identified by custom_id, with the cause addressed — chunking the over-long ones, for example",
+        "Process the failed documents synchronously one by one",
+        "Halve the size of every future batch"
+      ],
+      "answer": 1,
+      "explanation": "The custom_id field correlates requests with responses, which is how the failures are isolated. Resubmitting without addressing the cause reproduces the same error, and resending the whole batch doubles the bill."
+    },
+    {
+      "question": "A review of generated code in the same session finds none of the problems QA later finds. What is most effective?",
+      "options": [
+        "Add a thorough self-check instruction to the prompt",
+        "Enable extended thinking before the answer",
+        "Run the review as an independent instance with none of the author reasoning context",
+        "Raise max_tokens so the review is more detailed"
+      ],
+      "answer": 2,
+      "explanation": "The model retains reasoning context from generation and is less likely to question its own decisions. The guide explicitly names an independent instance as more effective than self-review instructions or extended thinking."
+    },
+    {
+      "question": "Why ask the model to report confidence alongside each finding in a verification pass?",
+      "options": [
+        "To discard every finding below high confidence",
+        "To route review in a calibrated way: doubtful findings to a human, confident ones posted directly",
+        "To reduce the cost of the request",
+        "To make the model hallucinate less"
+      ],
+      "answer": 1,
+      "explanation": "Self-reported confidence beside a finding enables calibrated routing: it decides what a human checks and what posts automatically. Simply discarding would throw away correct findings too."
+    }
   ]
 }
