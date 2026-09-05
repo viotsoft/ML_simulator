@@ -71,6 +71,46 @@ const I18N = {
     ccaCertHint: (n) => `Сертификат откроется после всех ${n} модулей и пробного экзамена от 720`,
     ccaCertHeader: 'ML Career Simulator · CCAR-F Exam Ready',
     ccaCertBody: (n) => `успешно прошёл(ла) ${n} модулей трека подготовки к экзамену Claude Certified Architect – Foundations и сдал(а) пробный экзамен с результатом не ниже 720. Это внутренний сертификат ML Career Simulator, а не официальная сертификация Anthropic.`,
+    examTitle: '🎯 Пробный экзамен CCAR-F',
+    examIntro: (n, m, p) => `${n} вопросов · ${m} минут · порог ${p} по шкале 100–1000. Время идёт на сервере: закрыть вкладку можно, ответы сохраняются. Неотвеченные вопросы засчитываются как неверные.`,
+    examStart: 'Начать попытку',
+    examResume: 'Продолжить попытку',
+    examScenarios: 'Сценарии этой попытки',
+    examSelectN: (n) => `Выберите ${n} варианта`,
+    examSelectOne: 'Выберите один вариант',
+    examQuestionN: (i, n) => `Вопрос ${i} из ${n}`,
+    examDomain: (d) => `Домен ${d}`,
+    examPrev: '← Назад',
+    examNext: 'Далее →',
+    examAnswered: (a, n) => `Отвечено ${a} из ${n}`,
+    examSubmit: 'Сдать экзамен',
+    examConfirm: (n) => n
+      ? `Не отвечено вопросов: ${n}. Они будут засчитаны как неверные. Сдать?`
+      : 'Сдать экзамен и посмотреть результат?',
+    examTimeLeft: (t) => `Осталось ${t}`,
+    examExpired: 'Время истекло — попытка сдана автоматически.',
+    examResultTitle: 'Результат пробного экзамена',
+    examPassed: 'Порог пройден',
+    examFailed: 'Порог не пройден',
+    examScore: (s, p) => `${s} из 1000 · порог ${p}`,
+    examRaw: (c, n) => `Правильных ответов: ${c} из ${n}`,
+    examByDomain: 'Процент правильных по доменам',
+    examDomainNames: {
+      1: 'Агентная архитектура и оркестрация',
+      2: 'Дизайн инструментов и MCP',
+      3: 'Claude Code: конфигурация и процессы',
+      4: 'Промптинг и структурированный вывод',
+      5: 'Контекст и надёжность',
+    },
+    examDomainModules: (ids) => `Модули домена: ${ids}`,
+    examReview: 'Разбор ответов',
+    examYourAnswer: 'Ваш ответ',
+    examCorrectAnswer: 'Верно',
+    examNoAnswer: 'без ответа',
+    examBack: '← К треку',
+    examScaleNote: 'Шкала приближает официальную: реальный экзамен использует IRT, поэтому точное совпадение баллов невозможно.',
+    examAgain: 'Пройти ещё раз',
+    examHistory: 'Прошлые попытки',
     grade: (g) => `Ваш грейд: ${g}`,
     grades: { advanced: 'Middle+ · Advanced complete 🏆', middle: 'Middle ML Engineer 🎉', almost: 'Middle (почти!)', track: 'Middle-track', juniorPlus: 'Junior+', junior: 'Junior' },
     passedOf: (p, n) => `Пройдено ${p} из ${n} модулей`,
@@ -181,6 +221,46 @@ const I18N = {
     ccaCertHint: (n) => `Unlocks after all ${n} modules and a mock exam of 720 or higher`,
     ccaCertHeader: 'ML Career Simulator · CCAR-F Exam Ready',
     ccaCertBody: (n) => `has completed ${n} modules of the Claude Certified Architect – Foundations preparation track and passed the mock exam with a score of 720 or higher. This is an internal ML Career Simulator certificate, not an official Anthropic certification.`,
+    examTitle: '🎯 CCAR-F mock exam',
+    examIntro: (n, m, p) => `${n} questions · ${m} minutes · a ${p} threshold on a 100–1000 scale. The clock runs on the server: you may close the tab, your answers are saved. Unanswered questions count as incorrect.`,
+    examStart: 'Start attempt',
+    examResume: 'Resume attempt',
+    examScenarios: 'Scenarios in this attempt',
+    examSelectN: (n) => `Select ${n} responses`,
+    examSelectOne: 'Select one response',
+    examQuestionN: (i, n) => `Question ${i} of ${n}`,
+    examDomain: (d) => `Domain ${d}`,
+    examPrev: '← Back',
+    examNext: 'Next →',
+    examAnswered: (a, n) => `Answered ${a} of ${n}`,
+    examSubmit: 'Submit exam',
+    examConfirm: (n) => n
+      ? `${n} questions are unanswered and will count as incorrect. Submit?`
+      : 'Submit the exam and see your result?',
+    examTimeLeft: (t) => `${t} left`,
+    examExpired: 'Time is up — the attempt was submitted automatically.',
+    examResultTitle: 'Mock exam result',
+    examPassed: 'Passing score reached',
+    examFailed: 'Below the passing score',
+    examScore: (s, p) => `${s} of 1000 · threshold ${p}`,
+    examRaw: (c, n) => `Correct answers: ${c} of ${n}`,
+    examByDomain: 'Percent correct by domain',
+    examDomainNames: {
+      1: 'Agentic Architecture & Orchestration',
+      2: 'Tool Design & MCP Integration',
+      3: 'Claude Code Configuration & Workflows',
+      4: 'Prompt Engineering & Structured Output',
+      5: 'Context Management & Reliability',
+    },
+    examDomainModules: (ids) => `Modules for this domain: ${ids}`,
+    examReview: 'Answer review',
+    examYourAnswer: 'Your answer',
+    examCorrectAnswer: 'Correct',
+    examNoAnswer: 'no answer',
+    examBack: '← Back to the track',
+    examScaleNote: 'The scale approximates the official one: the real exam uses IRT, so exact score parity is impossible.',
+    examAgain: 'Take it again',
+    examHistory: 'Past attempts',
     grade: (g) => `Your grade: ${g}`,
     grades: { advanced: 'Middle+ · Advanced complete 🏆', middle: 'Middle ML Engineer 🎉', almost: 'Middle (almost!)', track: 'Middle-track', juniorPlus: 'Junior+', junior: 'Junior' },
     passedOf: (p, n) => `${p} of ${n} modules completed`,
@@ -898,9 +978,252 @@ async function renderCca() {
   if (certBtn) certBtn.onclick = renderCcaCertificate;
   const examBtn = document.getElementById('ccaExamBtn');
   if (examBtn) examBtn.onclick = () => renderExam();
+  stopExamTimer();
   const subBtn = document.getElementById('subBtn');
   if (subBtn) subBtn.onclick = renderPaywall;
   bindSectionTabs();
+}
+
+// ------------------------------------------------- пробный экзамен CCAR-F
+// Модули, закрывающие каждый домен: по ним строятся ссылки в отчёте.
+const EXAM_DOMAIN_MODULES = {
+  1: ['c01', 'c02', 'c03', 'c04', 'c05', 'c06'],
+  2: ['c07', 'c08', 'c09'],
+  3: ['c10', 'c11', 'c12', 'c13'],
+  4: ['c14', 'c15', 'c16', 'c17'],
+  5: ['c18', 'c19', 'c20'],
+};
+
+let examState = null;   // { attempt, index, timer }
+
+function fmtClock(ms) {
+  const total = Math.max(0, Math.round(ms / 1000));
+  const h = Math.floor(total / 3600);
+  const m = String(Math.floor((total % 3600) / 60)).padStart(2, '0');
+  const sec = String(total % 60).padStart(2, '0');
+  return h ? `${h}:${m}:${sec}` : `${m}:${sec}`;
+}
+
+function stopExamTimer() {
+  if (examState && examState.timer) clearInterval(examState.timer);
+  if (examState) examState.timer = null;
+}
+
+async function renderExam() {
+  let attempt;
+  try {
+    attempt = await api('/api/cca-exam/attempt');
+  } catch (e) {
+    if (e.status === 402) return renderPaywall();
+    return toast(e.message);
+  }
+  if (attempt.expired && attempt.attemptId) {
+    toast(t('examExpired'));
+    return renderExamResult(attempt.attemptId);
+  }
+  if (!attempt.active) return renderExamIntro();
+  examState = { attempt, index: 0, timer: null };
+  renderExamQuestion();
+}
+
+async function renderExamIntro() {
+  stopExamTimer();
+  let cfg = { items: 60, minutes: 120, passScaled: 720 };
+  let history = { attempts: [] };
+  try {
+    const list = await api('/api/cca-modules');
+    if (list.exam) cfg = list.exam;
+    history = await api('/api/cca-exam/history');
+  } catch (e) { /* показываем интро с дефолтами */ }
+
+  view.innerHTML = `
+    <a class="back-link" id="backLink">${t('examBack')}</a>
+    <div class="interview-intro" style="margin-bottom:22px">
+      <h2 style="font-size:22px;margin-bottom:8px">${t('examTitle')}</h2>
+      <p style="color:var(--muted);font-size:15px;max-width:760px">${t('examIntro', cfg.items, cfg.minutes, cfg.passScaled)}</p>
+      <p style="color:var(--muted);font-size:12.5px;max-width:760px;margin-top:10px;opacity:.8">${t('examScaleNote')}</p>
+      <div style="margin-top:18px"><button class="btn btn-primary" id="examStart">${t('examStart')}</button></div>
+    </div>
+    ${history.attempts.length ? `
+      <h3 style="font-size:16px;margin:0 0 10px">${t('examHistory')}</h3>
+      <div class="module-list">
+        ${history.attempts.map((a) => `
+          <div class="module-card" data-attempt="${esc(a.attemptId)}">
+            <div class="module-status">${a.passed ? '✅' : '📄'}</div>
+            <div>
+              <div class="m-title">${t('examScore', a.scaled, cfg.passScaled)}</div>
+              <div class="m-sub">${t('examRaw', a.correct, a.total)} · ${esc(String(a.submittedAt).slice(0, 10))}</div>
+            </div>
+            <div class="module-meta">${a.passed ? t('examPassed') : t('examFailed')}</div>
+          </div>`).join('')}
+      </div>` : ''}`;
+
+  document.getElementById('backLink').onclick = renderCca;
+  document.getElementById('examStart').onclick = async () => {
+    try {
+      const attempt = await api('/api/cca-exam/start', { method: 'POST' });
+      examState = { attempt: { ...attempt, active: true }, index: 0, timer: null };
+      renderExamQuestion();
+    } catch (e) {
+      if (e.status === 402) return renderPaywall();
+      toast(e.message);
+    }
+  };
+  view.querySelectorAll('[data-attempt]').forEach((card) => {
+    card.onclick = () => renderExamResult(card.dataset.attempt);
+  });
+}
+
+function renderExamQuestion() {
+  stopExamTimer();
+  const { attempt, index } = examState;
+  const item = attempt.items[index];
+  const scenario = (attempt.scenarios || []).find((sc) => sc.id === item.scenario);
+  const given = attempt.answers[String(index)] || [];
+  const answered = Object.keys(attempt.answers).length;
+  const deadline = Date.parse(attempt.endsAt);
+
+  view.innerHTML = `
+    <div class="exam-bar">
+      <div class="exam-progress">${t('examQuestionN', index + 1, attempt.items.length)} · ${t('examAnswered', answered, attempt.items.length)}</div>
+      <div class="exam-clock" id="examClock">${t('examTimeLeft', fmtClock(deadline - Date.now()))}</div>
+    </div>
+    <div class="exam-grid" id="examGrid">
+      ${attempt.items.map((it, i) => `<button class="exam-dot ${i === index ? 'current' : ''} ${attempt.answers[String(i)] ? 'done' : ''}" data-goto="${i}">${i + 1}</button>`).join('')}
+    </div>
+    ${scenario ? `<div class="exam-scenario"><b>${esc(scenario.title)}</b><p>${esc(scenario.brief)}</p></div>` : ''}
+    <div class="exam-question">
+      <div class="exam-meta">${t('examDomain', item.domain)} · ${item.type === 'multi' ? t('examSelectN', item.select) : t('examSelectOne')}</div>
+      <h3>${esc(item.question)}</h3>
+      <div class="exam-options">
+        ${item.options.map((o, i) => `
+          <label class="exam-option ${given.includes(i) ? 'chosen' : ''}">
+            <input type="${item.type === 'multi' ? 'checkbox' : 'radio'}" name="opt" value="${i}" ${given.includes(i) ? 'checked' : ''}>
+            <span>${esc(o)}</span>
+          </label>`).join('')}
+      </div>
+    </div>
+    <div class="exam-nav">
+      <button class="btn btn-ghost" id="examPrev" ${index === 0 ? 'disabled' : ''}>${t('examPrev')}</button>
+      <button class="btn btn-ghost" id="examNext" ${index === attempt.items.length - 1 ? 'disabled' : ''}>${t('examNext')}</button>
+      <button class="btn btn-primary" id="examSubmit">${t('examSubmit')}</button>
+    </div>`;
+
+  const clock = document.getElementById('examClock');
+  examState.timer = setInterval(async () => {
+    const left = deadline - Date.now();
+    clock.textContent = t('examTimeLeft', fmtClock(left));
+    clock.classList.toggle('urgent', left < 5 * 60000);
+    if (left <= 0) {
+      stopExamTimer();
+      toast(t('examExpired'));
+      renderExam();
+    }
+  }, 1000);
+
+  const save = async () => {
+    const checked = [...view.querySelectorAll('.exam-options input:checked')].map((el) => Number(el.value));
+    attempt.answers[String(index)] = checked;
+    try {
+      const r = await api('/api/cca-exam/answer', { method: 'POST', body: JSON.stringify({ index, answers: checked }) });
+      // ресинхронизация таймера с сервером при каждом ответе
+      if (typeof r.remainingMs === 'number') {
+        attempt.endsAt = new Date(Date.now() + r.remainingMs).toISOString();
+      }
+    } catch (e) {
+      if (e.data && e.data.expired) { stopExamTimer(); toast(t('examExpired')); return renderExam(); }
+      toast(e.message);
+    }
+  };
+
+  view.querySelectorAll('.exam-options input').forEach((el) => {
+    el.onchange = async () => {
+      if (item.type === 'multi') {
+        const checked = [...view.querySelectorAll('.exam-options input:checked')];
+        if (checked.length > item.select) { el.checked = false; return; }
+      }
+      view.querySelectorAll('.exam-option').forEach((lab) => {
+        lab.classList.toggle('chosen', lab.querySelector('input').checked);
+      });
+      await save();
+      const dot = view.querySelector(`[data-goto="${index}"]`);
+      if (dot) dot.classList.toggle('done', (attempt.answers[String(index)] || []).length > 0);
+      const answeredNow = Object.values(attempt.answers).filter((a) => a && a.length).length;
+      view.querySelector('.exam-progress').textContent =
+        `${t('examQuestionN', index + 1, attempt.items.length)} · ${t('examAnswered', answeredNow, attempt.items.length)}`;
+    };
+  });
+
+  const go = (i) => { examState.index = i; renderExamQuestion(); };
+  document.getElementById('examPrev').onclick = () => go(index - 1);
+  document.getElementById('examNext').onclick = () => go(index + 1);
+  view.querySelectorAll('[data-goto]').forEach((b) => { b.onclick = () => go(Number(b.dataset.goto)); });
+  document.getElementById('examSubmit').onclick = async () => {
+    const unanswered = attempt.items.length - Object.values(attempt.answers).filter((a) => a && a.length).length;
+    if (!confirm(t('examConfirm', unanswered))) return;
+    stopExamTimer();
+    try {
+      const r = await api('/api/cca-exam/submit', { method: 'POST' });
+      state.user = r.user;
+      renderUserPanel();
+      renderExamResult(r.attemptId);
+    } catch (e) { toast(e.message); }
+  };
+}
+
+async function renderExamResult(attemptId) {
+  stopExamTimer();
+  let r;
+  try { r = await api(`/api/cca-exam/result/${encodeURIComponent(attemptId)}`); }
+  catch (e) { return toast(e.message); }
+
+  const names = I18N[LANG].examDomainNames || I18N.ru.examDomainNames;
+  view.innerHTML = `
+    <a class="back-link" id="backLink">${t('examBack')}</a>
+    <div class="exam-result ${r.passed ? 'pass' : 'fail'}">
+      <div class="exam-verdict">${r.passed ? '✅ ' + t('examPassed') : '⚠️ ' + t('examFailed')}</div>
+      <div class="exam-score">${t('examScore', r.scaled, r.passScaled)}</div>
+      <div class="exam-raw">${t('examRaw', r.correct, r.total)}</div>
+    </div>
+    <h3 style="font-size:16px;margin:24px 0 12px">${t('examByDomain')}</h3>
+    <div class="exam-domains">
+      ${[1, 2, 3, 4, 5].map((d) => {
+        const v = r.perDomain[d] || { percent: 0, correct: 0, total: 0 };
+        const weak = v.percent < 70;
+        return `
+        <div class="exam-domain-row">
+          <div class="exam-domain-name">${d}. ${esc(names[d])}</div>
+          <div class="exam-domain-bar"><div style="width:${v.percent}%" class="${weak ? 'weak' : ''}"></div></div>
+          <div class="exam-domain-num">${v.percent}% <span>(${v.correct}/${v.total})</span></div>
+        </div>
+        ${weak ? `<div class="exam-domain-hint">${t('examDomainModules', EXAM_DOMAIN_MODULES[d].map((id) => id.toUpperCase()).join(', '))}</div>` : ''}`;
+      }).join('')}
+    </div>
+    <p style="color:var(--muted);font-size:12.5px;margin-top:14px;opacity:.8">${t('examScaleNote')}</p>
+    <h3 style="font-size:16px;margin:26px 0 12px">${t('examReview')}</h3>
+    <div class="exam-review">
+      ${r.review.map((q, i) => `
+        <div class="exam-review-item ${q.correct ? 'ok' : 'bad'}">
+          <div class="exam-meta">${i + 1}. ${t('examDomain', q.domain)} · ${esc(q.ts)}</div>
+          <div class="exam-review-q">${esc(q.question)}</div>
+          <ul>
+            ${q.options.map((o, oi) => {
+              const isRight = q.answers.includes(oi);
+              const isGiven = (q.given || []).includes(oi);
+              const mark = isRight ? '✓' : (isGiven ? '✗' : '·');
+              return `<li class="${isRight ? 'right' : ''} ${isGiven && !isRight ? 'wrong' : ''}">${mark} ${esc(o)}</li>`;
+            }).join('')}
+          </ul>
+          ${!(q.given || []).length ? `<div class="exam-review-note">${t('examNoAnswer')}</div>` : ''}
+          <div class="exam-review-note">${esc(q.explanation)}</div>
+        </div>`).join('')}
+    </div>
+    <div style="text-align:center;margin:24px 0">
+      <button class="btn btn-primary" id="examAgain">${t('examAgain')}</button>
+    </div>`;
+
+  document.getElementById('backLink').onclick = renderCca;
+  document.getElementById('examAgain').onclick = renderExamIntro;
 }
 
 // ---------------------------------------------------------------- сертификат

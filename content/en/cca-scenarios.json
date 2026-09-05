@@ -1,0 +1,59 @@
+[
+  {
+    "id": "s1",
+    "title": "Support agent: resolving tickets",
+    "brief": "You own the Datacore support agent built on the Agent SDK. It handles high-ambiguity tickets: refunds, disputed charges, account access problems. It reaches the backend through in-house MCP tools — get_customer, lookup_order, process_refund and escalate_to_human. The goal is resolving more than 80% of tickets on first contact while recognising in time when a human is needed.",
+    "domains": [
+      1,
+      2,
+      5
+    ]
+  },
+  {
+    "id": "s2",
+    "title": "Development with Claude Code",
+    "brief": "The Datacore engineering team uses Claude Code for code generation, refactoring, debugging and documentation across a twelve-package monorepo. It has to fit the team workflow: conventions in CLAUDE.md, custom slash commands and skills, and a sensible choice between planning and direct execution.",
+    "domains": [
+      3,
+      5
+    ]
+  },
+  {
+    "id": "s3",
+    "title": "Multi-agent research system",
+    "brief": "You are building a market research system on the Agent SDK. A coordinator delegates to specialised subagents: one searches the web, one analyses internal documents, one synthesises findings, one produces the report. The output is properly attributed reviews that go to the leadership team.",
+    "domains": [
+      1,
+      2,
+      5
+    ]
+  },
+  {
+    "id": "s4",
+    "title": "Developer productivity tooling",
+    "brief": "You are building an internal Agent SDK tool that helps engineers explore unfamiliar code, understand legacy systems, generate boilerplate and automate routine work. It relies on the built-in tools (Read, Write, Bash, Grep, Glob) and connected MCP servers.",
+    "domains": [
+      2,
+      3,
+      1
+    ]
+  },
+  {
+    "id": "s5",
+    "title": "Claude Code in the CI pipeline",
+    "brief": "Claude Code is wired into the Datacore build pipeline: automated pull request review, test generation, inline comments. The prompts must produce actionable feedback and keep false positives down — otherwise developers stop reading the comments.",
+    "domains": [
+      3,
+      4
+    ]
+  },
+  {
+    "id": "s6",
+    "title": "Structured data extraction",
+    "brief": "The system extracts data from supplier documents — invoices, delivery notes, specifications — in twenty different formats, validates it against JSON schemas and feeds the ERP. Accuracy is critical: an error goes straight to accounting, and edge cases must be handled predictably.",
+    "domains": [
+      4,
+      5
+    ]
+  }
+]

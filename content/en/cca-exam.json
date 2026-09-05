@@ -1,0 +1,1148 @@
+[
+  {
+    "id": "e001",
+    "scenario": "s1",
+    "domain": 1,
+    "ts": "1.1",
+    "type": "single",
+    "select": 1,
+    "question": "The support agent repeatedly calls lookup_order with the same order number until the 10-iteration safety net fires. The customer receives \"checking your order\". Which change removes the cause?",
+    "options": [
+      "Append the assistant response containing the tool_use block, and the following tool_result, to the message history",
+      "Add a system prompt instruction never to call the same tool twice",
+      "Lower the temperature to zero so decisions become deterministic",
+      "Raise the iteration limit to 30 so the agent has time to finish"
+    ],
+    "answers": [
+      0
+    ],
+    "explanation": "The model keeps no state between iterations: it sees only the history you send. If the assistant response and the tool result are not appended to messages, every iteration starts from identical context and reaches an identical decision."
+  },
+  {
+    "id": "e002",
+    "scenario": "s3",
+    "domain": 1,
+    "ts": "1.1",
+    "type": "multi",
+    "select": 2,
+    "question": "Reviewing a research subagent loop. Which TWO signs indicate an incorrectly built agentic loop? Select two responses.",
+    "options": [
+      "The loop continues while stop_reason equals \"tool_use\"",
+      "Termination is decided by searching for a marker word in the response text block",
+      "Results of every call are returned with their matching tool_use_id",
+      "The loop exits when the first content block has type text"
+    ],
+    "answers": [
+      1,
+      3
+    ],
+    "explanation": "Both faulty signs infer protocol state from prose the model wrote for a human. A stop word breaks on a change of language or phrasing, and a text block routinely sits beside tool_use in the same response."
+  },
+  {
+    "id": "e003",
+    "scenario": "s3",
+    "domain": 1,
+    "ts": "1.2",
+    "type": "single",
+    "select": 1,
+    "question": "The synthesis subagent cites a company that appeared in no source. The logs show the document subagent returned \"see previous discussion\". The cause?",
+    "options": [
+      "The subagents exchanged results directly, bypassing the coordinator",
+      "The coordinator invoked the subagents in the wrong order",
+      "Subagent context is isolated: it does not inherit the coordinator history and filled the gap itself",
+      "The synthesiser system prompt does not forbid invented facts"
+    ],
+    "answers": [
+      2
+    ],
+    "explanation": "A subagent sees only the task it was handed. A reference to a shared discussion is empty for it, so the model fills the blank. The task must be self-contained: goal, all required data, expected format."
+  },
+  {
+    "id": "e004",
+    "scenario": "s3",
+    "domain": 1,
+    "ts": "1.2",
+    "type": "single",
+    "select": 1,
+    "question": "The coordinator always routes every request through all four subagents. A simple factual question takes six minutes. Which change matches the expected architecture?",
+    "options": [
+      "Merge the four subagents into one with a longer system prompt",
+      "Run all four in parallel to cut total time",
+      "Cache subagent results between requests",
+      "The coordinator analyses query requirements and dynamically selects which subagents to invoke"
+    ],
+    "answers": [
+      3
+    ],
+    "explanation": "The required skill is dynamic subagent selection based on query complexity and requirements, not a fixed pipeline. Parallelism and caching only speed up work that should not be done at all."
+  },
+  {
+    "id": "e005",
+    "scenario": "s3",
+    "domain": 1,
+    "ts": "1.2",
+    "type": "single",
+    "select": 1,
+    "question": "Broad survey requests come back as reports with large gaps in topic coverage. Which decomposition risk is this?",
+    "options": [
+      "Overly narrow decomposition by the coordinator — incomplete coverage of a broad topic",
+      "Coordinator context window overflow during aggregation",
+      "Missing retries when an individual subagent fails",
+      "Too many subagents, producing contradictory conclusions"
+    ],
+    "answers": [
+      0
+    ],
+    "explanation": "A coordinator that can only produce pointed subqueries will assemble a handful of unrelated facts for a broad topic. A survey needs a cut by the dimensions of the topic, not a set of narrow questions."
+  },
+  {
+    "id": "e006",
+    "scenario": "s4",
+    "domain": 1,
+    "ts": "1.3",
+    "type": "single",
+    "select": 1,
+    "question": "The internal tool coordinator is configured but never spawns subagents in the logs and does everything itself. No errors are raised. What do you check first?",
+    "options": [
+      "Whether the coordinator max_tokens is sufficient",
+      "Whether \"Task\" is present in the coordinator allowedTools",
+      "Whether the subagents have system prompts defined",
+      "Whether a subagent description exceeds a length limit"
+    ],
+    "answers": [
+      1
+    ],
+    "explanation": "Subagents are spawned by the Task tool. Without it in allowedTools, delegation is physically impossible and the model does the work itself — silently, with no error, which is what makes the symptom confusing."
+  },
+  {
+    "id": "e007",
+    "scenario": "s3",
+    "domain": 1,
+    "ts": "1.3",
+    "type": "single",
+    "select": 1,
+    "question": "Three subagents are independent and take 90 seconds each. Total wait is 270 seconds. How do you reduce it?",
+    "options": [
+      "Give all three a shared session so they can share context",
+      "Cut each subagent max_tokens by two thirds",
+      "Emit several Task calls in a single coordinator response",
+      "Call Task one at a time in separate turns so the coordinator can react to each result"
+    ],
+    "answers": [
+      2
+    ],
+    "explanation": "One model response can carry several tool_use blocks. Several Task calls in one response is parallel subagent spawning; separate turns produce sequential execution."
+  },
+  {
+    "id": "e008",
+    "scenario": "s3",
+    "domain": 1,
+    "ts": "1.3",
+    "type": "single",
+    "select": 1,
+    "question": "Claims in the final report lose their source citations even though the web subagent found them. Which context-passing technique is required?",
+    "options": [
+      "Pass the full coordinator history to the synthesiser",
+      "Forbid the synthesiser from paraphrasing prior agents",
+      "Ask the synthesiser in the prompt to remember the sources",
+      "Pass findings as structured data with content and source metadata in separate fields"
+    ],
+    "answers": [
+      3
+    ],
+    "explanation": "A source embedded in a sentence is lost in paraphrase. A structured format separates content from metadata so attribution reaches the report. A prompt request is not a mechanism."
+  },
+  {
+    "id": "e009",
+    "scenario": "s1",
+    "domain": 1,
+    "ts": "1.4",
+    "type": "single",
+    "select": 1,
+    "question": "An audit found that in 9% of refunds the agent skipped identity verification despite a capitalised system prompt requirement. What provides deterministic compliance?",
+    "options": [
+      "A programmatic prerequisite blocking process_refund until get_customer returns a verified customer",
+      "Raise the iteration limit so the agent has more chances to run the check",
+      "Strengthen the wording and add few-shot examples of the correct order",
+      "Lower the temperature to zero"
+    ],
+    "answers": [
+      0
+    ],
+    "explanation": "Prompt instructions carry a non-zero failure rate — a property of a probabilistic system. Where deterministic compliance is required, ordering is enforced in code: a hook or a prerequisite gate."
+  },
+  {
+    "id": "e010",
+    "scenario": "s1",
+    "domain": 1,
+    "ts": "1.4",
+    "type": "single",
+    "select": 1,
+    "question": "The agent escalates a ticket to an operator. What must the structured handoff summary contain?",
+    "options": [
+      "The full conversation transcript so the operator misses nothing",
+      "The customer identifier, the established root cause, the amount and the recommended action",
+      "Only the recommended action: the operator can find the rest in the CRM",
+      "A sentiment score and the customer ticket history for the year"
+    ],
+    "answers": [
+      1
+    ],
+    "explanation": "The summary is written for a human with no access to the transcript. It therefore needs the customer id, the established cause, the specifics of the operation and the proposed action."
+  },
+  {
+    "id": "e011",
+    "scenario": "s1",
+    "domain": 1,
+    "ts": "1.5",
+    "type": "single",
+    "select": 1,
+    "question": "Tools from three MCP servers return dates as a Unix timestamp, ISO 8601 and DD/MM/YY, and status as a numeric code. The agent periodically gets deadlines wrong. What do you apply?",
+    "options": [
+      "A dedicated converter subagent receiving the raw results",
+      "Forced tool_choice for a normalisation tool",
+      "A PostToolUse hook reducing the formats to one shape before the model processes them",
+      "A description of every format in the system prompt with examples"
+    ],
+    "answers": [
+      2
+    ],
+    "explanation": "PostToolUse normalises heterogeneous data from different MCP tools before the agent processes it. That is deterministic code rather than a probabilistic request."
+  },
+  {
+    "id": "e012",
+    "scenario": "s1",
+    "domain": 1,
+    "ts": "1.5",
+    "type": "single",
+    "select": 1,
+    "question": "An interception hook blocked a refund above the threshold. Which behaviour matches the described skill?",
+    "options": [
+      "Allow the call but flag it in the logs as a policy violation",
+      "Retry the call with a reduced amount",
+      "Return a refusal with no explanation and end the conversation",
+      "Block and redirect to an alternative workflow — human escalation"
+    ],
+    "answers": [
+      3
+    ],
+    "explanation": "The skill is phrased as blocking policy-violating actions and redirecting to alternative workflows. A bare refusal leaves the agent no way forward and it retries the same call."
+  },
+  {
+    "id": "e013",
+    "scenario": "s5",
+    "domain": 1,
+    "ts": "1.6",
+    "type": "single",
+    "select": 1,
+    "question": "A review agent receives an 18-file diff in one request and returns comments about the first two files only. Which decomposition architecture is required?",
+    "options": [
+      "Per-file local passes plus a separate cross-file pass",
+      "Split the diff into two nine-file halves processed sequentially",
+      "Dynamic decomposition generating subtasks as the analysis proceeds",
+      "Increase the context window and pass the whole diff"
+    ],
+    "answers": [
+      0
+    ],
+    "explanation": "The diff fits the window, but the more material in one request, the shallower each part is analysed. The recipe is a per-file local pass plus a separate pass for cross-file inconsistencies."
+  },
+  {
+    "id": "e014",
+    "scenario": "s4",
+    "domain": 1,
+    "ts": "1.6",
+    "type": "single",
+    "select": 1,
+    "question": "The task: get a 40,000-line legacy module with no tests under test. Which decomposition strategy matches expectations?",
+    "options": [
+      "Split into equal 5,000-line chunks processed in parallel",
+      "Structure map first, then high-impact areas, then a prioritised plan that adapts as dependencies are discovered",
+      "Generate tests for every public function, starting with the longest",
+      "A fixed pipeline: walk the files alphabetically and write tests for each"
+    ],
+    "answers": [
+      1
+    ],
+    "explanation": "This is an open-ended task: the work is not enumerable upfront. Dynamic decomposition in the stated order is expected; alphabet and equal chunks ignore where the risk sits."
+  },
+  {
+    "id": "e015",
+    "scenario": "s2",
+    "domain": 1,
+    "ts": "1.7",
+    "type": "single",
+    "select": 1,
+    "question": "Yesterday a bug investigation ran in a named session; in the evening half the affected files were rewritten. How do you continue today?",
+    "options": [
+      "Continue without mentioning the changes: the agent will notice on its next read",
+      "Resume the session and immediately ask where you left off",
+      "Resume the session and state which files changed so the agent re-reads exactly those",
+      "Fork yesterday session, preserving the original branch"
+    ],
+    "answers": [
+      2
+    ],
+    "explanation": "Resumption is right while context is mostly valid, but the agent reasons from earlier file reads and does not know about changes until told. Then it re-reads selectively."
+  },
+  {
+    "id": "e016",
+    "scenario": "s2",
+    "domain": 1,
+    "ts": "1.7",
+    "type": "single",
+    "select": 1,
+    "question": "The agent spent half an hour analysing the codebase; now two refactoring strategies must be compared without repeating that analysis. Which mechanism fits?",
+    "options": [
+      "Resuming one session twice under the same name",
+      "Two new sessions with a structured summary of the analysis",
+      "One subagent considering both options in a single response",
+      "fork_session — independent branches from the shared analysis baseline"
+    ],
+    "answers": [
+      3
+    ],
+    "explanation": "fork_session creates independent branches from a shared analysis baseline. Resuming twice tangles the reasoning, and fresh sessions would repeat the half-hour analysis."
+  },
+  {
+    "id": "e017",
+    "scenario": "s3",
+    "domain": 2,
+    "ts": "2.1",
+    "type": "single",
+    "select": 1,
+    "question": "Two tools are described as \"Analyzes content and returns key findings\" and \"Analyzes a document and returns key findings\". The agent keeps picking the wrong one. What do you fix?",
+    "options": [
+      "Rename the tools and rewrite the descriptions to eliminate the functional overlap",
+      "Merge both into one general tool with a mode parameter",
+      "Set tool_choice: any so the model definitely calls a tool",
+      "Add a system prompt rule about which tool to call when"
+    ],
+    "answers": [
+      0
+    ],
+    "explanation": "The description is the primary tool-selection mechanism; overlapping descriptions make the choice arbitrary. Renaming with sharpened descriptions and an explicit boundary against the neighbouring tool is expected."
+  },
+  {
+    "id": "e018",
+    "scenario": "s3",
+    "domain": 2,
+    "ts": "2.1",
+    "type": "single",
+    "select": 1,
+    "question": "The analyze_document tool extracts metrics, writes summaries and verifies claims. Which change matches the expected design?",
+    "options": [
+      "Extend the description to list all three modes",
+      "Split it into purpose-specific tools with defined contracts: extract_data_points, summarize_content, verify_claim_against_source",
+      "Add a mode parameter with values extract, summarize, verify",
+      "Move the mode decision into the coordinator system prompt"
+    ],
+    "answers": [
+      1
+    ],
+    "explanation": "The technique is splitting a generic tool into purpose-specific tools with defined input/output contracts. One tool with three modes leaves the output contract vague and the selection harder."
+  },
+  {
+    "id": "e019",
+    "scenario": "s4",
+    "domain": 2,
+    "ts": "2.1",
+    "type": "single",
+    "select": 1,
+    "question": "The tool descriptions are well written, yet web-page requests still go to the document tools. The system prompt contains \"when working with documents, always clarify the details\". What does this describe?",
+    "options": [
+      "The model prefers tools declared earlier in the list",
+      "The web tool description lacks example queries",
+      "A keyword in the system prompt created an unintended association that overrides the descriptions",
+      "The document tool descriptions are longer and therefore weightier"
+    ],
+    "answers": [
+      2
+    ],
+    "explanation": "Keyword-sensitive system prompt wording can override even well-written descriptions. That is why misrouting analysis reviews the system prompt alongside the descriptions."
+  },
+  {
+    "id": "e020",
+    "scenario": "s1",
+    "domain": 2,
+    "ts": "2.2",
+    "type": "multi",
+    "select": 2,
+    "question": "An MCP tool returns an archive access failure. Which TWO fields of the structured response let the agent make the right decision? Select two responses.",
+    "options": [
+      "Request duration in milliseconds",
+      "isRetryable — whether retrying is meaningful",
+      "A trace identifier for the monitoring system",
+      "errorCategory carrying the failure type (transient / validation / business / permission)"
+    ],
+    "answers": [
+      1,
+      3
+    ],
+    "explanation": "The category conveys the nature of the failure and isRetryable saves pointless attempts. Duration and trace id help observability but do not help the agent choose a recovery path."
+  },
+  {
+    "id": "e021",
+    "scenario": "s1",
+    "domain": 2,
+    "ts": "2.2",
+    "type": "single",
+    "select": 1,
+    "question": "An archive search ran successfully but found no matches. What should the tool return?",
+    "options": [
+      "A successful response with an empty results list",
+      "A generic \"operation failed\" error",
+      "isError: true with category transient so the agent retries",
+      "isError: true with category validation, since the query produced nothing"
+    ],
+    "answers": [
+      0
+    ],
+    "explanation": "An access failure needing a retry decision and a valid empty result are different things. Erroring on an empty result sends the agent hunting for a problem that does not exist."
+  },
+  {
+    "id": "e022",
+    "scenario": "s3",
+    "domain": 2,
+    "ts": "2.2",
+    "type": "single",
+    "select": 1,
+    "question": "A subagent hit an external service timeout, retried, and got the data on the second attempt. What propagates to the coordinator?",
+    "options": [
+      "A partial result flagged as possibly incomplete",
+      "Nothing about the error: the transient failure was resolved locally and only the result goes up",
+      "A full log of both attempts for stability assessment",
+      "A transient-category error so the coordinator can decide about retrying"
+    ],
+    "answers": [
+      1
+    ],
+    "explanation": "Transient failures are recovered locally inside the subagent; only what cannot be resolved propagates to the coordinator, along with partial results and what was attempted."
+  },
+  {
+    "id": "e023",
+    "scenario": "s3",
+    "domain": 2,
+    "ts": "2.3",
+    "type": "single",
+    "select": 1,
+    "question": "All four subagents share one list of 18 tools. The synthesiser started searching the web itself and call counts rose. What do you do?",
+    "options": [
+      "Set tool_choice: any so the model stops hesitating",
+      "List forbidden tools in each subagent prompt",
+      "Restrict each subagent set to its role, leaving 4–5 relevant tools",
+      "Improve the descriptions of all 18 tools while keeping the shared list"
+    ],
+    "answers": [
+      2
+    ],
+    "explanation": "Too many tools degrades selection reliability, and tools outside an agent specialisation get misused. Role scoping removes both problems."
+  },
+  {
+    "id": "e024",
+    "scenario": "s6",
+    "domain": 2,
+    "ts": "2.3",
+    "type": "single",
+    "select": 1,
+    "question": "You must guarantee extract_metadata runs before the enrichment tools. How?",
+    "options": [
+      "State the required order in the enrichment tool description",
+      "Disable the other tools until metadata is obtained",
+      "tool_choice: \"any\" at every step",
+      "Forced selection {\"type\": \"tool\", \"name\": \"extract_metadata\"} on the first call, with later steps in follow-up turns"
+    ],
+    "answers": [
+      3
+    ],
+    "explanation": "Forced selection pins the first step: a specific tool is guaranteed to be called and later steps proceed in follow-up turns. It sets the start of the route, not the whole route."
+  },
+  {
+    "id": "e025",
+    "scenario": "s4",
+    "domain": 2,
+    "ts": "2.3",
+    "type": "single",
+    "select": 1,
+    "question": "The document subagent calls fetch_url with a document id instead of a URL and gets a validation error. Which change matches the expected approach?",
+    "options": [
+      "Replace generic fetch_url with a constrained load_document that validates document URLs",
+      "Handle the validation error with a retry carrying a corrected argument",
+      "Remove fetch_url from every subagent and route such requests through the coordinator",
+      "Add an input format warning to the fetch_url description"
+    ],
+    "answers": [
+      0
+    ],
+    "explanation": "The skill is replacing generic tools with constrained alternatives: load_document validates that the URL points at a document, so the error class disappears instead of being handled."
+  },
+  {
+    "id": "e026",
+    "scenario": "s2",
+    "domain": 2,
+    "ts": "2.4",
+    "type": "single",
+    "select": 1,
+    "question": "A team MCP server is needed by every developer on the project and requires a token. How do you configure it?",
+    "options": [
+      "In the project .mcp.json with the token in plain text — the repository is private",
+      "In the project .mcp.json, expanding the token from the environment via ${VAR}",
+      "In a separate config file added to .gitignore",
+      "In each developer ~/.claude.json with their personal token"
+    ],
+    "answers": [
+      1
+    ],
+    "explanation": "The project .mcp.json describes shared team servers and is committed; secrets stay out thanks to environment variable expansion. The user scope is for personal and experimental servers."
+  },
+  {
+    "id": "e027",
+    "scenario": "s4",
+    "domain": 2,
+    "ts": "2.4",
+    "type": "single",
+    "select": 1,
+    "question": "An MCP server with indexed code search is connected, yet the agent keeps using the built-in Grep. The most likely cause?",
+    "options": [
+      "MCP server tools become available only after an explicit resource request",
+      "Built-in tools take precedence over MCP server tools",
+      "The MCP tool description is too thin and does not explain its capabilities or output format",
+      "The server is configured at user scope instead of project scope"
+    ],
+    "answers": [
+      2
+    ],
+    "explanation": "There is no built-in precedence — there is clarity. MCP tool descriptions are enhanced to explain capabilities and outputs, or the agent prefers the built-in tool it understands."
+  },
+  {
+    "id": "e028",
+    "scenario": "s2",
+    "domain": 3,
+    "ts": "3.1",
+    "type": "single",
+    "select": 1,
+    "question": "A new team member does not receive the testing conventions, although they work for their author. The most likely cause?",
+    "options": [
+      "The new member did not run /memory after cloning the repository",
+      "The CLAUDE.md file exceeded a length limit and is truncated on load",
+      "The conventions must be duplicated in every package subdirectory",
+      "The conventions live in ~/.claude/CLAUDE.md — user level, which does not reach version control"
+    ],
+    "answers": [
+      3
+    ],
+    "explanation": "User-level settings apply only to their owner and are not shared with teammates via version control. Team standards belong in the project file in the repository."
+  },
+  {
+    "id": "e029",
+    "scenario": "s2",
+    "domain": 3,
+    "ts": "3.1",
+    "type": "single",
+    "select": 1,
+    "question": "The root CLAUDE.md has grown to 900 lines and loads in full in every session. What matches the expected modular organisation?",
+    "options": [
+      "Split into topic files in .claude/rules/ and include them selectively via @import or paths scoping",
+      "Move some rules to user level",
+      "Split the repository so each package has its own root",
+      "Shorten the file by dropping less important rules"
+    ],
+    "answers": [
+      0
+    ],
+    "explanation": "Modular organisation solves both: the rules become readable, and selective inclusion keeps irrelevant sections out of the session, saving context and tokens."
+  },
+  {
+    "id": "e030",
+    "scenario": "s2",
+    "domain": 3,
+    "ts": "3.3",
+    "type": "single",
+    "select": 1,
+    "question": "Test files are spread across the codebase next to their components. How do you apply shared conventions to them?",
+    "options": [
+      "Create a CLAUDE.md in every directory containing tests",
+      "A file in .claude/rules/ with frontmatter paths: [\"**/*.test.tsx\", \"**/*.test.ts\"]",
+      "Add the conventions to the root CLAUDE.md so they always load",
+      "Include the conventions via @import in each package CLAUDE.md"
+    ],
+    "answers": [
+      1
+    ],
+    "explanation": "Rules with glob patterns in the paths field apply to files by type regardless of directory. That is preferred over directory CLAUDE.md files when conventions cover files spread across the codebase."
+  },
+  {
+    "id": "e031",
+    "scenario": "s2",
+    "domain": 3,
+    "ts": "3.2",
+    "type": "single",
+    "select": 1,
+    "question": "A codebase-analysis skill emits two hundred lines that clutter the main session. What do you configure in the frontmatter?",
+    "options": [
+      "argument-hint naming the directory to analyse",
+      "description requiring a concise answer",
+      "context: fork — execution in an isolated sub-agent context",
+      "allowed-tools restricted to Read"
+    ],
+    "answers": [
+      2
+    ],
+    "explanation": "The context: fork option exists to isolate verbose or exploratory output so it never reaches the main conversation."
+  },
+  {
+    "id": "e032",
+    "scenario": "s2",
+    "domain": 3,
+    "ts": "3.2",
+    "type": "multi",
+    "select": 2,
+    "question": "A data migration skill once deleted too much, and you want your own review skill variant without breaking colleagues. Which TWO solutions match expectations? Select two responses.",
+    "options": [
+      "State a prohibition on executing commands in the migration skill body",
+      "Create a personal review skill variant in ~/.claude/skills/ under a different name",
+      "Change the shared review skill in the repository and warn the team",
+      "Set allowed-tools in the migration skill frontmatter, leaving only file operations"
+    ],
+    "answers": [
+      1,
+      3
+    ],
+    "explanation": "allowed-tools is a configuration-level guarantee, while a prohibition in text remains a request. Personal customisation is a variant in the user scope under a different name — otherwise which skill ran is ambiguous."
+  },
+  {
+    "id": "e033",
+    "scenario": "s2",
+    "domain": 3,
+    "ts": "3.2",
+    "type": "single",
+    "select": 1,
+    "question": "The standard \"every service logs errors with structured context\" must always apply. Where do you put it?",
+    "options": [
+      "In CLAUDE.md — it is a universal, always-loaded standard",
+      "In a slash command invoked before every commit",
+      "In the allowed-tools of every project skill",
+      "In a skill with an argument-hint, invoked before edits"
+    ],
+    "answers": [
+      0
+    ],
+    "explanation": "The distinction is activation: CLAUDE.md holds always-loaded universal standards, while skills and commands are on-demand invocation for a specific task."
+  },
+  {
+    "id": "e034",
+    "scenario": "s2",
+    "domain": 3,
+    "ts": "3.4",
+    "type": "single",
+    "select": 1,
+    "question": "There is a clear stack trace: the function crashes on an empty date value, a two-line fix in a single file. What do you choose?",
+    "options": [
+      "Plan mode: any change is safer planned first",
+      "Direct execution: a simple change with clear scope",
+      "Plan mode followed by direct execution of the plan",
+      "An Explore subagent for a full module analysis"
+    ],
+    "answers": [
+      1
+    ],
+    "explanation": "Direct execution suits simple, well-scoped changes: a clear cause, one file, an obvious fix. Planning adds time here without reducing risk."
+  },
+  {
+    "id": "e035",
+    "scenario": "s2",
+    "domain": 3,
+    "ts": "3.4",
+    "type": "single",
+    "select": 1,
+    "question": "A library migration touches 45 files with two integration approaches requiring different infrastructure. What do you do?",
+    "options": [
+      "Start with direct execution and switch to plan mode at the first problem",
+      "Direct execution: describe the task in detail and run it",
+      "Plan mode to investigate and choose the approach, then direct execution of the chosen plan",
+      "Split into 45 per-file tasks handled sequentially"
+    ],
+    "answers": [
+      2
+    ],
+    "explanation": "Every plan mode signal is present: scale, many files, multiple valid approaches, architectural implications. The plan-for-investigation, execute-directly combination is described separately."
+  },
+  {
+    "id": "e036",
+    "scenario": "s2",
+    "domain": 3,
+    "ts": "3.5",
+    "type": "single",
+    "select": 1,
+    "question": "A prose description of a transformation is interpreted differently from iteration to iteration. What is most effective?",
+    "options": [
+      "Break the description into numbered steps",
+      "Ask the model to check back whenever something is unclear",
+      "Rewrite the description in more detail and more strictly",
+      "Provide 2–3 concrete input/output examples"
+    ],
+    "answers": [
+      3
+    ],
+    "explanation": "Concrete input/output examples are named the most effective way to communicate an expected transformation when prose is read inconsistently. A longer description usually introduces new ambiguities."
+  },
+  {
+    "id": "e037",
+    "scenario": "s2",
+    "domain": 3,
+    "ts": "3.5",
+    "type": "single",
+    "select": 1,
+    "question": "The code has two interacting problems (a date format and the sorting that depends on it) and two independent ones. How do you hand them over?",
+    "options": [
+      "The interacting ones in a single detailed message, the independent ones sequentially",
+      "The independent ones together first, then the interacting ones one at a time",
+      "All four in one message — it is faster",
+      "All four one at a time — it is safer"
+    ],
+    "answers": [
+      0
+    ],
+    "explanation": "The rule depends on interaction: if fixing one changes the conditions for another, describe them together or the work is redone. Independent problems in one message dilute attention."
+  },
+  {
+    "id": "e038",
+    "scenario": "s5",
+    "domain": 3,
+    "ts": "3.6",
+    "type": "single",
+    "select": 1,
+    "question": "The review job sometimes hangs until timeout: the log shows the agent asked a clarifying question. What do you fix?",
+    "options": [
+      "Raise the job timeout",
+      "Run Claude Code with the -p flag for non-interactive mode",
+      "Add a request to the prompt not to ask questions",
+      "Move the job to a more powerful runner"
+    ],
+    "answers": [
+      1
+    ],
+    "explanation": "The -p (--print) flag runs Claude Code non-interactively: the task executes and the result prints without requesting input. A prompt request leaves a non-zero chance of a question."
+  },
+  {
+    "id": "e039",
+    "scenario": "s5",
+    "domain": 3,
+    "ts": "3.6",
+    "type": "multi",
+    "select": 2,
+    "question": "After three consecutive commits the review posted the same findings three times, and the test generator proposes already-written scenarios. Which TWO changes are expected? Select two responses.",
+    "options": [
+      "Provide the existing test files in the test generation context",
+      "Hash the finding text and drop repeats in the posting script",
+      "Include prior review findings in context and instruct it to report only new or unaddressed issues",
+      "Run the review only on the final commit before merge"
+    ],
+    "answers": [
+      0,
+      2
+    ],
+    "explanation": "Both expected fixes work through the run context: prior findings with an instruction to report only what is new, and existing tests so the generator avoids already-covered scenarios."
+  },
+  {
+    "id": "e040",
+    "scenario": "s5",
+    "domain": 4,
+    "ts": "4.1",
+    "type": "single",
+    "select": 1,
+    "question": "The \"stale comments\" category yields 87 findings, 4 accepted. The prompt says \"check that comments are accurate\". What do you change?",
+    "options": [
+      "Lower the category severity to minor",
+      "Cap the category at ten findings per pull request",
+      "Add \"only report findings you are confident about\"",
+      "Replace with an explicit criterion: flag only when the behaviour the comment claims contradicts the actual code behaviour"
+    ],
+    "answers": [
+      3
+    ],
+    "explanation": "A vague instruction makes every imperfect comment a candidate, while an explicit categorical criterion demands a checkable condition — a contradiction with actual behaviour."
+  },
+  {
+    "id": "e041",
+    "scenario": "s5",
+    "domain": 4,
+    "ts": "4.1",
+    "type": "single",
+    "select": 1,
+    "question": "Why does \"be conservative and only report confident findings\" fail to improve precision?",
+    "options": [
+      "General confidence instructions do not improve precision compared with specific categorical criteria",
+      "The model systematically ignores instructions at the end of a prompt",
+      "Confidence is a numeric request parameter rather than text",
+      "It conflicts with schema-enforced structured output"
+    ],
+    "answers": [
+      0
+    ],
+    "explanation": "The model has no calibrated confidence threshold a word can turn down. Defining what counts as a problem and what to skip — categorical criteria — is what works."
+  },
+  {
+    "id": "e042",
+    "scenario": "s5",
+    "domain": 4,
+    "ts": "4.1",
+    "type": "single",
+    "select": 1,
+    "question": "One review category produces many false positives and developers now ignore every comment, including the accurate ones. What action is expected?",
+    "options": [
+      "Publish that category as a separate weekly report",
+      "Temporarily disable the problem category to restore trust while improving its prompt",
+      "Remove the category permanently as unworkable",
+      "Lower every finding in that category to minor severity"
+    ],
+    "answers": [
+      1
+    ],
+    "explanation": "A high false positive rate in one category undermines trust in accurate ones. Temporary disabling with concurrent prompt improvement is expected, not abandoning the category."
+  },
+  {
+    "id": "e043",
+    "scenario": "s6",
+    "domain": 4,
+    "ts": "4.2",
+    "type": "single",
+    "select": 1,
+    "question": "The output format instructions are detailed but results are inconsistent from run to run. What do you apply?",
+    "options": [
+      "Splitting the task into two sequential calls",
+      "An even more detailed instruction describing every field",
+      "2–4 targeted few-shot examples showing the format and the reasoning behind the choice",
+      "Temperature lowered to zero"
+    ],
+    "answers": [
+      2
+    ],
+    "explanation": "Few-shot is named the most effective technique precisely when detailed instructions alone produce inconsistent results. It means 2–4 targeted examples."
+  },
+  {
+    "id": "e044",
+    "scenario": "s5",
+    "domain": 4,
+    "ts": "4.2",
+    "type": "single",
+    "select": 1,
+    "question": "Why must a few-shot example show the reasoning for choosing one action over a plausible alternative?",
+    "options": [
+      "To make the output conform to the JSON schema",
+      "To reduce the number of tokens in the response",
+      "To lengthen the context and raise model attention",
+      "So the model generalises judgment to novel patterns rather than matching only the enumerated cases"
+    ],
+    "answers": [
+      3
+    ],
+    "explanation": "The reasoning conveys the property behind the decision. Without it the example is a record of one case and the judgment does not transfer to similar but new fragments."
+  },
+  {
+    "id": "e045",
+    "scenario": "s6",
+    "domain": 4,
+    "ts": "4.2",
+    "type": "single",
+    "select": 1,
+    "question": "Extraction from documents with varied structures (inline citations vs bibliographies, a methodology section vs details spread through the text) yields empty required fields. What is expected?",
+    "options": [
+      "Add few-shot examples of correct extraction from documents with varied structures",
+      "Split extraction into two tools by structure type",
+      "Increase the request max_tokens",
+      "Make every field optional"
+    ],
+    "answers": [
+      0
+    ],
+    "explanation": "Few-shot examples demonstrate correct handling of varied document structures and address empty extraction of required fields. Optionality solves a different problem — data absent from the source."
+  },
+  {
+    "id": "e046",
+    "scenario": "s6",
+    "domain": 4,
+    "ts": "4.3",
+    "type": "single",
+    "select": 1,
+    "question": "The document type is unknown, three extraction schemas are declared, and structure must come back. Which tool_choice?",
+    "options": [
+      "\"auto\"",
+      "\"any\"",
+      "{\"type\": \"tool\", \"name\": \"extract_invoice\"}",
+      "Leave tool_choice unset"
+    ],
+    "answers": [
+      1
+    ],
+    "explanation": "The \"any\" mode requires the model to call a tool while letting it choose which — exactly the unknown-type, multiple-schema case. \"auto\" permits a text answer."
+  },
+  {
+    "id": "e047",
+    "scenario": "s6",
+    "domain": 4,
+    "ts": "4.3",
+    "type": "single",
+    "select": 1,
+    "question": "After moving to tool use with a strict JSON schema, which errors remain?",
+    "options": [
+      "Only errors on documents longer than the context window",
+      "None: the schema guarantees the extracted data is correct",
+      "Semantic ones: values that do not sum, data in the wrong fields",
+      "Only JSON syntax errors"
+    ],
+    "answers": [
+      2
+    ],
+    "explanation": "Strict schemas via tool use eliminate syntax errors but do not prevent semantic ones — line items that do not sum, or a value in the wrong field."
+  },
+  {
+    "id": "e048",
+    "scenario": "s6",
+    "domain": 4,
+    "ts": "4.3",
+    "type": "multi",
+    "select": 2,
+    "question": "In 6% of extractions a plausible identifier absent from the document appears, and payment terms sometimes match no enum value. Which TWO schema design decisions are expected? Select two responses.",
+    "options": [
+      "Add a prohibition on inventing values to the field description",
+      "Add an \"unclear\" enum value for ambiguous cases",
+      "Replace the enum with an unconstrained free-text string",
+      "Make the identifier field optional (nullable) so the model is not forced to fill it"
+    ],
+    "answers": [
+      1,
+      3
+    ],
+    "explanation": "A required field the source lacks forces a plausible substitution — optionality fixes it. An enum without a \"cannot tell\" value forces the nearest choice, and the hesitation disappears without trace."
+  },
+  {
+    "id": "e049",
+    "scenario": "s6",
+    "domain": 4,
+    "ts": "4.4",
+    "type": "single",
+    "select": 1,
+    "question": "An extraction failed validation because of a wrong date format. How do you build the retry?",
+    "options": [
+      "Include the source document, the failed extraction and the specific validation errors in the retry",
+      "Split the document into parts and extract fragment by fragment",
+      "Switch to a different model and retry",
+      "Send the same request again with a lower temperature"
+    ],
+    "answers": [
+      0
+    ],
+    "explanation": "The technique is retry with error feedback: the specific validation errors are appended so the model corrects what was named. A repeat with the same prompt gives it no new information."
+  },
+  {
+    "id": "e050",
+    "scenario": "s6",
+    "domain": 4,
+    "ts": "4.4",
+    "type": "single",
+    "select": 1,
+    "question": "In 30% of invoices the required \"contract number\" is empty: the number exists only in an annex never given to the system. What do you do?",
+    "options": [
+      "Raise the extraction attempts from three to five",
+      "Recognise that retries are ineffective: the information is absent from the source and another document is required",
+      "Add an instruction to search for the number more carefully",
+      "Lower the temperature so the model stops skipping the field"
+    ],
+    "answers": [
+      1
+    ],
+    "explanation": "You must distinguish cases where a retry succeeds (format, structural errors) from those where the information is simply not in the source. There, no number of retries helps."
+  },
+  {
+    "id": "e051",
+    "scenario": "s5",
+    "domain": 4,
+    "ts": "4.6",
+    "type": "single",
+    "select": 1,
+    "question": "Reviewing generated code in the same session finds none of the problems QA later finds. What is most effective?",
+    "options": [
+      "Add a thorough self-check instruction to the prompt",
+      "Enable extended thinking before answering",
+      "Run the review as an independent instance without the author reasoning context",
+      "Raise max_tokens so the review is more detailed"
+    ],
+    "answers": [
+      2
+    ],
+    "explanation": "The model retains reasoning context from generation and is less likely to question its own decisions. An independent instance is more effective than self-review instructions or extended thinking."
+  },
+  {
+    "id": "e052",
+    "scenario": "s1",
+    "domain": 5,
+    "ts": "5.1",
+    "type": "single",
+    "select": 1,
+    "question": "In a long conversation the agent forgot the promised refund amount and deadline: the history was summarised. What do you do?",
+    "options": [
+      "Ask the model to preserve numbers when summarising",
+      "Enlarge the context window and stop summarising",
+      "Summarise less often so details survive longer",
+      "Extract transactional facts into a case facts block included in every prompt outside the summarised history"
+    ],
+    "answers": [
+      3
+    ],
+    "explanation": "The progressive summarization risk is condensing numbers, dates and customer-stated expectations into vague summaries. The answer is moving them out of the summarised part into a separate facts block."
+  },
+  {
+    "id": "e053",
+    "scenario": "s3",
+    "domain": 5,
+    "ts": "5.1",
+    "type": "single",
+    "select": 1,
+    "question": "The model consistently misses findings from the middle of a long aggregated subagent report. What mitigates the effect?",
+    "options": [
+      "A key findings summary at the beginning of the input and details under explicit section headers",
+      "Moving everything important to the very end of the input",
+      "Splitting the report into ten separate requests",
+      "Duplicating the middle of the report"
+    ],
+    "answers": [
+      0
+    ],
+    "explanation": "Models reliably process the beginning and end of long inputs and may omit middle sections. A key findings summary at the start plus explicit section headers for details is recommended."
+  },
+  {
+    "id": "e054",
+    "scenario": "s1",
+    "domain": 5,
+    "ts": "5.1",
+    "type": "single",
+    "select": 1,
+    "question": "Every lookup_order call returns more than forty fields, five of them relevant. What do you do?",
+    "options": [
+      "Nothing: the extra fields may be useful",
+      "Trim the tool output to the relevant fields before it accumulates in context",
+      "Summarise the history more often to push old calls out",
+      "Re-query the order only when necessary"
+    ],
+    "answers": [
+      1
+    ],
+    "explanation": "Tool results accumulate in context and consume tokens disproportionately to their relevance. Verbose output is trimmed to the relevant fields before reaching the context."
+  },
+  {
+    "id": "e055",
+    "scenario": "s1",
+    "domain": 5,
+    "ts": "5.2",
+    "type": "single",
+    "select": 1,
+    "question": "An irritated customer complains about delivery; the issue is simple and a one-step replacement resolves it. What is expected of the agent?",
+    "options": [
+      "Reply formally and close the ticket",
+      "Escalate: negative sentiment indicates a complex case",
+      "Acknowledge the frustration and offer a resolution; escalate if the customer reiterates asking for a human",
+      "Escalate if self-reported confidence is below a threshold"
+    ],
+    "answers": [
+      2
+    ],
+    "explanation": "Sentiment and self-reported confidence are unreliable proxies for actual complexity. When the issue is within capability, acknowledge the emotion and resolve it, leaving escalation for a reiterated request."
+  },
+  {
+    "id": "e056",
+    "scenario": "s1",
+    "domain": 5,
+    "ts": "5.2",
+    "type": "multi",
+    "select": 2,
+    "question": "Which TWO cases require escalation under the described criteria? Select two responses.",
+    "options": [
+      "The customer writes emotionally but the issue resolves routinely",
+      "The request is not covered by policy: policy describes price adjustments on our own site only",
+      "A tool returned several matches on the customer surname",
+      "The customer explicitly asks to be put through to a human"
+    ],
+    "answers": [
+      1,
+      3
+    ],
+    "explanation": "An explicit request and a policy gap are two of the three appropriate triggers. Emotion is not a trigger, and multiple matches call for a clarifying identifier rather than escalation."
+  },
+  {
+    "id": "e057",
+    "scenario": "s3",
+    "domain": 5,
+    "ts": "5.3",
+    "type": "single",
+    "select": 1,
+    "question": "A web search subagent timed out. What should it return to the coordinator?",
+    "options": [
+      "Structured context: failure type, what was attempted, partial results and possible alternatives",
+      "An exception terminating the whole workflow",
+      "A generic status such as \"search unavailable\"",
+      "An empty results list so the workflow does not break"
+    ],
+    "answers": [
+      0
+    ],
+    "explanation": "A generic status hides valuable context from the coordinator, and an empty result is silent suppression. Structured context allows choosing to retry, work around, or use the partial results."
+  },
+  {
+    "id": "e058",
+    "scenario": "s3",
+    "domain": 5,
+    "ts": "5.3",
+    "type": "single",
+    "select": 1,
+    "question": "Which pair describes the anti-patterns of subagent failure handling?",
+    "options": [
+      "Local recovery of transient failures and propagation of the unresolved",
+      "Silently suppressing an error as an empty result, and terminating the whole workflow on a single failure",
+      "Coverage annotation in synthesis and reporting partial results",
+      "Distinguishing access failures from valid empty results"
+    ],
+    "answers": [
+      1
+    ],
+    "explanation": "Both named anti-patterns are symmetric: one hides a failure and turns it into a false conclusion, the other discards the work of every other subagent because of one refusal."
+  },
+  {
+    "id": "e059",
+    "scenario": "s6",
+    "domain": 5,
+    "ts": "5.5",
+    "type": "single",
+    "select": 1,
+    "question": "The system shows 97% overall accuracy and management proposes switching off manual review. What must happen first?",
+    "options": [
+      "Increase the sample size on which accuracy was measured",
+      "Switch review off and watch for complaints",
+      "Analyse accuracy by document type and by field to verify performance is consistent",
+      "Raise the confidence threshold to 0.99 for all documents"
+    ],
+    "answers": [
+      2
+    ],
+    "explanation": "An aggregate metric may mask poor performance on specific document types and fields. Accuracy is verified by segment before reducing human review."
+  },
+  {
+    "id": "e060",
+    "scenario": "s3",
+    "domain": 5,
+    "ts": "5.6",
+    "type": "single",
+    "select": 1,
+    "question": "Two credible sources give different market size figures, and their data collection dates differ by two years. What do you do in synthesis?",
+    "options": [
+      "Drop the metric from the report as unreliable",
+      "Take the value from the more authoritative source",
+      "Average the values and note the spread",
+      "Include both values with attribution and dates, noting the difference may be temporal rather than a contradiction"
+    ],
+    "answers": [
+      3
+    ],
+    "explanation": "Conflicting statistics are annotated with source attribution rather than resolved by arbitrary choice. Publication or collection dates are mandatory: without them a temporal difference reads as a contradiction."
+  }
+]

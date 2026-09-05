@@ -5,8 +5,7 @@
       "name": "ml-simulator",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["start"],
-      "port": 3000,
-      "autoPort": true
+      "port": 4181
     }
   ]
 }

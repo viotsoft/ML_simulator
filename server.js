@@ -841,6 +841,207 @@ app.get('/api/cca-certificate', requireAuth, (req, res) => {
   });
 });
 
+// ------------------------------------------------- пробный экзамен CCAR-F
+// Правильные ответы и таймер живут на сервере: клиентский таймер обходится,
+// а отдавать answers в браузер до сдачи нельзя.
+const CCA_DOMAIN_QUOTA = { 1: 16, 2: 11, 3: 12, 4: 12, 5: 9 };  // 27/18/20/20/15% от 60
+
+function shuffled(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = crypto.randomInt(i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// 4 сценария из 6, затем добор по квотам доменов: сначала из выбранных сценариев,
+// потом из общего пула — иначе на банке ровно в один экзамен квоты не наберутся.
+function assembleExam(bank, scenarios) {
+  const picked = shuffled(scenarios.map((s) => s.id)).slice(0, CCA_EXAM_SCENARIOS);
+  const chosen = [];
+  const used = new Set();
+  for (const [domain, quota] of Object.entries(CCA_DOMAIN_QUOTA)) {
+    const d = Number(domain);
+    const preferred = shuffled(bank.filter((q) => q.domain === d && picked.includes(q.scenario)));
+    const rest = shuffled(bank.filter((q) => q.domain === d && !picked.includes(q.scenario)));
+    for (const q of preferred.concat(rest)) {
+      if (chosen.length >= CCA_EXAM_ITEMS) break;
+      if (used.has(q.id)) continue;
+      if (chosen.filter((x) => x.domain === d).length >= quota) break;
+      used.add(q.id);
+      chosen.push(q);
+    }
+  }
+  // Сценарии, реально представленные среди отобранных вопросов: при банке
+  // ровно в один экзамен добор из общего пула приводит сюда и другие сценарии,
+  // и бриф должен быть у каждого вопроса.
+  const usedScenarios = [...new Set(chosen.map((q) => q.scenario))];
+  return { scenarioIds: usedScenarios, preferredScenarios: picked, itemIds: shuffled(chosen).map((q) => q.id) };
+}
+
+// Сырой процент → шкала 100–1000, кусочно-линейно с якорем на PASS_SCORE.
+function scaledScore(raw) {
+  const s = raw < PASS_SCORE
+    ? 100 + (CCA_PASS_SCALED - 100) * (raw / PASS_SCORE)
+    : CCA_PASS_SCALED + (1000 - CCA_PASS_SCALED) * ((raw - PASS_SCORE) / (1 - PASS_SCORE));
+  return Math.round(Math.min(1000, Math.max(100, s)));
+}
+
+const sameSet = (a, b) => a.length === b.length && [...a].sort().every((v, i) => v === [...b].sort()[i]);
+
+function publicItem(q, index) {
+  return { index, id: q.id, scenario: q.scenario, domain: q.domain,
+           type: q.type, select: q.select || 1, question: q.question, options: q.options };
+}
+
+function gradeExam(attempt, bank) {
+  const byId = new Map(bank.map((q) => [q.id, q]));
+  const perDomain = {};
+  let correct = 0;
+  const review = attempt.itemIds.map((id, i) => {
+    const q = byId.get(id);
+    const given = Array.isArray(attempt.answers[String(i)]) ? attempt.answers[String(i)] : [];
+    const ok = sameSet(given, q.answers);
+    if (ok) correct++;
+    perDomain[q.domain] = perDomain[q.domain] || { correct: 0, total: 0 };
+    perDomain[q.domain].total++;
+    if (ok) perDomain[q.domain].correct++;
+    return { index: i, id, domain: q.domain, ts: q.ts, correct: ok,
+             given, answers: q.answers, explanation: q.explanation };
+  });
+  const total = attempt.itemIds.length || 1;
+  const scaled = scaledScore(correct / total);
+  for (const d of Object.keys(perDomain)) {
+    perDomain[d].percent = Math.round((100 * perDomain[d].correct) / perDomain[d].total);
+  }
+  return { correct, total, scaled, passed: scaled >= CCA_PASS_SCALED, perDomain, review };
+}
+
+function finishAttempt(user, attempt, bank) {
+  const r = gradeExam(attempt, bank);
+  attempt.submittedAt = new Date().toISOString();
+  attempt.result = { correct: r.correct, total: r.total, scaled: r.scaled,
+                     passed: r.passed, perDomain: r.perDomain };
+  attempt.review = r.review;
+  user.ccaExamHistory = user.ccaExamHistory || [];
+  user.ccaExamHistory.push({ attemptId: attempt.attemptId, submittedAt: attempt.submittedAt,
+                             scaled: r.scaled, passed: r.passed, correct: r.correct, total: r.total,
+                             perDomain: r.perDomain });
+  user.ccaExamArchive = user.ccaExamArchive || {};
+  user.ccaExamArchive[attempt.attemptId] = { review: r.review, result: attempt.result,
+                                             scenarioIds: attempt.scenarioIds };
+  user.ccaExam = null;
+  return r;
+}
+
+app.post('/api/cca-exam/start', requireAuth, (req, res) => {
+  const { db, user } = req.ctx;
+  if (!user.subscribed) return res.status(402).json({ error: 'Пробный экзамен доступен по подписке', needSubscription: true });
+  const lang = getLang(req);
+  const bank = localeCcaExam(lang);
+  if (bank.length < CCA_EXAM_ITEMS) {
+    return res.status(409).json({ error: 'Банк вопросов ещё формируется', comingSoon: true });
+  }
+  if (user.ccaExam && Date.now() < Date.parse(user.ccaExam.endsAt)) {
+    return res.status(409).json({ error: 'Попытка уже идёт', active: true });
+  }
+  if (user.ccaExam) finishAttempt(user, user.ccaExam, bank);   // просроченная — закрываем
+
+  const { scenarioIds, preferredScenarios, itemIds } = assembleExam(bank, localeCcaScenarios(lang));
+  const now = Date.now();
+  user.ccaExam = {
+    attemptId: crypto.randomBytes(8).toString('hex'),
+    startedAt: new Date(now).toISOString(),
+    endsAt: new Date(now + CCA_EXAM_MINUTES * 60000).toISOString(),
+    scenarioIds, preferredScenarios, itemIds, answers: {},
+  };
+  saveDB(db);
+  res.json(examView(user.ccaExam, bank, localeCcaScenarios(lang)));
+});
+
+function examView(attempt, bank, scenarios) {
+  const byId = new Map(bank.map((q) => [q.id, q]));
+  return {
+    attemptId: attempt.attemptId,
+    endsAt: attempt.endsAt,
+    remainingMs: Math.max(0, Date.parse(attempt.endsAt) - Date.now()),
+    minutes: CCA_EXAM_MINUTES,
+    passScaled: CCA_PASS_SCALED,
+    scenarios: scenarios.filter((s) => attempt.scenarioIds.includes(s.id)),
+    // answers и explanation НЕ отдаём до сдачи
+    items: attempt.itemIds.map((id, i) => publicItem(byId.get(id), i)),
+    answers: attempt.answers,
+  };
+}
+
+app.get('/api/cca-exam/attempt', requireAuth, (req, res) => {
+  const { db, user } = req.ctx;
+  const bank = localeCcaExam(getLang(req));
+  if (!user.ccaExam) return res.json({ active: false });
+  if (Date.now() >= Date.parse(user.ccaExam.endsAt)) {
+    const r = finishAttempt(user, user.ccaExam, bank);
+    saveDB(db);
+    return res.json({ active: false, expired: true, result: { correct: r.correct, total: r.total,
+      scaled: r.scaled, passed: r.passed, perDomain: r.perDomain },
+      attemptId: user.ccaExamHistory[user.ccaExamHistory.length - 1].attemptId });
+  }
+  res.json({ active: true, ...examView(user.ccaExam, bank, localeCcaScenarios(getLang(req))) });
+});
+
+app.post('/api/cca-exam/answer', requireAuth, (req, res) => {
+  const { db, user } = req.ctx;
+  const a = user.ccaExam;
+  if (!a) return res.status(409).json({ error: 'Активной попытки нет' });
+  if (Date.now() >= Date.parse(a.endsAt)) {
+    return res.status(409).json({ error: 'Время попытки истекло', expired: true });
+  }
+  const { index, answers } = req.body || {};
+  const i = Number(index);
+  if (!Number.isInteger(i) || i < 0 || i >= a.itemIds.length) {
+    return res.status(400).json({ error: 'Неверный номер вопроса' });
+  }
+  if (!Array.isArray(answers) || answers.some((x) => !Number.isInteger(x) || x < 0 || x > 9)) {
+    return res.status(400).json({ error: 'Неверный формат ответа' });
+  }
+  a.answers[String(i)] = [...new Set(answers)];
+  saveDB(db);
+  res.json({ ok: true, answered: Object.keys(a.answers).length,
+             remainingMs: Math.max(0, Date.parse(a.endsAt) - Date.now()) });
+});
+
+app.post('/api/cca-exam/submit', requireAuth, (req, res) => {
+  const { db, user } = req.ctx;
+  if (!user.ccaExam) return res.status(409).json({ error: 'Активной попытки нет' });
+  const r = finishAttempt(user, user.ccaExam, localeCcaExam(getLang(req)));
+  const attemptId = user.ccaExamHistory[user.ccaExamHistory.length - 1].attemptId;
+  saveDB(db);
+  res.json({ attemptId, correct: r.correct, total: r.total, scaled: r.scaled,
+             passed: r.passed, perDomain: r.perDomain, user: publicUser(user) });
+});
+
+app.get('/api/cca-exam/result/:attemptId', requireAuth, (req, res) => {
+  const user = req.ctx.user;
+  const rec = (user.ccaExamArchive || {})[req.params.attemptId];
+  if (!rec) return res.status(404).json({ error: 'Результат не найден' });
+  const lang = getLang(req);
+  const byId = new Map(localeCcaExam(lang).map((q) => [q.id, q]));
+  res.json({
+    ...rec.result,
+    passScaled: CCA_PASS_SCALED,
+    scenarios: localeCcaScenarios(lang).filter((s) => (rec.scenarioIds || []).includes(s.id)),
+    review: rec.review.map((r) => {
+      const q = byId.get(r.id);
+      return { ...r, question: q ? q.question : '', options: q ? q.options : [],
+               explanation: q ? q.explanation : r.explanation };
+    }),
+  });
+});
+
+app.get('/api/cca-exam/history', requireAuth, (req, res) => {
+  res.json({ attempts: (req.ctx.user.ccaExamHistory || []).slice().reverse() });
+});
+
 // ---------------------------------------------------------------- сертификат
 app.get('/api/certificate', requireAuth, (req, res) => {
   const user = req.ctx.user;
