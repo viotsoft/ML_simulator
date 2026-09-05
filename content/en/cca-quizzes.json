@@ -967,5 +967,176 @@
       "answer": 1,
       "explanation": "Self-reported confidence beside a finding enables calibrated routing: it decides what a human checks and what posts automatically. Simply discarding would throw away correct findings too."
     }
+  ],
+  "c18": [
+    {
+      "question": "In a long conversation the agent forgot the promised refund amount and deadline: the history had been summarised. What do you do?",
+      "options": [
+        "Summarise less often so details survive longer",
+        "Extract transactional facts (amounts, dates, order numbers, promises) into a case facts block included in every prompt outside the summarised history",
+        "Ask the model not to lose numbers when summarising",
+        "Enlarge the context window and stop summarising"
+      ],
+      "answer": 1,
+      "explanation": "The progressive summarization risk is that numbers, dates and customer-stated expectations condense into vague summaries. The answer is moving them out of the summarised part into a separate case facts block."
+    },
+    {
+      "question": "The model consistently misses findings from the middle of a long aggregated report. How do you mitigate that?",
+      "options": [
+        "Place a key findings summary at the beginning of the input and organise details under explicit section headers",
+        "Move everything important to the very end of the input",
+        "Split the report into ten separate requests",
+        "Duplicate the middle of the report twice"
+      ],
+      "answer": 0,
+      "explanation": "The \"lost in the middle\" effect: models reliably process the beginning and end of long inputs. The guide recommends exactly a key findings summary at the start plus explicit section headers for the details."
+    },
+    {
+      "question": "Every lookup_order call returns more than forty fields, of which five are relevant. What do you do?",
+      "options": [
+        "Nothing: the extra fields may come in handy later",
+        "Trim the tool output to the relevant fields before it accumulates in context",
+        "Summarise the history more often to push old calls out",
+        "Re-query the order only when needed"
+      ],
+      "answer": 1,
+      "explanation": "Tool results accumulate in context and consume tokens disproportionately to their relevance. The skill from the guide is trimming verbose output to the relevant fields before it reaches the context."
+    },
+    {
+      "question": "Three hours into a codebase exploration the agent stopped naming concrete classes and started answering \"systems like this usually\". What do you apply?",
+      "options": [
+        "Raise the response max_tokens",
+        "Keep a scratchpad file of key findings and reference it, delegate verbose discovery to subagents, summarise findings between phases",
+        "Rephrase the question in more detail",
+        "Lower the temperature to zero"
+      ],
+      "answer": 1,
+      "explanation": "This is the context degradation the guide describes for extended sessions. The remedies are mechanisms that survive a context boundary: scratchpad files, subagent delegation, phase summaries and /compact."
+    },
+    {
+      "question": "How do you design crash recovery for a multi-agent exploration?",
+      "options": [
+        "Store the full transcript of every session and reload it entirely",
+        "Each agent exports state to a known location, and on resume the coordinator loads a manifest and injects it into agent prompts",
+        "Repeat the whole exploration from scratch — it is more reliable",
+        "Keep the state in the coordinator context and never summarise it"
+      ],
+      "answer": 1,
+      "explanation": "The guide describes structured agent state exports into a manifest the coordinator loads on resume. A full transcript does not fit and carries much that is irrelevant, and restarting from scratch discards hours of work."
+    }
+  ],
+  "c19": [
+    {
+      "question": "A customer writes: \"Put me through to an agent.\" What should the agent do?",
+      "options": [
+        "Try to resolve it first and escalate if that fails",
+        "Escalate immediately, with no attempt to investigate first",
+        "Clarify the problem so the operator gets context, then escalate",
+        "Assess the complexity and escalate only if it is genuinely complex"
+      ],
+      "answer": 1,
+      "explanation": "An explicit customer request for a human is a trigger in its own right, honoured immediately. Attempting investigation first degrades the experience, as the ticket review shows."
+    },
+    {
+      "question": "A customer complains angrily about delivery, but the issue is simple and a one-step replacement resolves it. What do you do?",
+      "options": [
+        "Escalate: negative sentiment signals a complex case",
+        "Acknowledge the frustration and offer a resolution; escalate only if the customer reiterates asking for a human",
+        "Escalate if the model self-reported confidence is below a threshold",
+        "Reply formally and close the ticket"
+      ],
+      "answer": 1,
+      "explanation": "Sentiment and self-reported confidence are named unreliable proxies for actual complexity. When the issue is within the agent capability, the right move is acknowledging the emotion and resolving it, leaving escalation for a reiterated request."
+    },
+    {
+      "question": "A customer asks to match a competitor price. Policy covers price adjustments on our own site only and is silent about competitors. What should the agent do?",
+      "options": [
+        "Approve the discount: not forbidden means allowed",
+        "Refuse, citing the absence of such a rule",
+        "Escalate: the policy is ambiguous or does not cover the request",
+        "Offer a compromise discount at its own discretion"
+      ],
+      "answer": 2,
+      "explanation": "A policy gap or ambiguity is one of the three appropriate escalation triggers. Policy silence can be read neither as permission nor as prohibition: a human makes that call."
+    },
+    {
+      "question": "A surname search returned three different customers. What should the agent do?",
+      "options": [
+        "Pick the customer with the most recent order",
+        "Ask for an additional identifier: order number, email, or the last digits of the card",
+        "Handle all three cases identically",
+        "Escalate to an operator as an ambiguous case"
+      ],
+      "answer": 1,
+      "explanation": "The guide requires requesting additional identifiers on multiple matches rather than selecting by heuristic. \"Most recent order\" is a bet whose cost lands on the customer."
+    },
+    {
+      "question": "A web search subagent timed out. What should it return to the coordinator?",
+      "options": [
+        "A generic status such as \"search unavailable\"",
+        "An empty results list, so the workflow does not break",
+        "Structured context: the failure type, what was attempted, partial results and possible alternatives",
+        "An exception that terminates the whole workflow"
+      ],
+      "answer": 2,
+      "explanation": "A generic status hides valuable context from the coordinator, and returning an empty result is silent suppression — a named anti-pattern. Structured context lets the coordinator choose to retry, work around, or use the partial results."
+    }
+  ],
+  "c20": [
+    {
+      "question": "The system shows 97% overall accuracy. Management proposes switching off manual review. What must happen first?",
+      "options": [
+        "Switch review off and watch for complaints",
+        "Analyse accuracy by each document type and each field to verify performance is consistent",
+        "Raise the confidence threshold to 0.99 for all documents",
+        "Increase the sample size on which the 97% was measured"
+      ],
+      "answer": 1,
+      "explanation": "An aggregate metric may mask poor performance on specific document types and fields. The guide requires verifying accuracy by segment before reducing human review."
+    },
+    {
+      "question": "Why keep sampling extractions the model marked as confident?",
+      "options": [
+        "To train operators on easy examples",
+        "Stratified random sampling measures the real error rate in the automated stream and detects novel error patterns",
+        "To satisfy formal audit requirements",
+        "To stop the model overfitting to confident cases"
+      ],
+      "answer": 1,
+      "explanation": "Confident extractions are sampled precisely to measure the real error rate and detect new patterns: when a document template changes, confident extractions start erring and sampling is the only way to notice."
+    },
+    {
+      "question": "At what level should the model report confidence, and how are thresholds set?",
+      "options": [
+        "At document level, with one threshold for all types",
+        "At field level, with thresholds calibrated using labeled validation sets",
+        "At batch level, with the threshold set by the business",
+        "Confidence is unnecessary: schema validation is enough"
+      ],
+      "answer": 1,
+      "explanation": "An extraction can be confident in one field and unsure in another, so the score is needed per field. Thresholds are calibrated on labeled sets, or \"high confidence\" corresponds to no measured error rate."
+    },
+    {
+      "question": "Two credible sources give different market size figures. What do you do in synthesis?",
+      "options": [
+        "Take the value from the more authoritative source",
+        "Average the values",
+        "Annotate the conflict with source attribution, keep both values, and leave the decision to the coordinator",
+        "Drop the metric from the report as unreliable"
+      ],
+      "answer": 2,
+      "explanation": "The guide requires annotating conflicting statistics with attribution rather than arbitrarily selecting a value. Analysis completes with both values explicitly annotated, and reconciliation is the coordinator decision before synthesis."
+    },
+    {
+      "question": "Why must subagents include publication or data collection dates in structured outputs?",
+      "options": [
+        "To make the report look more professional",
+        "So a temporal difference is not misinterpreted as a contradiction between sources",
+        "To comply with source licensing requirements",
+        "So the coordinator can sort findings chronologically"
+      ],
+      "answer": 1,
+      "explanation": "Without dates, values from different periods look like a conflict when they describe a trend. The guide explicitly requires publication or collection dates for correct temporal interpretation."
+    }
   ]
 }

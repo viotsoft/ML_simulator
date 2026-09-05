@@ -267,7 +267,7 @@
       "codebase"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "c19",
@@ -282,7 +282,7 @@
       "reliability"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "c20",
@@ -297,6 +297,6 @@
       "provenance"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   }
 ]
