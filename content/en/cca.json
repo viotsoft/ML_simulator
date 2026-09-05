@@ -27,7 +27,7 @@
       "decomposition"
     ],
     "free": true,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "c03",
@@ -42,7 +42,7 @@
       "sessions"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "c04",
@@ -57,7 +57,7 @@
       "enforcement"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "c05",
@@ -72,7 +72,7 @@
       "audit"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "c06",
@@ -87,7 +87,7 @@
       "cost"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "c07",

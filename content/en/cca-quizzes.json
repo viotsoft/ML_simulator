@@ -55,5 +55,290 @@
       "answer": 2,
       "explanation": "The defining property of an agentic loop is that the model chooses the next tool from context. A call sequence hardcoded in code is a workflow. That is perfectly appropriate where the order is mandatory — but it should not be called an agent, and it does not need a stop_reason loop."
     }
+  ],
+  "c02": [
+    {
+      "question": "In a multi-agent research system the \"synth\" subagent cites data that appeared in no source. The logs show \"docs\" returned the phrase \"see previous discussion\". What is the cause?",
+      "options": [
+        "The synth subagent ran with too high a temperature",
+        "A subagent does not inherit the coordinator history: the task arrived with no substance and the model filled the gap itself",
+        "The coordinator invoked the subagents in the wrong order",
+        "The synth system prompt does not forbid hallucination"
+      ],
+      "answer": 1,
+      "explanation": "Subagent context is isolated — it only sees the task it was handed. A reference to a shared discussion is empty for it, so the model fills in the blank. The fix is a self-contained task: goal, all required data, expected format."
+    },
+    {
+      "question": "Which statement is true of a hub-and-spoke architecture?",
+      "options": [
+        "Subagents exchange intermediate results directly to take load off the coordinator",
+        "The coordinator is the single point through which tasks, results, errors and routing all pass",
+        "Every subagent has access to the coordinator full history",
+        "The coordinator only assembles the final answer; each subagent handles its own errors"
+      ],
+      "answer": 1,
+      "explanation": "The point of hub-and-spoke is that all traffic goes through the centre. That gives one place for error handling, logging and routing decisions — and makes the system explainable."
+    },
+    {
+      "question": "The coordinator always runs every request through all four subagents. Users complain that a simple factual question takes six minutes. What does the exam expect as the solution?",
+      "options": [
+        "Run the four subagents in parallel instead of sequentially",
+        "Cache subagent results between requests",
+        "The coordinator should analyse the query requirements and dynamically select which subagents to invoke",
+        "Lower max_tokens on each subagent"
+      ],
+      "answer": 2,
+      "explanation": "The skill tested explicitly: the coordinator analyses query complexity and requirements and invokes only the subagents that are needed, rather than always running the full pipeline. Parallelism and caching are optimisations — they do not remove the unnecessary work."
+    },
+    {
+      "question": "Analysts complain that broad survey requests come back as reports with large gaps in coverage. Which decomposition risk is this?",
+      "options": [
+        "Overly narrow decomposition by the coordinator — incomplete coverage of a broad topic",
+        "Too many subagents, so their results contradict each other",
+        "Overflow of the coordinator context window",
+        "Missing retries when a subagent fails"
+      ],
+      "answer": 0,
+      "explanation": "The guide names this risk directly: a coordinator that can only produce pointed subqueries will return a handful of unrelated facts for a broad topic. Broad topics need a cut by dimension — players, pricing, technology, regulation."
+    },
+    {
+      "question": "Which responsibility does NOT belong to the coordinator in this architecture?",
+      "options": [
+        "Decomposing the request into subtasks",
+        "Aggregating subagent results into a single answer",
+        "Performing the domain work itself when a subagent returns an error",
+        "Handling subagent errors and deciding how to route next"
+      ],
+      "answer": 2,
+      "explanation": "The coordinator owns decomposition, delegation, aggregation and error handling. It should not stand in for a subagent: on a failure it decides whether to retry, call someone else, return a partial result or escalate — not do the work itself."
+    }
+  ],
+  "c03": [
+    {
+      "question": "The coordinator is defined and configured, but in the logs it always does the work itself and never spawns a subagent. What do you check first?",
+      "options": [
+        "That the subagents have system prompts defined",
+        "That the coordinator allowedTools includes \"Task\"",
+        "That the coordinator has a large enough max_tokens",
+        "That the subagent descriptions are under 200 characters"
+      ],
+      "answer": 1,
+      "explanation": "Subagents are spawned by the Task tool. If it is missing from the coordinator allowedTools, delegation is physically impossible and the model does everything itself — with no error raised, which is what makes the symptom confusing."
+    },
+    {
+      "question": "Three subagents are independent and take 90 seconds each. How do you run them in parallel?",
+      "options": [
+        "Call Task one at a time in separate turns so the coordinator can react to each result",
+        "Emit several Task calls in a single coordinator response",
+        "Triple the iteration limit of the agentic loop",
+        "Give all three one shared session so they can share context"
+      ],
+      "answer": 1,
+      "explanation": "One model response can carry several tool_use blocks. Several Task calls in one response is exactly what parallel subagent spawning is. Separate turns give sequential execution and triple the wait."
+    },
+    {
+      "question": "In the synthesiser final report, claims lose their source citations even though the web agent found them. Which technique does the exam require?",
+      "options": [
+        "Ask the synthesiser in the prompt to \"remember to cite sources\"",
+        "Pass findings as structured data with content and metadata (source_url, document, page) in separate fields",
+        "Lower the synthesiser temperature to zero",
+        "Forbid the synthesiser from paraphrasing prior agents"
+      ],
+      "answer": 1,
+      "explanation": "A source embedded in a sentence gets lost in paraphrase. A structured format separates content from metadata, and attribution reaches the report. A prompt request helps but is not a mechanism."
+    },
+    {
+      "question": "Yesterday you spent half a day debugging in Claude Code, then rewrote half the affected files in the evening. What is the right way to continue today?",
+      "options": [
+        "Resume with --resume and immediately ask where you left off",
+        "Resume the session and state which files changed so the agent re-reads exactly those",
+        "Fork yesterday session to preserve the original branch",
+        "Continue without mentioning the changes: the agent will notice the mismatch on its next read"
+      ],
+      "answer": 1,
+      "explanation": "Resumption is right while context is mostly valid, but the agent is reasoning from earlier file reads. It does not know about the changes until you say so — then it re-reads selectively instead of reasoning from stale data."
+    },
+    {
+      "question": "The agent spent half an hour analysing a codebase and now you want to compare two refactoring strategies without repeating that analysis. What do you use?",
+      "options": [
+        "fork_session — two independent branches from the shared analysis baseline",
+        "--resume twice with the same session name",
+        "Two new sessions with a structured summary of the analysis",
+        "One subagent instructed to consider both options in a single response"
+      ],
+      "answer": 0,
+      "explanation": "This is what fork_session is for: the shared analysis baseline is preserved and the branches proceed independently. Resuming one session twice would tangle the two lines of reasoning, and fresh sessions would mean repeating the analysis."
+    }
+  ],
+  "c04": [
+    {
+      "question": "An audit found that in 9% of refunds the agent skipped identity verification, even though the system prompt demands it in capitals. What do you do?",
+      "options": [
+        "Rewrite the instruction more forcefully and add few-shot examples of the correct order",
+        "Set temperature to zero so the behaviour becomes deterministic",
+        "Add a programmatic prerequisite: block process_refund until get_customer has returned a verified customer",
+        "Raise the iteration limit so the agent has more chances to run the check"
+      ],
+      "answer": 2,
+      "explanation": "Prompt instructions have a non-zero failure rate — that is a property of a probabilistic system. Where deterministic compliance is required (compliance, money, irreversible actions), ordering is enforced in code: a hook or a prerequisite gate."
+    },
+    {
+      "question": "The gate blocked a process_refund call. How should that be communicated to the model?",
+      "options": [
+        "Raise an exception and abort the conversation",
+        "Return a tool_result error stating which step is missing",
+        "Silently skip the call and continue the loop",
+        "Send the customer a message about a technical error"
+      ],
+      "answer": 1,
+      "explanation": "The block comes back as a tool result with a clear explanation: \"call get_customer first\". The model sees it in the history, understands what is missing, and performs the missing step itself — the ordering holds and the conversation survives."
+    },
+    {
+      "question": "A customer describes three problems in one message. What approach does the exam expect?",
+      "options": [
+        "Answer the first problem and ask them to submit the others separately",
+        "Decompose into distinct items, investigate each in parallel on shared customer context, and synthesise one unified answer",
+        "Escalate to a human, since multi-concern requests are outside the agent scope",
+        "Handle the items strictly sequentially, re-fetching customer data for each"
+      ],
+      "answer": 1,
+      "explanation": "The skill is stated directly: decompose a multi-concern request into distinct items, investigate each in parallel using shared context, then synthesise a unified resolution. Shared context matters — customer data is fetched once."
+    },
+    {
+      "question": "What must a structured handoff summary contain when escalating to an operator?",
+      "options": [
+        "The full conversation transcript, so the operator misses nothing",
+        "Customer identifier, root cause, amount, and recommended action",
+        "Only the recommended action: the operator can find the rest in the CRM",
+        "A customer satisfaction estimate and the sentiment of the conversation"
+      ],
+      "answer": 1,
+      "explanation": "The summary is written for a human without access to the transcript. It therefore needs the customer id, the established root cause (not a retelling of the chat), the specifics of the operation, and the proposed action."
+    },
+    {
+      "question": "In which case is a system-prompt instruction sufficient, making a programmatic gate unnecessary?",
+      "options": [
+        "Identity verification before a financial operation",
+        "Never sending a customer email without human confirmation",
+        "The preferred tone of voice and message structure",
+        "The cap on an autonomous refund amount"
+      ],
+      "answer": 2,
+      "explanation": "A prompt is good at style, tone and preferred ordering — the cost of deviation there is small. A gate is required where a violation costs money or compliance, or is irreversible: identity checks, refund caps, anything sent outside."
+    }
+  ],
+  "c05": [
+    {
+      "question": "Tools from three MCP servers return dates as a Unix timestamp, ISO 8601 and DD/MM/YY, and status as a numeric code. The agent periodically gets time wrong. What do you apply?",
+      "options": [
+        "A PostToolUse hook reducing the formats to one shape before the model sees the result",
+        "A description of every format in the system prompt, with examples",
+        "A dedicated converter subagent that receives the raw results",
+        "A lower temperature on the main agent"
+      ],
+      "answer": 0,
+      "explanation": "This is the guide example verbatim: PostToolUse normalises heterogeneous data from different MCP tools before the agent processes it. A prompt copes most of the time, but normalisation in code is deterministic."
+    },
+    {
+      "question": "The rule \"no refund above $500\" must apply identically across three different agents. Where does it belong?",
+      "options": [
+        "In each agent system prompt",
+        "In an outgoing call interception hook attached to all of them",
+        "In the description of the process_refund tool",
+        "In each agent loop as its own condition"
+      ],
+      "answer": 1,
+      "explanation": "An interception hook is a guarantee and applies to every agent it is attached to, regardless of their prompts. A condition inside the loop has to be copied three times and will drift the first time the policy changes."
+    },
+    {
+      "question": "A hook blocked a call that violates policy. How does the guide describe the correct behaviour?",
+      "options": [
+        "Block and return a refusal to the model with no explanation",
+        "Block and end the conversation with an error",
+        "Block and redirect to an alternative workflow, such as human escalation",
+        "Allow the call but flag it in the logs as a policy violation"
+      ],
+      "answer": 2,
+      "explanation": "The skill is phrased as \"block policy-violating actions and redirect to alternative workflows\". A bare refusal leaves the agent with no way forward, so it retries the same call."
+    },
+    {
+      "question": "Which requirement is NOT solved by a hook and correctly stays in the system prompt?",
+      "options": [
+        "Guaranteeing identity is verified before a financial operation",
+        "Turning numeric status codes into readable values",
+        "The preferred tone of voice and the structure of the customer reply",
+        "Forbidding refunds above a threshold"
+      ],
+      "answer": 2,
+      "explanation": "Tone and response structure are probabilistic preferences where deviation is cheap, and a prompt suits them. Anything where a violation costs money or compliance, or is irreversible, moves into hooks and gates."
+    },
+    {
+      "question": "What is the difference between a PostToolUse hook and an outgoing call interception hook?",
+      "options": [
+        "PostToolUse only works with MCP tools, interception only with built-in ones",
+        "PostToolUse transforms the result after execution; interception decides the fate of the call before execution",
+        "PostToolUse runs on the model side, interception on the server side",
+        "There is no difference: they are two names for the same mechanism"
+      ],
+      "answer": 1,
+      "explanation": "They are two different lifecycle positions. Outgoing call interception sits before execution and can forbid the action; PostToolUse sits after execution and changes the result before the model processes it."
+    }
+  ],
+  "c06": [
+    {
+      "question": "A review agent receives an 18-file diff in one request and returns comments about the first two files only. What is this called and what do you do?",
+      "options": [
+        "Context window overflow — halve the size of the diff",
+        "Attention dilution — split into per-file local passes plus a separate cross-file pass",
+        "Insufficient max_tokens — raise the response limit",
+        "An overly strict system prompt — soften the finding criteria"
+      ],
+      "answer": 1,
+      "explanation": "The diff fits in the window, but the more material in one request, the shallower each part is analysed. The guide recipe is a local pass per file plus a separate pass looking for cross-file inconsistencies."
+    },
+    {
+      "question": "A PR changed a function signature in one file while the call site in another stayed stale. Why will per-file local passes not catch it?",
+      "options": [
+        "A local pass sees one file only, and the defect exists between files — a separate cross-file pass is required",
+        "A local pass does not read function signatures",
+        "Only a static analyser finds such defects; an agent is useless here",
+        "It will catch it if the local pass prompt asks it to check dependencies"
+      ],
+      "answer": 0,
+      "explanation": "A mismatch by definition does not fit inside either file. Asking for it in the local pass prompt does not help: the second file is simply not in its context. You need a separate pass working over the summaries of all files."
+    },
+    {
+      "question": "The task: \"get a 40,000-line legacy module under test\". Which decomposition strategy is correct?",
+      "options": [
+        "A fixed pipeline: walk the files alphabetically and write tests for each",
+        "Split into equal 5,000-line chunks and process them in parallel",
+        "Map the structure first, then identify high-impact areas, then build a prioritised plan that adapts as dependencies are discovered",
+        "Write tests for every public function, starting with the longest"
+      ],
+      "answer": 2,
+      "explanation": "This is an open-ended task: the work is not enumerable upfront. The guide describes exactly this sequence — structure map, high-impact areas, prioritised adaptive plan. Alphabet and equal chunks ignore where the risk sits."
+    },
+    {
+      "question": "When is a fixed pipeline (prompt chaining) the right choice?",
+      "options": [
+        "When the list of aspects to check is known upfront and does not depend on findings",
+        "Always: it is cheaper than dynamic decomposition",
+        "When the task is open-ended and the structure is unknown",
+        "When exploring an unfamiliar codebase"
+      ],
+      "answer": 0,
+      "explanation": "Prompt chaining suits a predictable multi-aspect review: the steps are known before you start and each receives the previous result. Open-ended tasks need dynamism, because their subtasks are born from intermediate findings."
+    },
+    {
+      "question": "Why must a plan for an open-ended task adapt rather than be written once?",
+      "options": [
+        "Because the model forgets context between steps",
+        "Because dependencies and obstacles are discovered along the way and change the priorities",
+        "Because the user may change their mind",
+        "Because a fixed plan costs more tokens"
+      ],
+      "answer": 1,
+      "explanation": "The value of an adaptive plan is that subtasks are generated as findings accumulate. Once you start on one module you learn about its dependencies — and a rigid plan written before that knowledge falls apart."
+    }
   ]
 }
