@@ -102,7 +102,7 @@
       "ошибки"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "c08",
@@ -117,7 +117,7 @@
       "конфигурация"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "c09",
@@ -132,7 +132,7 @@
       "Bash"
     ],
     "free": false,
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "c10",

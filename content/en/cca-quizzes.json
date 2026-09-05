@@ -340,5 +340,176 @@
       "answer": 1,
       "explanation": "The value of an adaptive plan is that subtasks are generated as findings accumulate. Once you start on one module you learn about its dependencies — and a rigid plan written before that knowledge falls apart."
     }
+  ],
+  "c07": [
+    {
+      "question": "Two tools are described as \"Analyzes content and returns key findings\" and \"Analyzes a document and returns key findings\". The agent keeps picking the wrong one. What do you fix first?",
+      "options": [
+        "Add a rule to the system prompt about which tool to call when",
+        "Rename the tools and rewrite the descriptions to remove the functional overlap",
+        "Merge both tools into one general-purpose tool",
+        "Set tool_choice: any so the model definitely calls a tool"
+      ],
+      "answer": 1,
+      "explanation": "The description is the primary tool-selection mechanism. With overlapping descriptions the choice becomes arbitrary. The guide prescribes renaming and sharpening descriptions with an explicit boundary: how this tool differs from its neighbour."
+    },
+    {
+      "question": "The analyze_document tool can extract metrics, write summaries and verify claims. What should be done with it?",
+      "options": [
+        "Leave it and extend the description to list all three modes",
+        "Split it into purpose-specific tools with defined contracts: extract_data_points, summarize_content, verify_claim_against_source",
+        "Add a mode parameter with values extract, summarize, verify",
+        "Move the mode selection into the system prompt"
+      ],
+      "answer": 1,
+      "explanation": "The guide describes this move directly: split a generic tool into purpose-specific tools with defined input/output contracts. One tool with three modes leaves the output contract vague and the selection harder."
+    },
+    {
+      "question": "An MCP tool returned an archive access failure. Which fields let the agent make the right decision?",
+      "options": [
+        "Just a human-readable error message",
+        "isError, errorCategory, isRetryable and a readable message, plus customer-facing text for business errors",
+        "The HTTP status code and the server response body",
+        "An attempt counter and the time until the next retry"
+      ],
+      "answer": 1,
+      "explanation": "Structured metadata is the whole point: the category conveys the nature of the failure, isRetryable saves pointless attempts, and customerMessage lets the agent explain the reason to a human in plain language."
+    },
+    {
+      "question": "An archive search ran successfully but found no matches. What should the tool return?",
+      "options": [
+        "isError: true with category transient so the agent retries",
+        "isError: true with category validation, since the query produced nothing",
+        "A successful response with an empty results list",
+        "An \"Operation failed\" error — the agent will work it out"
+      ],
+      "answer": 2,
+      "explanation": "The guide asks specifically for distinguishing access failures (which need a retry decision) from valid empty results (a successful query with no matches). Erroring on an empty result sends the agent hunting for a problem that does not exist."
+    },
+    {
+      "question": "A subagent hit an external service timeout, retried, and got the data on the second attempt. What propagates to the coordinator?",
+      "options": [
+        "Nothing about the error: the transient failure was resolved locally, only the result goes up",
+        "A full log of both attempts, so the coordinator knows about the instability",
+        "A transient-category error, so the coordinator can decide whether to retry",
+        "A partial result flagged as possibly incomplete"
+      ],
+      "answer": 0,
+      "explanation": "The skill is phrased as local error recovery within subagents for transient failures, propagating to the coordinator only errors that cannot be resolved locally — along with partial results and what was attempted."
+    }
+  ],
+  "c08": [
+    {
+      "question": "All four subagents were given one shared list of 18 tools. The synthesiser started searching the web itself, and call counts on simple requests went up. What do you do?",
+      "options": [
+        "Restrict each subagent set to the tools of its role, leaving 4–5 relevant ones",
+        "Improve the descriptions of all 18 tools and keep the list shared",
+        "Set tool_choice: any so the model stops hesitating",
+        "Add a list of forbidden tools to each subagent prompt"
+      ],
+      "answer": 0,
+      "explanation": "A large tool count degrades selection reliability by increasing decision complexity. On top of that, an agent holding tools outside its specialisation tends to misuse them. Role scoping fixes both at once."
+    },
+    {
+      "question": "You need to guarantee extract_metadata runs before the enrichment tools. How is that done?",
+      "options": [
+        "tool_choice: \"any\" on every step",
+        "Forced selection {\"type\": \"tool\", \"name\": \"extract_metadata\"} on the first call, with subsequent steps in follow-up turns",
+        "State the ordering in the enrichment tool description",
+        "Disable the other tools until metadata has been obtained"
+      ],
+      "answer": 1,
+      "explanation": "Forced selection pins the first step: a specific tool is guaranteed to be called, and the following steps are processed in later turns. It sets the start of the route, not the whole route."
+    },
+    {
+      "question": "A team MCP server is needed by every developer on the project and requires a token. How do you configure it?",
+      "options": [
+        "Add the server to each developer ~/.claude.json with their own token",
+        "Add it to the project .mcp.json with the token in plain text — the repository is private",
+        "Add it to the project .mcp.json, expanding the token from the environment via ${VAR}",
+        "Put the token in a separate file next to .mcp.json and add that file to .gitignore"
+      ],
+      "answer": 2,
+      "explanation": "The project .mcp.json describes shared team servers and is committed; secrets stay out of it thanks to environment variable expansion. The user-scoped ~/.claude.json is for personal and experimental servers."
+    },
+    {
+      "question": "An MCP server with indexed code search is connected, yet the agent keeps using the built-in Grep. The most likely cause?",
+      "options": [
+        "Built-in tools always take precedence over MCP tools",
+        "The MCP tool description is too thin and does not explain its capabilities or output format",
+        "The MCP server is configured at user scope instead of project scope",
+        "MCP server tools are only available after explicitly requesting a resource"
+      ],
+      "answer": 1,
+      "explanation": "There is no built-in precedence — there is clarity. The guide asks you to enhance MCP tool descriptions, explaining capabilities and outputs, or the agent will prefer a clear Grep over an unclear MCP tool."
+    },
+    {
+      "question": "Why do MCP resources exist when there are already tools?",
+      "options": [
+        "Resources perform actions faster than tools",
+        "Resources expose a catalog of available content to the agent, reducing exploratory tool calls",
+        "Resources store the credentials used to connect to the server",
+        "Resources are only needed for servers that run over HTTP"
+      ],
+      "answer": 1,
+      "explanation": "A resource answers \"what is here at all\": issue summaries, documentation hierarchies, database schemas. Seeing the catalog, the agent skips exploration and goes straight to the right tool."
+    }
+  ],
+  "c09": [
+    {
+      "question": "You need to find every place in the repository where process_refund is called. Which built-in tool is right?",
+      "options": [
+        "Glob — by file name pattern",
+        "Grep — content search across files",
+        "Read — read the files and look through them",
+        "Bash — run a search command manually"
+      ],
+      "answer": 1,
+      "explanation": "Grep is for content search: function names, error messages, import statements. Glob matches file paths by pattern and never sees contents at all."
+    },
+    {
+      "question": "You need to find all test files matching **/*.test.tsx. What does that?",
+      "options": [
+        "Grep for the string \".test.tsx\"",
+        "Glob by path pattern",
+        "Read over the tests directory",
+        "Bash with a find command"
+      ],
+      "answer": 1,
+      "explanation": "Glob is the file path pattern matching tool. Grep would look for mentions of that string inside files, which solves an entirely different problem."
+    },
+    {
+      "question": "Edit cannot apply a change: the anchor text occurs three times in the file. What do you do?",
+      "options": [
+        "Read the whole file with Read and write the modified version with Write",
+        "Repeat Edit several times — it will hit one of the occurrences",
+        "Delete the file and recreate it",
+        "Use Glob to find similar files and edit those"
+      ],
+      "answer": 0,
+      "explanation": "A non-unique match means there is no unambiguous anchor, not that the file is broken. The guide names Read + Write as the reliable fallback; the alternative is widening the anchor with adjacent lines until the match is unique."
+    },
+    {
+      "question": "An agent is exploring an unfamiliar codebase. Which order does the exam expect?",
+      "options": [
+        "Read every file upfront to get the full picture",
+        "Start with Grep to find entry points, then Read along the imports, tracing the flows",
+        "Walk the directories with Glob and read one file from each",
+        "Ask the user for a list of important files and read only those"
+      ],
+      "answer": 1,
+      "explanation": "The skill is described as building understanding incrementally: Grep finds the entry points first, then Read follows the imports. Bulk reading upfront exhausts context and yields no understanding."
+    },
+    {
+      "question": "A function is re-exported from a wrapper module under a different name. How do you reliably find every caller?",
+      "options": [
+        "Search the codebase for the original function name",
+        "First identify every name the function is exported under, then search for each of those names",
+        "Read every file that imports the module",
+        "Use Glob to find files with similar names"
+      ],
+      "answer": 1,
+      "explanation": "Searching the original name alone misses calls that go through wrappers. The guide describes the two-step technique: collect all exported names first, then run a search for each of them."
+    }
   ]
 }
