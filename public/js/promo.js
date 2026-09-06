@@ -1,4 +1,6 @@
-/* ML Career Simulator — промо-ролик (код-анимация, ~100 сек, RU/EN) */
+/* ML Career Simulator — промо-ролик (код-анимация, ~60 сек, RU/EN)
+   Арка: классический ML → агентная инженерия → уровень архитектора,
+   плюс собеседования и переход из разработки в AI. */
 (function () {
   const player = document.getElementById('promoPlayer');
   if (!player) return;
@@ -6,69 +8,89 @@
 
   const T = {
     ru: {
-      watch: '▶ Смотреть промо · 1:40',
+      watch: '▶ Смотреть промо · 1:00',
       replay: '↻ Смотреть ещё раз',
       cta: 'Начать бесплатно',
       scenes: {
-        hook: ['Курсы дают знания.', 'Работу дают навыки.', 'Получите их — как на настоящей работе.'],
-        hookCap: 'ML Career Simulator — симулятор карьеры ML-инженера',
-        chatTitle: '#ml-team · Datacore',
-        chat1: 'Добро пожаловать в команду! Ты наш новый Junior ML Engineer 🎉',
-        chat2: 'Первая задача: выручка растёт, а прибыль — нет. Разберись, что в данных.',
-        chat3: 'Отчёт нужен к пятнице. Погнали!',
-        chatCap: 'Вас «принимают на работу» в компанию Datacore',
-        codeTitle: 'eda_report.py — задача №1',
-        codeInsight: '💡 Инсайт: рост куплен скидками, маржа −15%',
-        codeCap: 'Решаете реальные задачи: код, данные, выводы для бизнеса',
-        alertTitle: '⚠ ALERT: model quality drop',
-        alertFound: '🔍 Найдено: утечка данных из будущего',
-        alertFixed: '✅ Исправлено. Метрика восстановлена',
-        alertCap: 'Разбираете инциденты, как в настоящем проде',
-        growthCap: '23 модуля: от первого дня до Middle ML Engineer',
-        gJunior: 'Junior', gPlus: 'Junior+', gTrack: 'Middle-track', gMiddle: 'Middle 🎉',
-        mods: ['EDA и статистика', 'Модели и метрики', 'Фрод и рекомендации', 'MLOps и System Design'],
+        hook: [
+          'Классический ML — вход в профессию.',
+          'Агентные системы — то, что бизнес автоматизирует сегодня.',
+          'Архитектура — уровень, где решение видно целиком.',
+        ],
+        hookCap: 'Путь от первой ML-задачи до архитектуры уровня enterprise',
+
+        mlTask: 'Лена, тимлид: выручка растёт, прибыль — нет. Ответ нужен бизнесу к пятнице.',
+        mlTitle: 'eda_report.py — задача №1',
+        mlInsight: '💡 Рост куплен скидками. Маржа −15%. Это ответ бизнесу, а не график.',
+        mlCap: 'Трек 1 · Классический ML: 23 модуля на реальных задачах Datacore',
+
+        agQuote: 'Марина, CEO: хочу маркетинговую фабрику — агент ведёт исходящие сам.',
+        agNodes: ['координатор', 'поиск', 'черновик', 'проверка', 'человек ✓'],
+        agResult: 'Операционный процесс закрыт агентом. Человек остаётся только на подтверждении.',
+        agCap: 'Трек 2 · Агентная инженерия: 20 кейсов, Junior AI → Senior AI Engineer',
+
+        arTitle: 'Уровень Solution Architect: систему видно целиком',
+        arTiles: ['Агентная архитектура', 'Инструменты и MCP', 'Процессы разработки', 'Промптинг и данные', 'Контекст и надёжность'],
+        arResult: 'Пробный экзамен: 60 вопросов за 120 минут, отчёт по доменам — как на настоящем.',
+        arCap: 'Трек 3 · Подготовка к Claude Certified Architect: 20 модулей и пробный экзамен',
+
+        ivIntro: 'Вы уже software-инженер? Код — не ваша проблема.',
         ivQ: 'Вопрос интервьюера: «Accuracy 99% — это хорошо?»',
-        ivThink: 'Ваш ответ вслух…',
-        ivA: '«Зависит от баланса классов и цены ошибки…» — эталонный разбор внутри',
-        ivCap: 'Симулятор собеседований: Junior, Middle, System Design',
-        certName: 'Ваше Имя',
-        certText: 'Middle-track ML Engineer',
-        certCap: 'Финальный проект, экзамен — и сертификат',
-        finalTitle: 'Ваша первая ML-работа начинается здесь',
-        finalSub: 'Первые 2 модуля — бесплатно. Без карты.',
+        ivThink: '🎤 Отвечаете вслух…',
+        ivA: '«Зависит от баланса классов и цены ошибки» — эталонный разбор внутри',
+        ivCap: 'Симулятор собеседований: Junior, Middle, System Design — и переход из разработки в AI',
+
+        outLines: ['Не конспект теории. Не пачка ноутбуков.', 'Готовность решать задачу бизнеса — и защитить решение.'],
+        outCap: 'Чем вы отличаетесь от выпускника курса',
+
+        certs: ['Middle-track ML Engineer', 'AI Agent Engineer', 'CCAR-F Exam Ready'],
+        certEyebrow: 'CERTIFICATE',
+        finalTitle: 'Ваш путь в AI начинается здесь',
+        finalSub: 'Первые 2 модуля каждого трека — бесплатно, без карты.',
+        finalCap: 'Три трека — три сертификата. Одна подписка.',
       },
     },
     en: {
-      watch: '▶ Watch the promo · 1:40',
+      watch: '▶ Watch the promo · 1:00',
       replay: '↻ Watch again',
       cta: 'Start for free',
       scenes: {
-        hook: ['Courses give knowledge.', 'Jobs demand skills.', 'Get them — like on a real job.'],
-        hookCap: 'ML Career Simulator — an ML engineer career simulator',
-        chatTitle: '#ml-team · Datacore',
-        chat1: 'Welcome to the team! You are our new Junior ML Engineer 🎉',
-        chat2: 'First task: revenue grows, profit does not. Find out what is in the data.',
-        chat3: 'Report due Friday. Let’s go!',
-        chatCap: 'You get "hired" by the Datacore company',
-        codeTitle: 'eda_report.py — task #1',
-        codeInsight: '💡 Insight: growth bought with discounts, margin −15%',
-        codeCap: 'You solve real tasks: code, data, business conclusions',
-        alertTitle: '⚠ ALERT: model quality drop',
-        alertFound: '🔍 Found: data leakage from the future',
-        alertFixed: '✅ Fixed. Metric recovered',
-        alertCap: 'You investigate incidents, like in real production',
-        growthCap: '23 modules: from day one to Middle ML Engineer',
-        gJunior: 'Junior', gPlus: 'Junior+', gTrack: 'Middle-track', gMiddle: 'Middle 🎉',
-        mods: ['EDA & statistics', 'Models & metrics', 'Fraud & recommenders', 'MLOps & System Design'],
+        hook: [
+          'Classic ML is how you get in.',
+          'Agentic systems are what business automates today.',
+          'Architecture is where the whole solution is visible.',
+        ],
+        hookCap: 'From your first ML task to enterprise-level architecture',
+
+        mlTask: 'Lena, team lead: revenue is up, profit is not. Business needs an answer by Friday.',
+        mlTitle: 'eda_report.py — task #1',
+        mlInsight: '💡 Growth was bought with discounts. Margin −15%. That is an answer, not a chart.',
+        mlCap: 'Track 1 · Classic ML: 23 modules on real Datacore problems',
+
+        agQuote: 'Marina, CEO: I want a marketing factory — an agent running outbound on its own.',
+        agNodes: ['coordinator', 'search', 'draft', 'check', 'human ✓'],
+        agResult: 'An operational process, run by an agent. A human stays only on approval.',
+        agCap: 'Track 2 · Agentic engineering: 20 cases, Junior AI → Senior AI Engineer',
+
+        arTitle: 'Solution Architect level: you see the whole system',
+        arTiles: ['Agentic architecture', 'Tools & MCP', 'Dev workflows', 'Prompting & data', 'Context & reliability'],
+        arResult: 'Mock exam: 60 questions in 120 minutes, a per-domain report — like the real one.',
+        arCap: 'Track 3 · Claude Certified Architect prep: 20 modules and a mock exam',
+
+        ivIntro: 'Already a software engineer? Code is not your problem.',
         ivQ: 'Interviewer: “Is 99% accuracy good?”',
-        ivThink: 'Your answer out loud…',
-        ivA: '“It depends on class balance and the cost of errors…” — model answer inside',
-        ivCap: 'Interview simulator: Junior, Middle, System Design',
-        certName: 'Your Name',
-        certText: 'Middle-track ML Engineer',
-        certCap: 'A capstone project, the exam — and the certificate',
-        finalTitle: 'Your first ML job starts here',
-        finalSub: 'First 2 modules are free. No card required.',
+        ivThink: '🎤 You answer out loud…',
+        ivA: '“It depends on class balance and the cost of errors” — model answer inside',
+        ivCap: 'Interview simulator: Junior, Middle, System Design — and the switch from dev into AI',
+
+        outLines: ['Not lecture notes. Not a pile of notebooks.', 'Readiness to solve a business problem — and defend the solution.'],
+        outCap: 'What sets you apart from a course graduate',
+
+        certs: ['Middle-track ML Engineer', 'AI Agent Engineer', 'CCAR-F Exam Ready'],
+        certEyebrow: 'CERTIFICATE',
+        finalTitle: 'Your path into AI starts here',
+        finalSub: 'The first 2 modules of each track are free, no card.',
+        finalCap: 'Three tracks — three certificates. One subscription.',
       },
     },
   }[LANG];
@@ -86,74 +108,70 @@
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   // ---------- сцены: {dur (сек), cap, build(el) — DOM с CSS-анимациями}
+  // Дуга: хук → классический ML → агентная инженерия → уровень архитектора →
+  // собеседования → что остаётся на выходе → сертификаты и призыв. Всего 60 сек.
   const scenes = [
-    { dur: 11, cap: S.hookCap, build (el) {
+    { dur: 6, cap: S.hookCap, build (el) {
       el.innerHTML = `<div class="sc-hook">
-        ${S.hook.map((line, i) => `<div class="sc-hook-line" style="animation-delay:${i * 2.4}s">${esc(line)}</div>`).join('')}
+        ${S.hook.map((line, i) => `<div class="sc-hook-line" style="animation-delay:${0.2 + i * 1.7}s">${esc(line)}</div>`).join('')}
       </div>`;
     }},
-    { dur: 14, cap: S.chatCap, build (el) {
-      el.innerHTML = `<div class="sc-chat">
-        <div class="sc-chat-head">💬 ${esc(S.chatTitle)}</div>
-        <div class="sc-bubble" style="animation-delay:.6s"><span class="sc-ava">Л</span>${esc(S.chat1)}</div>
-        <div class="sc-bubble" style="animation-delay:4.6s"><span class="sc-ava">Л</span>${esc(S.chat2)}</div>
-        <div class="sc-bubble" style="animation-delay:8.6s"><span class="sc-ava">М</span>${esc(S.chat3)}</div>
-        <div class="sc-typing" style="animation-delay:11.5s">●●●</div>
-      </div>`;
-    }},
-    { dur: 15, cap: S.codeCap, build (el) {
+    { dur: 10, cap: S.mlCap, build (el) {
       const lines = [
-        'df = pd.read_csv("sales.csv")',
-        'df.duplicated(subset="order_id").sum()   # 412 !',
         'df.groupby("month")[["revenue","profit"]].sum()',
-        'df["discount_pct"].mean()               # 4.2% → 16.8%',
+        'df["discount_pct"].mean()             # 4.2% → 16.8%',
+        'df.duplicated("order_id").sum()       # 412',
       ];
-      el.innerHTML = `<div class="sc-code">
-        <div class="sc-code-head"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-          <span class="sc-code-title">${esc(S.codeTitle)}</span></div>
-        ${lines.map((l, i) => `<div class="sc-code-line" style="animation-delay:${0.6 + i * 2.2}s"><span class="ln">${i + 1}</span>${esc(l)}</div>`).join('')}
-        <div class="sc-insight" style="animation-delay:10.5s">${esc(S.codeInsight)}</div>
-      </div>`;
-    }},
-    { dur: 15, cap: S.alertCap, build (el) {
-      el.innerHTML = `<div class="sc-alert">
-        <div class="sc-alert-banner">${esc(S.alertTitle)}</div>
-        <svg viewBox="0 0 560 170" class="sc-alert-chart">
-          <polyline class="sc-line-bad" points="10,40 90,42 170,45 250,44 330,95 410,120 550,135"/>
-          <polyline class="sc-line-good" points="330,95 410,70 490,50 550,45"/>
-          <line x1="330" y1="20" x2="330" y2="150" stroke="#f87171" stroke-dasharray="5 4"/>
-        </svg>
-        <div class="sc-alert-found" style="animation-delay:5s">${esc(S.alertFound)}</div>
-        <div class="sc-alert-fixed" style="animation-delay:9.5s">${esc(S.alertFixed)}</div>
-      </div>`;
-    }},
-    { dur: 15, cap: S.growthCap, build (el) {
-      const grades = [S.gJunior, S.gPlus, S.gTrack, S.gMiddle];
-      el.innerHTML = `<div class="sc-growth">
-        <div class="sc-grade" id="scGrade">${esc(grades[0])}</div>
-        <div class="sc-gbar"><div class="sc-gfill"></div></div>
-        <div class="sc-mods">
-          ${S.mods.map((m, i) => `<div class="sc-mod" style="animation-delay:${1 + i * 2.6}s">✅ ${esc(m)}</div>`).join('')}
+      el.innerHTML = `<div class="sc-track">
+        <div class="sc-task" style="animation-delay:.2s">${esc(S.mlTask)}</div>
+        <div class="sc-code">
+          <div class="sc-code-head"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <span class="sc-code-title">${esc(S.mlTitle)}</span></div>
+          ${lines.map((l, i) => `<div class="sc-code-line" style="animation-delay:${1.6 + i * 1.6}s"><span class="ln">${i + 1}</span>${esc(l)}</div>`).join('')}
+          <div class="sc-insight" style="animation-delay:6.8s">${esc(S.mlInsight)}</div>
         </div>
       </div>`;
-      const gradeEl = el.querySelector('#scGrade');
-      grades.forEach((g, i) => setTimeout(() => { if (player.dataset.playing === '1') { gradeEl.textContent = g; gradeEl.classList.remove('pop'); void gradeEl.offsetWidth; gradeEl.classList.add('pop'); } }, i * 3400));
     }},
-    { dur: 14, cap: S.ivCap, build (el) {
+    { dur: 10, cap: S.agCap, build (el) {
+      el.innerHTML = `<div class="sc-track">
+        <div class="sc-task accent" style="animation-delay:.2s">${esc(S.agQuote)}</div>
+        <div class="sc-agents">
+          ${S.agNodes.map((n, i) => `${i ? `<span class="sc-agent-arrow" style="animation-delay:${1.5 + i * 0.8}s">→</span>` : ''}<span class="sc-agent-node${i === S.agNodes.length - 1 ? ' done' : ''}" style="animation-delay:${1.8 + i * 0.8}s">${esc(n)}</span>`).join('')}
+        </div>
+        <div class="sc-result" style="animation-delay:7s">${esc(S.agResult)}</div>
+      </div>`;
+    }},
+    { dur: 10, cap: S.arCap, build (el) {
+      el.innerHTML = `<div class="sc-track">
+        <div class="sc-arch-title" style="animation-delay:.2s">${esc(S.arTitle)}</div>
+        <div class="sc-arch">
+          ${S.arTiles.map((t, i) => `<div class="sc-arch-tile" style="animation-delay:${1.4 + i * 0.7}s">${esc(t)}</div>`).join('')}
+        </div>
+        <div class="sc-result" style="animation-delay:6.6s">${esc(S.arResult)}</div>
+      </div>`;
+    }},
+    { dur: 10, cap: S.ivCap, build (el) {
       el.innerHTML = `<div class="sc-iv">
-        <div class="sc-iv-q" style="animation-delay:.4s">${esc(S.ivQ)}</div>
-        <div class="sc-iv-think" style="animation-delay:3.6s">🎤 ${esc(S.ivThink)}</div>
-        <div class="sc-iv-a" style="animation-delay:7.6s">${esc(S.ivA)}</div>
+        <div class="sc-iv-intro" style="animation-delay:.2s">${esc(S.ivIntro)}</div>
+        <div class="sc-iv-q" style="animation-delay:1.8s">${esc(S.ivQ)}</div>
+        <div class="sc-iv-think" style="animation-delay:4.2s">${esc(S.ivThink)}</div>
+        <div class="sc-iv-a" style="animation-delay:6.6s">${esc(S.ivA)}</div>
       </div>`;
     }},
-    { dur: 16, cap: S.certCap, build (el) {
+    { dur: 6, cap: S.outCap, build (el) {
+      el.innerHTML = `<div class="sc-hook sc-out">
+        ${S.outLines.map((line, i) => `<div class="sc-hook-line" style="animation-delay:${0.2 + i * 2}s">${esc(line)}</div>`).join('')}
+      </div>`;
+    }},
+    { dur: 8, cap: S.finalCap, build (el) {
       el.innerHTML = `<div class="sc-cert">
-        <div class="sc-cert-card">
-          <div class="sc-cert-eyebrow">CERTIFICATE OF COMPLETION</div>
-          <div class="sc-cert-name">${esc(S.certName)}</div>
-          <div class="sc-cert-track">${esc(S.certText)}</div>
+        <div class="sc-cert-row">
+          ${S.certs.map((c, i) => `<div class="sc-cert-card" style="animation-delay:${0.3 + i * 0.7}s">
+            <div class="sc-cert-eyebrow">${esc(S.certEyebrow)}</div>
+            <div class="sc-cert-track">${esc(c)}</div>
+          </div>`).join('')}
         </div>
-        <div class="sc-final" style="animation-delay:7s">
+        <div class="sc-final" style="animation-delay:4.4s">
           <div class="sc-final-title">${esc(S.finalTitle)}</div>
           <div class="sc-final-sub">${esc(S.finalSub)}</div>
           <a class="btn btn-primary btn-lg sc-final-cta" href="/app.html">${esc(T.cta)}</a>
@@ -229,11 +247,11 @@
       const T = getT();
       const chord = PROG[bar];
       if (pos === 0) chord.forEach((m) => tone('sawtooth', mtof(m), t0, SPB * 3.8, 0.045, 1100)); // пэд
-      tone('triangle', mtof(chord[ARP[pos]] + 12), t0, STEP * 0.9, T > 11 ? 0.085 : 0.055);        // арпеджио
-      if (T > 11 && pos % 4 === 0) tone('square', mtof(BASS[bar] + 12), t0, SPB * 0.85, 0.06, 500); // бас
-      if (T > 25 && pos % 2 === 0) kick(t0);                                                        // бочка
-      if (T > 40 && pos % 2 === 1) hat(t0);                                                         // хэты
-      if (T > 55 && pos === 4) kick(t0 + STEP / 2);                                                 // драйв-синкопа
+      tone('triangle', mtof(chord[ARP[pos]] + 12), t0, STEP * 0.9, T > 7 ? 0.085 : 0.055);         // арпеджио
+      if (T > 7 && pos % 4 === 0) tone('square', mtof(BASS[bar] + 12), t0, SPB * 0.85, 0.06, 500); // бас
+      if (T > 16 && pos % 2 === 0) kick(t0);                                                        // бочка
+      if (T > 28 && pos % 2 === 1) hat(t0);                                                         // хэты
+      if (T > 44 && pos === 4) kick(t0 + STEP / 2);                                                 // драйв-синкопа
     }
     function loop() {
       // lookahead-планировщик: держим очередь нот на ~0.15 c вперёд
