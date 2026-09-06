@@ -1,8 +1,7 @@
 /* ML Career Simulator — промо-ролик (код-анимация, ~120 сек, RU/EN)
    Арка: классический ML → агентная инженерия → уровень архитектора,
    собеседования на реальных вопросах продукта, переход из разработки в AI.
-   Плеер умеет паузу с читаемым кадром, покадровую навигацию и озвучку
-   синтезом речи браузера (с тихим откатом, если голоса нет). */
+   Плеер умеет паузу с читаемым кадром и покадровую навигацию. */
 (function () {
   const player = document.getElementById('promoPlayer');
   if (!player) return;
@@ -18,17 +17,6 @@
       next: 'Следующая сцена',
       chapters: 'Сцены',
       scenes: {
-        n1: 'Классический ML — это только вход. Дальше начинается то, за что платит бизнес.',
-        n2: 'Вас нанимают джуниором. Задача приходит не из учебника, а от тимлида.',
-        n3: 'Второй трек — про агентов, которые закрывают операционные процессы. Смотрите, как это работает.',
-        n4: 'Третий трек готовит к сертификации. В конце — пробный экзамен с отчётом по доменам.',
-        n5: 'Вопросы в симуляторе настоящие. Вот как выглядит джуниорский.',
-        n6: 'На мидле спрашивают уже не определения, а расследование.',
-        n7: 'А на системном дизайне метрика измеряется прямо в деньгах.',
-        n8: 'Если вы уже пишете код, вам не хватает не синтаксиса.',
-        n9: 'На выходе — не конспект, а готовность отвечать за решение.',
-        n10: 'Три трека, три сертификата, одна подписка. Первые два модуля каждого — бесплатно.',
-
         hook: [
           'Классический ML — вход в профессию.',
           'Агентные системы — то, что бизнес автоматизирует сегодня.',
@@ -96,17 +84,6 @@
       next: 'Next scene',
       chapters: 'Scenes',
       scenes: {
-        n1: 'Classic ML is only the entry point. What business pays for starts after it.',
-        n2: 'You are hired as a junior. The task comes from a team lead, not a textbook.',
-        n3: 'The second track is about agents that close operational processes. Watch it run.',
-        n4: 'The third track prepares you for certification, ending with a mock exam and a per-domain report.',
-        n5: 'The questions in the simulator are real. Here is what a junior one looks like.',
-        n6: 'At middle level they ask for an investigation, not a definition.',
-        n7: 'And in system design the metric is measured directly in money.',
-        n8: 'If you already write code, syntax is not what you are missing.',
-        n9: 'What you leave with is not notes, but readiness to own a decision.',
-        n10: 'Three tracks, three certificates, one subscription. The first two modules of each are free.',
-
         hook: [
           'Classic ML is how you get in.',
           'Agentic systems are what business automates today.',
@@ -185,13 +162,13 @@
   // update вызывается каждым кадром с временем внутри сцены: так числовые
   // демонстрации (таймер, балл) перематываются и замирают вместе с плеером.
   const scenes = [
-    { dur: 10, cap: S.hookCap, say: S.n1, build (el) {
+    { dur: 10, cap: S.hookCap, build (el) {
       el.innerHTML = `<div class="sc-hook">
         ${S.hook.map((line, i) => `<div class="sc-hook-line" style="animation-delay:${0.3 + i * 3.3}s">${esc(line)}</div>`).join('')}
       </div>`;
     }},
 
-    { dur: 14, cap: S.mlCap, say: S.n2, build (el) {
+    { dur: 14, cap: S.mlCap, build (el) {
       const lines = [
         'df.groupby("month")[["revenue","profit"]].sum()',
         'df["discount_pct"].mean()             # 4.2% → 16.8%',
@@ -208,7 +185,7 @@
       </div>`;
     }},
 
-    { dur: 20, cap: S.agCap, say: S.n3, build (el) {
+    { dur: 20, cap: S.agCap, build (el) {
       el.innerHTML = `<div class="sc-track">
         <div class="sc-task accent" style="animation-delay:.3s">${esc(S.agQuote)}</div>
         <div class="sc-log">
@@ -223,7 +200,7 @@
       </div>`;
     }},
 
-    { dur: 20, cap: S.exCap, say: S.n4, build (el) {
+    { dur: 20, cap: S.exCap, build (el) {
       const D = S.exDomains, PCT = [88, 82, 75, 91, 67];
       el.innerHTML = `<div class="sc-track">
         <div class="sc-exam-head">
@@ -276,10 +253,10 @@
       };
     }},
 
-    { dur: 11, cap: S.iv1Cap, say: S.n5, build (el) { el.innerHTML = ivMarkup(S.iv1Q, S.iv1A); }},
-    { dur: 11, cap: S.iv2Cap, say: S.n6, build (el) { el.innerHTML = ivMarkup(S.iv2Q, S.iv2A); }},
+    { dur: 11, cap: S.iv1Cap, build (el) { el.innerHTML = ivMarkup(S.iv1Q, S.iv1A); }},
+    { dur: 11, cap: S.iv2Cap, build (el) { el.innerHTML = ivMarkup(S.iv2Q, S.iv2A); }},
 
-    { dur: 12, cap: S.iv3Cap, say: S.n7, build (el) {
+    { dur: 12, cap: S.iv3Cap, build (el) {
       el.innerHTML = `<div class="sc-iv">
         <div class="sc-iv-q" style="animation-delay:.3s"><b>${esc(S.ivWho)}:</b> ${esc(S.iv3Q)}</div>
         <div class="sc-iv-a" style="animation-delay:5.3s"><b>${esc(S.iv3Metric)}:</b> ${esc(S.iv3A)}</div>
@@ -287,19 +264,19 @@
       </div>`;
     }},
 
-    { dur: 7, cap: S.swCap, say: S.n8, build (el) {
+    { dur: 7, cap: S.swCap, build (el) {
       el.innerHTML = `<div class="sc-hook sc-out">
         ${S.swLines.map((l, i) => `<div class="sc-hook-line" style="animation-delay:${0.3 + i * 3.3}s">${esc(l)}</div>`).join('')}
       </div>`;
     }},
 
-    { dur: 7, cap: S.outCap, say: S.n9, build (el) {
+    { dur: 7, cap: S.outCap, build (el) {
       el.innerHTML = `<div class="sc-hook sc-out">
         ${S.outLines.map((l, i) => `<div class="sc-hook-line" style="animation-delay:${0.3 + i * 3.3}s">${esc(l)}</div>`).join('')}
       </div>`;
     }},
 
-    { dur: 8, cap: S.finalCap, say: S.n10, build (el) {
+    { dur: 8, cap: S.finalCap, build (el) {
       el.innerHTML = `<div class="sc-cert">
         <div class="sc-cert-row">
           ${S.certs.map((c, i) => `<div class="sc-cert-card" style="animation-delay:${0.3 + i * 0.7}s">
@@ -334,8 +311,7 @@
 
     let ctx = null, master = null, comp = null, timer = null, step = 0, stopped = true;
     let muted = false;
-    let ducked = false;                       // приглушение под реплику диктора
-    const level = () => (muted ? 0 : (ducked ? 0.28 : 0.9));
+    const level = () => (muted ? 0 : 0.9);
     try { muted = localStorage.getItem('promoMuted') === '1'; } catch (e) {}
 
     const BPM = 112, SPB = 60 / BPM, STEP = SPB / 2;              // восьмые
@@ -433,51 +409,10 @@
         if (ctx && master && !stopped) master.gain.setTargetAtTime(level(), ctx.currentTime, 0.05);
         return muted;
       },
-      duck (on) {
-        ducked = !!on;
-        if (ctx && master && !stopped) master.gain.setTargetAtTime(level(), ctx.currentTime, 0.08);
-      },
       muted: () => muted,
     };
   }
 
-
-  // ---------- озвучка (синтез речи браузера; нет голоса — идём молча)
-  function makeNarrator (lang) {
-    const synth = typeof window !== 'undefined' && window.speechSynthesis;
-    const noop = { say () {}, pause () {}, resume () {}, stop () {}, setMuted () {}, available: () => false };
-    if (!synth || typeof SpeechSynthesisUtterance === 'undefined') return noop;
-
-    let voice = null, muted = false, speaking = false;
-    function pick () {
-      const vs = synth.getVoices() || [];
-      // точное совпадение локали, иначе любой голос нужного языка
-      voice = vs.find((v) => v.lang && v.lang.toLowerCase().replace('_', '-') === (lang === 'ru' ? 'ru-ru' : 'en-us'))
-           || vs.find((v) => v.lang && v.lang.toLowerCase().startsWith(lang))
-           || null;
-    }
-    pick();
-    if (typeof synth.addEventListener === 'function') synth.addEventListener('voiceschanged', pick);
-
-    return {
-      say (text) {
-        if (muted || !voice || !text) return;
-        try {
-          synth.cancel();
-          const u = new SpeechSynthesisUtterance(text);
-          u.voice = voice; u.lang = voice.lang; u.rate = 1.02; u.pitch = 1;
-          u.onstart = () => { speaking = true; music.duck(true); };
-          u.onend = u.onerror = () => { speaking = false; music.duck(false); };
-          synth.speak(u);
-        } catch (e) { /* озвучка необязательна */ }
-      },
-      pause () { try { if (speaking) synth.pause(); } catch (e) {} },
-      resume () { try { synth.resume(); } catch (e) {} },
-      stop () { try { synth.cancel(); } catch (e) {} speaking = false; music.duck(false); },
-      setMuted (v) { muted = v; if (v) this.stop(); },
-      available: () => !!voice,
-    };
-  }
 
   // ---------- плеер
   // Таймлайн — накопление дельт между кадрами (капы на случай фоновой вкладки:
@@ -485,7 +420,6 @@
   let raf = null, elapsed = 0, lastTs = null, curScene = -1, sceneStart = 0, sceneUpdate = null, curRevealed = false;
   let started = false, finished = false;
   const music = makeMusic(() => elapsed);
-  const narrator = makeNarrator(LANG);
 
   function fmt (t) {
     t = Math.max(0, Math.round(t));
@@ -529,7 +463,7 @@
     lastTs = ts;
     if (elapsed >= TOTAL) return finish();
     const idx = sceneAt(elapsed);
-    if (idx !== curScene) { renderScene(idx); narrator.say(scenes[idx].say); }
+    if (idx !== curScene) renderScene(idx);
     if (sceneUpdate) sceneUpdate(elapsed - sceneStart);
     updateUI();
     raf = requestAnimationFrame(tick);
@@ -549,8 +483,8 @@
     lastTs = null;
     // сцена, показанная раскрытой (постер или переход на паузе), пересобирается,
     // иначе анимации не проиграют; обычное продолжение после паузы — без пересборки
-    if (curScene < 0 || curRevealed) { renderScene(sceneAt(elapsed)); narrator.say(scenes[curScene].say); }
-    if (started) { music.resume(); narrator.resume(); } else { music.start(); started = true; }
+    if (curScene < 0 || curRevealed) renderScene(sceneAt(elapsed));
+    if (started) music.resume(); else { music.start(); started = true; }
     raf = requestAnimationFrame(tick);
   }
 
@@ -558,7 +492,6 @@
     player.dataset.playing = '0';
     cancelAnimationFrame(raf);
     music.pause();
-    narrator.pause();
     setPausedUI(true);      // оверлей НЕ показываем: кадр должен остаться читаемым
   }
 
@@ -567,7 +500,7 @@
     finished = true;
     cancelAnimationFrame(raf);
     elapsed = TOTAL; lastTs = null;
-    music.stop(); narrator.stop();
+    music.stop();
     setPausedUI(false);
     progressEl.style.width = '100%';
     timeEl.textContent = `${fmt(TOTAL)} / ${fmt(TOTAL)}`;
@@ -581,11 +514,9 @@
     const playing = player.dataset.playing === '1';
     elapsed = startOf(idx);
     lastTs = null;
-    narrator.stop();
     if (finished) { finished = false; overlay.classList.add('hidden'); }
     renderScene(idx, !playing);
     updateUI();
-    if (playing) narrator.say(scenes[idx].say);
   }
 
   // ---------- элементы управления, которых нет в разметке страницы
@@ -633,12 +564,10 @@
     if (!r.width) return;
     elapsed = Math.min(TOTAL - 0.05, Math.max(0, ((e.clientX - r.left) / r.width) * TOTAL));
     lastTs = null;
-    narrator.stop();
     const playing = player.dataset.playing === '1';
     if (finished) { finished = false; overlay.classList.add('hidden'); }
     renderScene(sceneAt(elapsed), !playing);
     updateUI();
-    if (playing) narrator.say(scenes[curScene].say);
   });
 
   document.addEventListener('visibilitychange', () => {
@@ -649,11 +578,9 @@
   if (muteBtn) {
     const icon = () => { muteBtn.textContent = music.muted() ? '🔇' : '🔊'; };
     icon();
-    narrator.setMuted(music.muted());
     muteBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       music.toggleMute();
-      narrator.setMuted(music.muted());
       icon();
     });
   }
