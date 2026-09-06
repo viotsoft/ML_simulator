@@ -2,7 +2,7 @@
 
 Весь конвейер живёт **внутри приложения** и управляется через веб-панель:
 
-**https://ml-simulator-app-production.up.railway.app/admin/marketing**
+**https://mlsimulator.com/admin/marketing**
 (вход — тот же Basic Auth, что у `/admin`: любой логин + `ADMIN_PASSWORD`)
 
 ## Что умеет панель
@@ -47,7 +47,7 @@
 
 «Link in bio»: в TikTok и Instagram ссылки в постах некликабельны — поставьте
 в bio аккаунтов ссылку вида
-`https://ml-simulator-app-production.up.railway.app/en.html?utm_source=instagram&utm_medium=bio`
+`https://mlsimulator.com/en.html?utm_source=instagram&utm_medium=bio`
 (для TikTok — `utm_source=tiktok`), тогда регистрации будут видны в статистике.
 
 ## Хранение и деплой
