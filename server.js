@@ -24,6 +24,14 @@ const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || '';
 const STRIPE_PRICE_ID = process.env.STRIPE_PRICE_ID || '';
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
 const APP_URL = (process.env.APP_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
+
+// APP_URL остаётся служебным адресом эквайринга: он завязан на WFP_DOMAIN,
+// зарегистрированный в кабинете WayForPay, и менять его при покупке домена
+// нельзя — отвалятся платежи. PUBLIC_URL — канонический адрес сайта: из него
+// собираются canonical, og:url и sitemap.xml. По умолчанию равен APP_URL,
+// поэтому до покупки домена настраивать ничего не нужно.
+const PUBLIC_URL = (process.env.PUBLIC_URL || APP_URL).replace(/\/$/, '');
+const seo = require('./seo');
 const stripe = STRIPE_SECRET_KEY ? require('stripe')(STRIPE_SECRET_KEY) : null;
 
 // ---------------------------------------------------------------- WayForPay
@@ -273,6 +281,11 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), (req,
 });
 
 app.use(express.json());
+
+// Публичные html отдаём сами и подставляем в них {{BASE}} — обязательно ДО
+// express.static, иначе он вернёт файл с литералом в canonical.
+seo.mountEarly(app, { base: PUBLIC_URL, publicDir: path.join(__dirname, 'public') });
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ---------------------------------------------------------------- auth API
@@ -1104,7 +1117,7 @@ ${code
 });
 
 app.get('/admin', requireAdmin, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+  res.sendFile(path.join(__dirname, 'views', 'admin.html'));
 });
 
 // Только безопасные поля — без salt/hash паролей и без токенов сессий.
@@ -1146,6 +1159,19 @@ app.get('/api/admin/users', requireAdmin, (req, res) => {
 // ---------------------------------------------------------------- маркетинговая панель
 // Очередь постов, генерация, публикация и OAuth-подключения соцсетей: /admin/marketing
 require('./marketing/panel').mount(app, { requireAdmin, loadDB });
+
+// ---------------------------------------------------------------- публичные уроки и SEO
+// Страницы уроков, sitemap, robots, счётчик показов и обработчики 404/500.
+// Строго последним: обработчики ошибок обязаны замыкать цепочку.
+seo.mountLate(app, {
+  base: PUBLIC_URL,
+  modules: () => localeModules(DEFAULT_LOCALE),
+  markdownPath: moduleMarkdownPath,
+  dataDir: DATA_DIR,
+  freeModules: FREE_MODULES,
+  requireAdmin,
+  loadDB,
+});
 
 app.listen(PORT, () => {
   console.log(`ML Career Simulator запущен: http://localhost:${PORT}`);

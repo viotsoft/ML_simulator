@@ -1243,7 +1243,7 @@ async function renderCertificateView(cfg) {
       <div class="c-meta">
         <span>ID: ${esc(cert.certId)}</span>
         <span>${t('certDate')}: ${esc(cert.date)}</span>
-        <span>mlsimulator.dev</span>
+        <span>mlsimulator.com</span>
       </div>
     </div>
     <div style="text-align:center;margin-top:22px">

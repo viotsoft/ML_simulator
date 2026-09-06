@@ -412,6 +412,9 @@ async function loadStats() {
   const el = $('#tab-stats');
   el.innerHTML = '<p class="mk-muted">Загрузка…</p>';
   const { bySource, published } = await api('/api/admin/marketing/stats');
+  // Показы страниц уроков: свой серверный счётчик, без cookie и чужих скриптов
+  let lessons = [];
+  try { lessons = (await api('/api/admin/views')).lessons || []; } catch (e) { /* счётчик мог не подняться */ }
 
   const srcRows = Object.entries(bySource).sort((a, b) => b[1].total - a[1].total)
     .map(([src, v]) => `<tr><td>${esc(src)}</td><td>${v.total}</td><td>${v.subscribed}</td></tr>`).join('');
@@ -423,12 +426,33 @@ async function loadStats() {
       <td>${p.signups || '—'}</td>
     </tr>`).join('');
 
+  const lessonRows = lessons.map((l) => `
+    <tr>
+      <td><a href="/lesson/${esc(l.slug)}" target="_blank" rel="noopener">${String(l.order).padStart(2, '0')}. ${esc(l.title)}</a></td>
+      <td>${l.short ? esc(l.short) : '—'}</td>
+      <td>${l.views7 || '—'}</td>
+      <td>${l.views30 || '—'}</td>
+      <td>${l.total || '—'}</td>
+      <td>${l.bots || '—'}</td>
+      <td>${l.signups || '—'}</td>
+      <td>${l.subscribed || '—'}</td>
+    </tr>`).join('');
+
   el.innerHTML = `
     <div class="mk-panel">
       <h2>Регистрации по источникам</h2>
       <div class="admin-table-wrap"><table class="admin-table">
         <thead><tr><th>Источник (utm_source)</th><th>Регистраций</th><th>Подписок</th></tr></thead>
         <tbody>${srcRows || '<tr><td colspan="3">Пока пусто</td></tr>'}</tbody>
+      </table></div>
+    </div>
+    <div class="mk-panel">
+      <h2>Страницы уроков</h2>
+      <p class="mk-muted">Показы, а не уникальные посетители: идентификатор посетителя мы не храним.
+      «Ролик» — метка utm_content из описания шортса, по ней же считаются регистрации.</p>
+      <div class="admin-table-wrap"><table class="admin-table">
+        <thead><tr><th>Урок</th><th>Ролик</th><th>7 дней</th><th>30 дней</th><th>Всего</th><th>Боты</th><th>Регистраций</th><th>Подписок</th></tr></thead>
+        <tbody>${lessonRows || '<tr><td colspan="8">Пока пусто</td></tr>'}</tbody>
       </table></div>
     </div>
     <div class="mk-panel">

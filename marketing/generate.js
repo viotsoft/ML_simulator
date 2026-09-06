@@ -16,6 +16,9 @@ const store = require('./credentials');
 const ROOT = path.join(__dirname, '..');
 const { QUEUE_DIR, STATE_FILE } = store;
 const APP_URL = process.env.APP_URL || 'https://ml-simulator-app-production.up.railway.app';
+// Ссылка в посте ведёт на брендовый домен, а не на служебный адрес деплоя:
+// APP_URL остаётся привязан к WFP_DOMAIN и к колбэкам соцсетей.
+const PUBLIC_URL = (process.env.PUBLIC_URL || APP_URL).replace(/\/$/, '');
 const MODEL = process.env.MARKETING_MODEL || 'claude-sonnet-5';
 
 // Порядок рубрик: 5 контентных + 1 продуктовая на каждые 6 постов.
@@ -301,7 +304,7 @@ function offlinePost(rubric, src) {
 // ---------- сборка постов ----------
 
 function trackedLink(platform, postId) {
-  return `${APP_URL}/en.html?utm_source=${platform}&utm_medium=social&utm_campaign=organic&utm_content=${postId}`;
+  return `${PUBLIC_URL}/en.html?utm_source=${platform}&utm_medium=social&utm_campaign=organic&utm_content=${postId}`;
 }
 
 function stripLink(text) {

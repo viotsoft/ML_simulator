@@ -329,7 +329,7 @@ function mount(app, { requireAdmin, loadDB }) {
 
   // страница панели
   app.get('/admin/marketing', requireAdmin, (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'admin-marketing.html'));
+    res.sendFile(path.join(__dirname, '..', 'views', 'admin-marketing.html'));
   });
 
   // публичные медиа для Threads (не угадываемые имена-хэши)

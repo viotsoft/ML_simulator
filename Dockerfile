@@ -10,9 +10,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
-COPY server.js ./
+COPY server.js seo.js ./
 COPY content ./content
 COPY public ./public
+COPY views ./views
 COPY marketing ./marketing
 
 # Данные пользователей — на постоянный диск, путь задаётся DATA_DIR.
