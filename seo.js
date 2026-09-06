@@ -23,6 +23,107 @@ const THIN_CONTENT = 1500;    // ниже этого страница счита
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+// ---------------------------------------------------------------- локали
+// Русские адреса менять нельзя: они уже опубликованы и на них ведут ссылки.
+// Английские встают под /en/, рядом с существующим /en.html.
+const LOCALES = {
+  ru: {
+    lang: 'ru',
+    ogLocale: 'ru_RU',
+    home: '/',
+    hub: '/lessons',
+    lesson: (slug) => `/lesson/${slug}`,
+    ogDir: '/og',
+    // Служебные строки модуля, которые на публичной странице не нужны.
+    levelLine: /^>\s*\*\*Уровень:.*$/m,
+    tails: [/\*\*Что почитать[^*]*\*\*[\s\S]*$/m, /^\s*Квиз ниже.*$/m],
+    hours: /~\s*(\d+(?:[.,]\d+)?)\s*час/,
+    minutes: /~\s*(\d+)\s*минут/,
+    timeLabel: /~\s*([\d.,]+\s*(?:час\w*|минут\w*))/,
+    nav: { lessons: 'Уроки', program: 'Программа', pricing: 'Тарифы', signin: 'Войти' },
+    foot: { all: 'Все уроки', terms: 'Условия использования', privacy: 'Конфиденциальность' },
+    crumbs: { home: 'Главная', lessons: 'Уроки', module: (n, t) => `Модуль ${n}. ${t}` },
+    body: {
+      moduleWord: 'МОДУЛЬ',
+      ctaPrimary: 'Пройти модуль в симуляторе',
+      ctaSecondary: 'Все 23 урока',
+      noteFree: 'Этот модуль бесплатный — нужна только регистрация, без карты.',
+      notePaid: 'Первые два модуля бесплатны, без карты. Остальные — по подписке $20/мес.',
+      takeaways: 'Что запомнить',
+      nextIn: (t) => `Дальше в модуле: ${t}`,
+      practiceFallback: 'Пошаговый разбор решения, код и квиз на 5 вопросов.',
+      openModule: 'Открыть модуль →',
+      nearby: 'Соседние уроки',
+      wholeProgram: 'Программа целиком — 23 урока',
+    },
+    hubCopy: {
+      eyebrow: 'ТРЕК КЛАССИЧЕСКОГО ML · 23 УРОКА',
+      h1: 'Разборы <em>реальных ML-задач</em> из работы инженера',
+      sub: 'Каждый урок — задача, которая пришла от бизнеса: почему прибыль падает при растущей выручке, отчего модель с точностью 99% бесполезна, как выбрать порог по цене ошибки. Разбор с цифрами открыт, практика и квиз — в симуляторе.',
+      title: 'Уроки ML на реальных бизнес-задачах — 23 разбора',
+      description: 'Разборы реальных задач ML-инженера: метрики и цена ошибки, утечки данных, дисбаланс классов, прогноз спроса, MLOps. Первые модули бесплатно.',
+    },
+    err: {
+      word: 'ОШИБКА',
+      h404: 'Такой страницы нет',
+      t404: 'Возможно, ссылка устарела или в адресе опечатка.',
+      h500: 'Что-то сломалось',
+      t500: 'Это на нашей стороне. Попробуйте обновить страницу.',
+      title404: 'Страница не найдена',
+      title500: 'Ошибка сервера',
+      home: 'На главную',
+      all: 'Все уроки',
+    },
+  },
+  en: {
+    lang: 'en',
+    ogLocale: 'en_US',
+    home: '/en.html',
+    hub: '/en/lessons',
+    lesson: (slug) => `/en/lesson/${slug}`,
+    ogDir: '/og/en',
+    levelLine: /^>\s*\*\*Level:.*$/m,
+    tails: [/\*\*Further reading[^*]*\*\*[\s\S]*$/m, /^\s*Quiz below.*$/m],
+    hours: /~\s*(\d+(?:[.,]\d+)?)\s*hour/,
+    minutes: /~\s*(\d+)\s*minute/,
+    timeLabel: /~\s*([\d.,]+\s*(?:hours?|minutes?))/,
+    nav: { lessons: 'Lessons', program: 'Program', pricing: 'Pricing', signin: 'Sign in' },
+    foot: { all: 'All lessons', terms: 'Terms of use', privacy: 'Privacy' },
+    crumbs: { home: 'Home', lessons: 'Lessons', module: (n, t) => `Module ${n}. ${t}` },
+    body: {
+      moduleWord: 'MODULE',
+      ctaPrimary: 'Open this module in the simulator',
+      ctaSecondary: 'All 23 lessons',
+      noteFree: 'This module is free — it only needs an account, no card.',
+      notePaid: 'The first two modules are free, no card. The rest are $20/month.',
+      takeaways: 'What to remember',
+      nextIn: (t) => `Next in this module: ${t}`,
+      practiceFallback: 'A step-by-step walkthrough of the solution, the code and a five-question quiz.',
+      openModule: 'Open the module →',
+      nearby: 'Nearby lessons',
+      wholeProgram: 'The whole program — 23 lessons',
+    },
+    hubCopy: {
+      eyebrow: 'CLASSIC ML TRACK · 23 LESSONS',
+      h1: 'Real <em>ML problems</em> as they reach an engineer',
+      sub: 'Every lesson is a problem that came from the business: why profit falls while revenue grows, why a 99%-accurate model is useless, how to set a threshold from the cost of an error. The walkthrough with the numbers is open; the practice and the quiz live in the simulator.',
+      title: 'ML lessons built on real business problems — 23 walkthroughs',
+      description: 'Walkthroughs of real ML engineering problems: metrics and the cost of error, data leakage, class imbalance, demand forecasting, MLOps. First modules free.',
+    },
+    err: {
+      word: 'ERROR',
+      h404: 'This page does not exist',
+      t404: 'The link may be out of date, or there is a typo in the address.',
+      h500: 'Something broke',
+      t500: 'That is on our side. Try reloading the page.',
+      title404: 'Page not found',
+      title500: 'Server error',
+      home: 'Go to the homepage',
+      all: 'All lessons',
+    },
+  },
+};
+
 // ---------------------------------------------------------------- разбор модуля
 /**
  * Нарезка markdown по заголовкам. Считаем «```» и «~~~», чтобы заголовок
@@ -66,12 +167,13 @@ function stripFences (md) {
   return out.join('\n');
 }
 
-function trimTail (text) {
-  return text
-    // формулировка плавает: «Что почитать:» и «Что почитать дополнительно:»
-    .replace(/\*\*Что почитать[^*]*\*\*[\s\S]*$/m, '')
-    .replace(/^\s*Квиз ниже!\s*$/m, '')
-    .trim();
+function trimTail (text, loc) {
+  // Формулировки плавают в обоих языках: «Что почитать» и «Что почитать
+  // дополнительно», «Quiz below!» и «Quiz below — go!». Паттерны живут в
+  // таблице локалей.
+  let out = text;
+  for (const re of loc.tails) out = out.replace(re, '');
+  return out.trim();
 }
 
 /**
@@ -84,7 +186,7 @@ function trimTail (text) {
  * «Практики» — «Экзамен», вместо выводов — «Куда дальше». Поэтому режем
  * ПО НОМЕРУ секции: иначе особый случай понадобился бы восьми модулям.
  */
-function lessonTeaser (md) {
+function lessonTeaser (md, loc) {
   const s = splitByHeading(md, 2);
   if (s.count < 5) throw new Error(`ожидалось 5 секций, найдено ${s.count}`);
 
@@ -95,7 +197,7 @@ function lessonTeaser (md) {
   // над заголовком страницы.
   const intro = s.intro
     .replace(/^#\s.*$/m, '')
-    .replace(/^>\s*\*\*Уровень:.*$/m, '')
+    .replace(loc.levelLine, '')
     .replace(/^---\s*$/gm, '')
     .trim();
   const parts = [intro, `## ${s.head(0)}`, stripFences(s.body(0)), `## ${s.head(1)}`, stripFences(s.body(1))];
@@ -120,7 +222,7 @@ function lessonTeaser (md) {
   }
   if (taken.length) parts.push(`## ${s.head(2)}`, ...taken);
 
-  const markdown = trimTail(parts.filter((p) => p && p.trim()).join('\n\n'));
+  const markdown = trimTail(parts.filter((p) => p && p.trim()).join('\n\n'), loc);
   const fig = firstFigure(md);
   const practice = splitByHeading(s.whole(3), 3);
 
@@ -128,7 +230,7 @@ function lessonTeaser (md) {
     markdown,
     // если схема уже попала во взятый кусок теории — не дублируем
     figure: fig && !markdown.includes(fig) ? fig : '',
-    takeaways: trimTail(s.body(4)),
+    takeaways: trimTail(s.body(4), loc),
     // витрина платной части: только заголовки подразделов, без тел
     // «💻 Практика» → «Практика»: эмодзи уместна в модуле, но не в заголовке страницы
     practiceTitle: s.head(3).replace(/^[^\p{L}\p{N}]+/u, ''),
@@ -139,15 +241,15 @@ function lessonTeaser (md) {
 
 // «~90 минут» → PT90M, «~3 часа» → PT3H. Реальные данные из шапки модуля,
 // а не выдуманное время.
-function timeRequired (md) {
-  // «~2.5 часа» — не «5 часов»: дробную часть обязательно захватываем,
-  // иначе \d+ подберёт цифру после точки.
-  const h = /~\s*(\d+(?:[.,]\d+)?)\s*час/.exec(md);
+function timeRequired (md, loc) {
+  // «~2.5 часа» / «~2.5 hours» — не «5»: дробную часть обязательно
+  // захватываем, иначе \d+ подберёт цифру после точки.
+  const h = loc.hours.exec(md);
   if (h) {
     const mins = Math.round(parseFloat(h[1].replace(',', '.')) * 60);
     return mins % 60 === 0 ? `PT${mins / 60}H` : `PT${mins}M`;
   }
-  const m = /~\s*(\d+)\s*минут/.exec(md);
+  const m = loc.minutes.exec(md);
   return m ? `PT${m[1]}M` : '';
 }
 
@@ -171,7 +273,7 @@ function metaHead (o) {
   <meta name="theme-color" content="#0b1020">
   <meta property="og:type" content="${esc(o.ogType || 'website')}">
   <meta property="og:site_name" content="${SITE_NAME}">
-  <meta property="og:locale" content="ru_RU">
+  <meta property="og:locale" content="${esc(o.loc.ogLocale)}">
   <meta property="og:title" content="${esc(o.title)}">
   <meta property="og:description" content="${esc(o.description)}">
   <meta property="og:url" content="${esc(o.canonical)}">
@@ -188,37 +290,38 @@ function metaHead (o) {
   <link rel="stylesheet" href="/css/style.css">${ld}`;
 }
 
-const NAV = `<header class="container">
+const NAV = (loc) => `<header class="container">
   <nav class="nav">
-    <a class="logo" href="/" style="text-decoration:none">ML<span>Simulator</span></a>
+    <a class="logo" href="${loc.home}" style="text-decoration:none">ML<span>Simulator</span></a>
     <div class="nav-links">
-      <a href="/lessons">Уроки</a>
-      <a href="/#program">Программа</a>
-      <a href="/#pricing">Тарифы</a>
-      <a href="__CTA_HREF__" class="btn btn-primary" style="padding:9px 20px">Войти</a>
+      <a href="${loc.hub}">${esc(loc.nav.lessons)}</a>
+      <a href="${loc.home}#program">${esc(loc.nav.program)}</a>
+      <a href="${loc.home}#pricing">${esc(loc.nav.pricing)}</a>
+      <a href="${CTA_TOKEN}" class="btn btn-primary" style="padding:9px 20px">${esc(loc.nav.signin)}</a>
     </div>
   </nav>
 </header>`;
 
-const FOOT = `<footer class="footer">
+const FOOT = (loc) => `<footer class="footer">
   <div class="container">
-    ML Career Simulator © 2026 · <a href="/lessons">Все уроки</a> ·
-    <a href="/terms.html">Условия использования</a> · <a href="/privacy.html">Конфиденциальность</a>
+    ML Career Simulator © 2026 · <a href="${loc.hub}">${esc(loc.foot.all)}</a> ·
+    <a href="/terms.html">${esc(loc.foot.terms)}</a> · <a href="/privacy.html">${esc(loc.foot.privacy)}</a>
   </div>
 </footer>`;
 
 // Ни строчки JavaScript: ссылки с метками собираются на сервере. Трафик из
 // Shorts — мобильный, и пустой js здесь дороже, чем кажется.
 function page (o) {
+  const loc = o.loc;
   return fillCta(`<!DOCTYPE html>
-<html lang="ru">
+<html lang="${loc.lang}">
 <head>
   ${metaHead(o)}
 </head>
 <body>
-${NAV}
+${NAV(loc)}
 ${o.body}
-${FOOT}
+${FOOT(loc)}
 </body>
 </html>`, o.cta);
 }
@@ -231,34 +334,33 @@ function fillCta (html, href) {
 
 // ---------------------------------------------------------------- страница урока
 
-function lessonBody (mod, teaser, all, free, md) {
+function lessonBody (mod, teaser, all, free, md, loc) {
   const seo = mod.seo || {};
+  const B = loc.body;
   const idx = all.findIndex((m) => m.id === mod.id);
   const prev = all[idx - 1];
   const next = all[idx + 1];
-  const mins = /~\s*([\d.,]+\s*(?:час\w*|минут\w*))/.exec(md);
+  const mins = loc.timeLabel.exec(md);
 
   const nearby = [prev, next].filter(Boolean).map((m) => `
-      <a class="syl-item" href="/lesson/${esc(m.slug)}" style="text-decoration:none;color:inherit">
+      <a class="syl-item" href="${loc.lesson(m.slug)}" style="text-decoration:none;color:inherit">
         <span class="syl-num">${String(m.order).padStart(2, '0')}</span> ${esc(m.title)}
       </a>`).join('');
 
   const outline = teaser.practiceOutline.length
     ? `<ul>${teaser.practiceOutline.map((h) => `<li>${esc(h)}</li>`).join('')}</ul>`
-    : `<p>Пошаговый разбор решения, код и квиз на 5 вопросов.</p>`;
+    : `<p>${esc(B.practiceFallback)}</p>`;
 
   return `
 <section class="hero container" style="padding-top:34px;padding-bottom:10px">
-  <div class="eyebrow">МОДУЛЬ ${String(mod.order).padStart(2, '0')} · ${esc(mod.level)}${mins ? ' · ' + esc(mins[1]) : ''}</div>
+  <div class="eyebrow">${esc(B.moduleWord)} ${String(mod.order).padStart(2, '0')} · ${esc(mod.level)}${mins ? ' · ' + esc(mins[1]) : ''}</div>
   <h1>${esc(seo.h1 || mod.title)}</h1>
   <p class="sub">${esc(seo.lead || mod.subtitle)}</p>
   <div class="cta-row">
-    <a href="${CTA_TOKEN}" class="btn btn-primary btn-lg">Пройти модуль в симуляторе</a>
-    <a href="/lessons" class="btn btn-ghost btn-lg">Все 23 урока</a>
+    <a href="${CTA_TOKEN}" class="btn btn-primary btn-lg">${esc(B.ctaPrimary)}</a>
+    <a href="${loc.hub}" class="btn btn-ghost btn-lg">${esc(B.ctaSecondary)}</a>
   </div>
-  <p class="note">${mod.order <= free
-    ? 'Этот модуль бесплатный — нужна только регистрация, без карты.'
-    : 'Первые два модуля бесплатны, без карты. Остальные — по подписке $20/мес.'}</p>
+  <p class="note">${esc(mod.order <= free ? B.noteFree : B.notePaid)}</p>
 </section>
 
 <article class="section container" style="padding-top:26px">
@@ -270,33 +372,33 @@ function lessonBody (mod, teaser, all, free, md) {
 
 <section class="section container" style="padding-top:0">
   <div class="card">
-    <h3>Что запомнить</h3>
+    <h3>${esc(B.takeaways)}</h3>
     <div class="md-content">${marked.parse(teaser.takeaways)}</div>
   </div>
 </section>
 
 <section class="section container" style="padding-top:0">
   <div class="card lesson-paywall">
-    <h3>Дальше в модуле: ${esc(teaser.practiceTitle)}</h3>
+    <h3>${esc(B.nextIn(teaser.practiceTitle))}</h3>
     ${outline}
     <p style="margin-top:14px">
-      <a href="${CTA_TOKEN}" class="btn btn-primary btn-lg">Открыть модуль →</a>
+      <a href="${CTA_TOKEN}" class="btn btn-primary btn-lg">${esc(B.openModule)}</a>
     </p>
   </div>
 </section>
 
 <section class="section container" id="program" style="padding-top:0">
-  <h2>Соседние уроки</h2>
+  <h2>${esc(B.nearby)}</h2>
   <div class="syllabus">${nearby}</div>
   <p style="text-align:center;margin-top:22px">
-    <a href="/lessons" class="btn btn-ghost">Программа целиком — 23 урока</a>
+    <a href="${loc.hub}" class="btn btn-ghost">${esc(B.wholeProgram)}</a>
   </p>
 </section>`;
 }
 
-function lessonJsonLd (mod, base, teaser, md, free) {
+function lessonJsonLd (mod, base, teaser, md, free, loc) {
   const seo = mod.seo || {};
-  const url = `${base}/lesson/${mod.slug}`;
+  const url = base + loc.lesson(mod.slug);
   const freeModule = mod.order <= free;
   const resource = {
     '@type': 'LearningResource',
@@ -304,7 +406,7 @@ function lessonJsonLd (mod, base, teaser, md, free) {
     url,
     name: seo.title || mod.title,
     description: seo.description || mod.subtitle,
-    inLanguage: 'ru',
+    inLanguage: loc.lang,
     learningResourceType: 'lesson',
     educationalLevel: mod.level,
     teaches: mod.tags || [],
@@ -313,7 +415,7 @@ function lessonJsonLd (mod, base, teaser, md, free) {
     provider: { '@id': `${base}/#org` },
     isAccessibleForFree: freeModule,
   };
-  const t = timeRequired(md);
+  const t = timeRequired(md, loc);
   if (t) resource.timeRequired = t;
   // Разметка платного контента. Без неё «показали кусок, спрятали остальное»
   // выглядит для поисковика как маскировка (cloaking), а не как paywall.
@@ -326,9 +428,9 @@ function lessonJsonLd (mod, base, teaser, md, free) {
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Главная', item: `${base}/` },
-          { '@type': 'ListItem', position: 2, name: 'Уроки', item: `${base}/lessons` },
-          { '@type': 'ListItem', position: 3, name: `Модуль ${mod.order}. ${mod.title}` },
+          { '@type': 'ListItem', position: 1, name: loc.crumbs.home, item: base + loc.home },
+          { '@type': 'ListItem', position: 2, name: loc.crumbs.lessons, item: base + loc.hub },
+          { '@type': 'ListItem', position: 3, name: loc.crumbs.module(mod.order, mod.title) },
         ],
       },
       resource,
@@ -339,59 +441,73 @@ function lessonJsonLd (mod, base, teaser, md, free) {
 }
 
 // ---------------------------------------------------------------- хаб и служебные страницы
-function hubBody (all) {
+function hubBody (all, loc) {
   const items = all.map((m) => `
-    <a class="syl-item" href="/lesson/${esc(m.slug)}" style="text-decoration:none;color:inherit">
+    <a class="syl-item" href="${loc.lesson(m.slug)}" style="text-decoration:none;color:inherit">
       <span class="syl-num">${String(m.order).padStart(2, '0')}</span> ${esc((m.seo || {}).h1 || m.title)}
     </a>`).join('');
   return `
 <section class="hero container" style="padding-top:34px;padding-bottom:10px">
-  <div class="eyebrow">ТРЕК КЛАССИЧЕСКОГО ML · 23 УРОКА</div>
-  <h1>Разборы <em>реальных ML-задач</em> из работы инженера</h1>
-  <p class="sub">
-    Каждый урок — задача, которая пришла от бизнеса: почему прибыль падает при растущей
-    выручке, отчего модель с точностью 99% бесполезна, как выбрать порог по цене ошибки.
-    Разбор с цифрами открыт, практика и квиз — в симуляторе.
-  </p>
+  <div class="eyebrow">${esc(loc.hubCopy.eyebrow)}</div>
+  <h1>${loc.hubCopy.h1}</h1>
+  <p class="sub">${esc(loc.hubCopy.sub)}</p>
 </section>
 <section class="section container" style="padding-top:10px">
   <div class="syllabus">${items}</div>
 </section>`;
 }
 
-function errorBody (code, title, text) {
+function errorBody (code, title, text, loc) {
   return `
 <section class="hero container" style="padding-top:60px">
-  <div class="eyebrow">ОШИБКА ${code}</div>
+  <div class="eyebrow">${esc(loc.err.word)} ${code}</div>
   <h1>${esc(title)}</h1>
   <p class="sub">${esc(text)}</p>
   <div class="cta-row">
-    <a href="/" class="btn btn-primary btn-lg">На главную</a>
-    <a href="/lessons" class="btn btn-ghost btn-lg">Все уроки</a>
+    <a href="${loc.home}" class="btn btn-primary btn-lg">${esc(loc.err.home)}</a>
+    <a href="${loc.hub}" class="btn btn-ghost btn-lg">${esc(loc.err.all)}</a>
   </div>
 </section>`;
 }
 
-function sitemap (base, all) {
-  const alt = [
-    `<xhtml:link rel="alternate" hreflang="ru" href="${base}/"/>`,
-    `<xhtml:link rel="alternate" hreflang="en" href="${base}/en.html"/>`,
-    `<xhtml:link rel="alternate" hreflang="x-default" href="${base}/"/>`,
+/**
+ * Карта сайта на обе локали. Каждая страница объявляет свой языковой двойник:
+ * ссылки обязаны быть взаимными, иначе Google отбрасывает весь кластер целиком.
+ */
+function sitemap (base, sets) {
+  const url = (href, extra) => `  <url><loc>${href}</loc>${extra || ''}</url>`;
+  const pair = (ruHref, enHref) => [
+    `<xhtml:link rel="alternate" hreflang="ru" href="${ruHref}"/>`,
+    `<xhtml:link rel="alternate" hreflang="en" href="${enHref}"/>`,
+    `<xhtml:link rel="alternate" hreflang="x-default" href="${ruHref}"/>`,
   ].join('');
-  const url = (loc, extra) => `  <url><loc>${loc}</loc>${extra || ''}</url>`;
+
+  const home = pair(`${base}/`, `${base}/en.html`);
+  const hubs = pair(base + LOCALES.ru.hub, base + LOCALES.en.hub);
+
   const rows = [
-    url(`${base}/`, alt),
-    url(`${base}/en.html`, alt),
-    url(`${base}/lessons`),
-    // Страницы уроков только на русском: объявлять несуществующий английский
-    // вариант нельзя — Google отбрасывает весь кластер hreflang целиком.
-    ...all.map((m) => {
-      const upd = (m.seo || {}).updated;
-      return url(`${base}/lesson/${m.slug}`, upd ? `<lastmod>${upd}</lastmod>` : '');
-    }),
-    url(`${base}/terms.html`),
-    url(`${base}/privacy.html`),
+    url(`${base}/`, home),
+    url(`${base}/en.html`, home),
+    url(base + LOCALES.ru.hub, hubs),
+    url(base + LOCALES.en.hub, hubs),
   ];
+
+  // Уроки перечисляем парами по id модуля: языковой двойник есть у каждого.
+  for (const m of sets.ru) {
+    const twin = sets.enById.get(m.id);
+    const ruHref = base + LOCALES.ru.lesson(m.slug);
+    const enHref = twin ? base + LOCALES.en.lesson(twin.slug) : '';
+    const alt = twin ? pair(ruHref, enHref) : '';
+    const upd = (m.seo || {}).updated;
+    rows.push(url(ruHref, alt + (upd ? `<lastmod>${upd}</lastmod>` : '')));
+    if (twin) {
+      const tupd = (twin.seo || {}).updated;
+      rows.push(url(enHref, alt + (tupd ? `<lastmod>${tupd}</lastmod>` : '')));
+    }
+  }
+
+  rows.push(url(`${base}/terms.html`), url(`${base}/privacy.html`));
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -542,90 +658,135 @@ function mountEarly (app, deps) {
  * После всех маршрутов: страницы уроков, sitemap, robots и обработчики
  * 404/500 — они обязаны быть последними в цепочке.
  */
+/**
+ * После всех маршрутов: страницы уроков на обе локали, sitemap, robots и
+ * обработчики 404/500 — они обязаны быть последними в цепочке.
+ */
 function mountLate (app, deps) {
   const { base, modules, markdownPath, dataDir, freeModules, requireAdmin, loadDB } = deps;
   const views = makeViews(dataDir);
-  const all = modules().filter((m) => m.slug);
-  const bySlug = new Map();
-  const byId = new Map();
 
-  for (const mod of all) {
-    if (bySlug.has(mod.slug)) { console.warn(`[seo] дубль slug «${mod.slug}» (${mod.id})`); continue; }
-    try {
-      const md = fs.readFileSync(markdownPath('ru', mod.id), 'utf8');
-      const teaser = lessonTeaser(md);
-      if (teaser.chars < THIN_CONTENT) console.warn(`[seo] ${mod.id}: тонкая страница, ${teaser.chars} знаков`);
-      const seo = mod.seo || {};
-      const html = page({
-        base,
-        title: seo.title || `${mod.title} — ${SITE_NAME}`,
-        description: seo.description || mod.subtitle,
-        canonical: `${base}/lesson/${mod.slug}`,
-        image: `/og/${mod.id}.png`,
-        ogType: 'article',
-        jsonld: lessonJsonLd(mod, base, teaser, md, freeModules),
-        body: lessonBody(mod, teaser, all, freeModules, md),
-        cta: CTA_TOKEN,   // подставим на запрос, см. ниже
-      });
-      bySlug.set(mod.slug, { id: mod.id, short: seo.short || '', html });
-      byId.set(mod.id, mod.slug);
-    } catch (e) {
-      // Кривой модуль стоит одной страницы, а не всего сервера.
-      console.warn(`[seo] ${mod.id}: страница не собрана — ${e.message}`);
-    }
+  // Ключ счётчика: для русского — просто id модуля (данные уже накоплены так),
+  // для остальных локалей — с суффиксом, иначе m06 двух языков сложились бы.
+  const viewKey = (lang, id) => (lang === 'ru' ? id : `${id}@${lang}`);
+
+  const sets = {};   // lang -> массив модулей со slug
+  const pages = {};  // lang -> Map slug -> {id, short, html}
+  const ids = {};    // lang -> Map id -> slug
+
+  for (const lang of Object.keys(LOCALES)) {
+    const list = modules(lang).filter((m) => m.slug);
+    sets[lang] = list;
+    ids[lang] = new Map(list.map((m) => [m.id, m]));
   }
-  console.log(`[seo] страниц уроков: ${bySlug.size}/${modules().length}`);
 
-  const hubHtml = page({
-    base,
-    title: 'Уроки ML на реальных бизнес-задачах — 23 разбора',
-    description: 'Разборы реальных задач ML-инженера: метрики и цена ошибки, утечки данных, дисбаланс классов, прогноз спроса, MLOps. Первые модули бесплатно.',
-    canonical: `${base}/lessons`,
-    jsonld: [{
-      '@context': 'https://schema.org',
-      '@type': 'ItemList',
-      itemListElement: all.map((m) => ({
-        '@type': 'ListItem', position: m.order, url: `${base}/lesson/${m.slug}`, name: m.title,
-      })),
-    }],
-    body: hubBody(all),
-  });
+  for (const lang of Object.keys(LOCALES)) {
+    const loc = LOCALES[lang];
+    const all = sets[lang];
+    const bySlug = new Map();
+    pages[lang] = bySlug;
+
+    for (const mod of all) {
+      if (bySlug.has(mod.slug)) { console.warn(`[seo] ${lang}: дубль slug «${mod.slug}» (${mod.id})`); continue; }
+      try {
+        const md = fs.readFileSync(markdownPath(lang, mod.id), 'utf8');
+        const teaser = lessonTeaser(md, loc);
+        if (teaser.chars < THIN_CONTENT) console.warn(`[seo] ${lang}/${mod.id}: тонкая страница, ${teaser.chars} знаков`);
+        const seo = mod.seo || {};
+        // Языковой двойник объявляем только если он реально существует:
+        // ссылка на 404 обнуляет весь кластер hreflang.
+        const alternates = [];
+        const ruTwin = ids.ru.get(mod.id);
+        const enTwin = ids.en.get(mod.id);
+        if (ruTwin && enTwin) {
+          alternates.push(
+            { lang: 'ru', href: base + LOCALES.ru.lesson(ruTwin.slug) },
+            { lang: 'en', href: base + LOCALES.en.lesson(enTwin.slug) },
+            { lang: 'x-default', href: base + LOCALES.ru.lesson(ruTwin.slug) },
+          );
+        }
+        const html = page({
+          loc, base, alternates,
+          title: seo.title || `${mod.title} — ${SITE_NAME}`,
+          description: seo.description || mod.subtitle,
+          canonical: base + loc.lesson(mod.slug),
+          image: `${loc.ogDir}/${mod.id}.png`,
+          ogType: 'article',
+          jsonld: lessonJsonLd(mod, base, teaser, md, freeModules, loc),
+          body: lessonBody(mod, teaser, all, freeModules, md, loc),
+          cta: CTA_TOKEN,   // подставим на запрос, см. ниже
+        });
+        bySlug.set(mod.slug, { id: mod.id, lang, short: seo.short || '', html });
+      } catch (e) {
+        // Кривой модуль стоит одной страницы, а не всего сервера.
+        console.warn(`[seo] ${lang}/${mod.id}: страница не собрана — ${e.message}`);
+      }
+    }
+    console.log(`[seo] страниц уроков (${lang}): ${bySlug.size}/${modules(lang).length}`);
+  }
 
   // Ссылку на приложение собираем на сервере: метки из описания ролика
   // переживают выключенный JavaScript, а страница остаётся без единого скрипта.
   function ctaHref (req, short) {
     const q = new URLSearchParams();
-    const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'];
-    for (const k of keys) {
+    for (const k of ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content']) {
       const v = String(req.query[k] || '').slice(0, 64).replace(/[^A-Za-z0-9._-]/g, '');
       if (v) q.set(k, v);
     }
     if (!q.get('utm_source') && short) {
       q.set('utm_source', 'youtube'); q.set('utm_medium', 'shorts'); q.set('utm_content', short);
     }
-    const s = q.toString();
-    return s ? `/app.html?${s}` : '/app.html';
+    const qs = q.toString();
+    return qs ? `/app.html?${qs}` : '/app.html';
   }
 
-  app.get('/lessons', (req, res) => res.type('html').send(hubHtml));
+  for (const lang of Object.keys(LOCALES)) {
+    const loc = LOCALES[lang];
+    const all = sets[lang];
+    const bySlug = pages[lang];
+    const byId = new Map(all.map((m) => [m.id, m.slug]));
 
-  app.get('/lesson/:key', (req, res, next) => {
-    const key = String(req.params.key || '').toLowerCase();
-    // Один адрес — одна страница: регистр и id-алиас сводим постоянным редиректом,
-    // иначе те же тексты живут по трём URL и конкурируют сами с собой.
-    const alias = byId.get(key);
-    if (alias && alias !== key) return res.redirect(301, `${base}/lesson/${alias}`);
-    const lesson = bySlug.get(key);
-    if (!lesson) return next();
-    if (req.params.key !== key) return res.redirect(301, `${base}/lesson/${key}`);
-    views.hit(req, lesson.id);
-    // Перезагрузка в пределах двух минут не долетает до сервера — это
-    // дедупликация без единого идентификатора посетителя.
-    res.set('Cache-Control', 'private, max-age=120');
-    res.type('html').send(lesson.html.split(CTA_TOKEN).join(esc(ctaHref(req, lesson.short))));
-  });
+    const hubHtml = page({
+      loc, base,
+      title: loc.hubCopy.title,
+      description: loc.hubCopy.description,
+      canonical: base + loc.hub,
+      alternates: [
+        { lang: 'ru', href: base + LOCALES.ru.hub },
+        { lang: 'en', href: base + LOCALES.en.hub },
+        { lang: 'x-default', href: base + LOCALES.ru.hub },
+      ],
+      jsonld: [{
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        itemListElement: all.map((m) => ({
+          '@type': 'ListItem', position: m.order, url: base + loc.lesson(m.slug), name: m.title,
+        })),
+      }],
+      body: hubBody(all, loc),
+    });
 
-  app.get('/sitemap.xml', (req, res) => res.type('application/xml').send(sitemap(base, all)));
+    app.get(loc.hub, (req, res) => res.type('html').send(hubHtml));
+
+    app.get(loc.lesson(':key'), (req, res, next) => {
+      const key = String(req.params.key || '').toLowerCase();
+      // Один адрес — одна страница: регистр и id-алиас сводим постоянным
+      // редиректом, иначе те же тексты живут по трём URL.
+      const alias = byId.get(key);
+      if (alias && alias !== key) return res.redirect(301, base + loc.lesson(alias));
+      const lesson = bySlug.get(key);
+      if (!lesson) return next();
+      if (req.params.key !== key) return res.redirect(301, base + loc.lesson(key));
+      views.hit(req, viewKey(lang, lesson.id));
+      // Перезагрузка в пределах двух минут не долетает до сервера — это
+      // дедупликация без единого идентификатора посетителя.
+      res.set('Cache-Control', 'private, max-age=120');
+      res.type('html').send(lesson.html.split(CTA_TOKEN).join(esc(ctaHref(req, lesson.short))));
+    });
+  }
+
+  app.get('/sitemap.xml', (req, res) => res.type('application/xml')
+    .send(sitemap(base, { ru: sets.ru, enById: ids.en })));
   app.get('/robots.txt', (req, res) => res.type('text/plain').send(robots(base)));
 
   app.get('/api/admin/views', requireAdmin, (req, res) => {
@@ -640,52 +801,66 @@ function mountLate (app, deps) {
     }
     const data = views.data();
     const since = (n) => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10);
-    const sum = (id, from, field) => Object.entries(data.days)
-      .filter(([d]) => d >= from).reduce((a, [, m]) => a + ((m[id] || {})[field] || 0), 0);
+    const sum = (key, from, field) => Object.entries(data.days)
+      .filter(([d]) => d >= from).reduce((a, [, m]) => a + ((m[key] || {})[field] || 0), 0);
 
-    res.json({
-      lessons: all.map((m) => {
+    const rows = [];
+    for (const lang of Object.keys(LOCALES)) {
+      for (const m of sets[lang]) {
+        const key = viewKey(lang, m.id);
         const short = (m.seo || {}).short || '';
-        const life = data.lifetime[m.id] || { views: 0, bots: 0 };
-        return {
-          id: m.id, order: m.order, title: m.title, slug: m.slug, short,
-          views7: sum(m.id, since(7), 'views'),
-          views30: sum(m.id, since(30), 'views'),
-          total: sum(m.id, '0000-00-00', 'views') + life.views,
-          bots: sum(m.id, '0000-00-00', 'bots') + life.bots,
+        const life = data.lifetime[key] || { views: 0, bots: 0 };
+        rows.push({
+          id: m.id, lang, order: m.order, title: m.title, slug: m.slug, short,
+          url: LOCALES[lang].lesson(m.slug),
+          views7: sum(key, since(7), 'views'),
+          views30: sum(key, since(30), 'views'),
+          total: sum(key, '0000-00-00', 'views') + life.views,
+          bots: sum(key, '0000-00-00', 'bots') + life.bots,
           signups: (signups[short] || {}).total || 0,
           subscribed: (signups[short] || {}).subscribed || 0,
-        };
-      }).sort((a, b) => b.views30 - a.views30 || a.order - b.order),
-    });
+        });
+      }
+    }
+    rows.sort((a, b) => b.views30 - a.views30 || a.order - b.order || a.lang.localeCompare(b.lang));
+    res.json({ lessons: rows });
   });
 
-  const notFound = page({
-    base, noindex: true,
-    title: 'Страница не найдена — ' + SITE_NAME,
-    description: 'Такой страницы нет. Возможно, ссылка устарела.',
-    canonical: `${base}/404`,
-    body: errorBody(404, 'Такой страницы нет', 'Возможно, ссылка устарела или в адресе опечатка.'),
-  });
-  const serverError = page({
-    base, noindex: true,
-    title: 'Ошибка сервера — ' + SITE_NAME,
-    description: 'Что-то сломалось на нашей стороне.',
-    canonical: `${base}/500`,
-    body: errorBody(500, 'Что-то сломалось', 'Это на нашей стороне. Попробуйте обновить страницу.'),
-  });
+  // Служебные страницы отдаём на языке раздела: англоязычный посетитель,
+  // промахнувшийся мимо /en/lesson/..., не должен получить русскую 404.
+  const errPages = {};
+  for (const lang of Object.keys(LOCALES)) {
+    const loc = LOCALES[lang];
+    errPages[lang] = {
+      notFound: page({
+        loc, base, noindex: true,
+        title: `${loc.err.title404} — ${SITE_NAME}`,
+        description: loc.err.t404,
+        canonical: `${base}${lang === 'ru' ? '' : '/en'}/404`,
+        body: errorBody(404, loc.err.h404, loc.err.t404, loc),
+      }),
+      serverError: page({
+        loc, base, noindex: true,
+        title: `${loc.err.title500} — ${SITE_NAME}`,
+        description: loc.err.t500,
+        canonical: `${base}${lang === 'ru' ? '' : '/en'}/500`,
+        body: errorBody(500, loc.err.h500, loc.err.t500, loc),
+      }),
+    };
+  }
+  const langOf = (req) => (/^\/en(\/|\.html|$)/.test(req.path) ? 'en' : 'ru');
 
   app.use((req, res) => {
     if (req.path.startsWith('/api/')) return res.status(404).json({ error: 'Не найдено' });
     // Именно 404, а не 200: «мягкие» 404 поисковик считает ошибкой качества.
-    res.status(404).type('html').send(notFound);
+    res.status(404).type('html').send(errPages[langOf(req)].notFound);
   });
   // Обработчика ошибок в приложении не было вовсе — исключение в любом
   // маршруте отдавало стандартную страницу Express со стеком.
   app.use((err, req, res, next) => {
     console.error(err);
     if (req.path.startsWith('/api/')) return res.status(500).json({ error: 'Ошибка сервера' });
-    res.status(500).type('html').send(serverError);
+    res.status(500).type('html').send(errPages[langOf(req)].serverError);
   });
 }
 

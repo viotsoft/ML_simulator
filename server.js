@@ -1165,7 +1165,7 @@ require('./marketing/panel').mount(app, { requireAdmin, loadDB });
 // Строго последним: обработчики ошибок обязаны замыкать цепочку.
 seo.mountLate(app, {
   base: PUBLIC_URL,
-  modules: () => localeModules(DEFAULT_LOCALE),
+  modules: (lang) => localeModules(lang || DEFAULT_LOCALE),
   markdownPath: moduleMarkdownPath,
   dataDir: DATA_DIR,
   freeModules: FREE_MODULES,

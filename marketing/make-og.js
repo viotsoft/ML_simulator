@@ -64,7 +64,9 @@ const markSvg = (size) => `<svg xmlns="http://www.w3.org/2000/svg" width="${size
 
 async function main () {
   const pub = path.join(__dirname, '..', 'public');
-  const modules = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'content', 'ru', 'modules.json'), 'utf8'));
+  const read = (lang) => JSON.parse(fs.readFileSync(
+    path.join(__dirname, '..', 'content', lang, 'modules.json'), 'utf8'));
+  const modules = read('ru');
 
   fs.writeFileSync(path.join(pub, 'favicon.svg'), markSvg(64));
   for (const [name, size] of [['favicon.png', 48], ['apple-touch-icon.png', 180]]) {
@@ -77,15 +79,25 @@ async function main () {
     footer: 'Три трека · 23 модуля на реальных задачах',
   }))).png().toFile(path.join(pub, 'og', 'default.png'));
 
-  for (const m of modules) {
-    const seo = m.seo || {};
-    await sharp(Buffer.from(ogSvg({
-      kicker: `МОДУЛЬ ${String(m.order).padStart(2, '0')} · ${m.level.toUpperCase()}`,
-      title: seo.h1 || m.title,
-      footer: 'Разбор реального кейса',
-    }))).png().toFile(path.join(pub, 'og', `${m.id}.png`));
+  // Русские — в /og, английские — в /og/en: имена файлов совпадают по id модуля.
+  const sets = [
+    { lang: 'ru', dir: path.join(pub, 'og'), word: 'МОДУЛЬ', footer: 'Разбор реального кейса' },
+    { lang: 'en', dir: path.join(pub, 'og', 'en'), word: 'MODULE', footer: 'A real case, walked through' },
+  ];
+  let made = 1;
+  for (const s of sets) {
+    fs.mkdirSync(s.dir, { recursive: true });
+    for (const m of read(s.lang)) {
+      const seo = m.seo || {};
+      await sharp(Buffer.from(ogSvg({
+        kicker: `${s.word} ${String(m.order).padStart(2, '0')} · ${m.level.toUpperCase()}`,
+        title: seo.h1 || m.title,
+        footer: s.footer,
+      }))).png().toFile(path.join(s.dir, `${m.id}.png`));
+      made++;
+    }
   }
-  console.log(`[og] иконки и ${modules.length + 1} картинки готовы`);
+  console.log(`[og] иконки и ${made} картинки готовы`);
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

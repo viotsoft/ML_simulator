@@ -1,25 +1,485 @@
 [
-  { "id": "m01", "order": 1,  "title": "First day at Datacore", "subtitle": "Onboarding: what ML really is, the project lifecycle and team roles", "level": "Junior", "tags": ["basics", "ML lifecycle", "team"] },
-  { "id": "m02", "order": 2,  "title": "First task: exploratory data analysis", "subtitle": "Python, Pandas and EDA: the team lead wants a sales data report by Friday", "level": "Junior", "tags": ["Python", "Pandas", "EDA"] },
-  { "id": "m03", "order": 3,  "title": "Marketing argues: did the discount help?", "subtitle": "Statistics and visualization: distributions, hypotheses and an A/B test of a promo", "level": "Junior", "tags": ["statistics", "A/B testing", "visualization"] },
-  { "id": "m04", "order": 4,  "title": "Predicting delivery cost", "subtitle": "Linear regression: your first model, gradient descent and coefficient interpretation", "level": "Junior", "tags": ["regression", "sklearn", "MAE/RMSE"] },
-  { "id": "m05", "order": 5,  "title": "Customers are leaving: a churn model", "subtitle": "Logistic regression and classification: predicting churn before the customer is gone", "level": "Junior", "tags": ["classification", "churn", "logistic regression"] },
-  { "id": "m06", "order": 6,  "title": "A 99%-accurate model that doesn't work", "subtitle": "Quality metrics: precision, recall, ROC-AUC and the cost of errors in anti-fraud", "level": "Junior", "tags": ["metrics", "precision/recall", "ROC-AUC"] },
-  { "id": "m07", "order": 7,  "title": "Credit scoring: data decides everything", "subtitle": "Feature engineering: aggregates, categorical encoding, handling missing values", "level": "Junior+", "tags": ["features", "encoding", "scoring"] },
-  { "id": "m08", "order": 8,  "title": "Churn v2: boosting vs the forest", "subtitle": "Decision trees, Random Forest and gradient boosting (XGBoost/LightGBM/CatBoost)", "level": "Junior+", "tags": ["ensembles", "boosting", "trees"] },
-  { "id": "m09", "order": 9,  "title": "Incident: the model fell apart in production", "subtitle": "Validation, overfitting and data leakage — a real failure post-mortem", "level": "Junior+", "tags": ["validation", "data leakage", "overfitting"] },
-  { "id": "m10", "order": 10, "title": "Squeezing out 2% more quality", "subtitle": "Hyperparameter tuning: grid search, random search and Optuna", "level": "Junior+", "tags": ["hyperparameters", "Optuna", "tuning"] },
-  { "id": "m11", "order": 11, "title": "Fraud: 1 fraudster per 1000 honest users", "subtitle": "Imbalanced classes: class weights, sampling, threshold selection", "level": "Middle-track", "tags": ["imbalance", "fraud", "threshold"] },
-  { "id": "m12", "order": 12, "title": "Who are our customers, really?", "subtitle": "Clustering and unsupervised learning: customer base segmentation", "level": "Middle-track", "tags": ["clustering", "K-Means", "segmentation"] },
-  { "id": "m13", "order": 13, "title": "\"Frequently bought together\": recommendations", "subtitle": "Recommender systems: collaborative filtering and ranking metrics", "level": "Middle-track", "tags": ["RecSys", "collaborative filtering", "NDCG"] },
-  { "id": "m14", "order": 14, "title": "The warehouse is overstocked: demand forecasting", "subtitle": "Time series: trend, seasonality, lag features and honest validation", "level": "Middle-track", "tags": ["time series", "forecasting", "lags"] },
-  { "id": "m15", "order": 15, "title": "Support is drowning in tickets", "subtitle": "NLP: from TF-IDF to transformers — automatic ticket classification", "level": "Middle-track", "tags": ["NLP", "TF-IDF", "transformers"] },
-  { "id": "m16", "order": 16, "title": "Meet neural networks", "subtitle": "Deep learning: the neuron, layers, backpropagation and your first PyTorch net", "level": "Middle-track", "tags": ["neural networks", "PyTorch", "backprop"] },
-  { "id": "m17", "order": 17, "title": "Defects on the conveyor: computer vision", "subtitle": "CV: convolutional networks, transfer learning and quality control in manufacturing", "level": "Middle-track", "tags": ["CV", "CNN", "transfer learning"] },
-  { "id": "m18", "order": 18, "title": "The interview in reverse: ML System Design", "subtitle": "Designing an ML system end-to-end: from business metric to architecture", "level": "Middle", "tags": ["system design", "architecture", "business metrics"] },
-  { "id": "m19", "order": 19, "title": "The model is ready. Now — to production", "subtitle": "MLOps: an API service, Docker, monitoring, data drift and retraining", "level": "Middle", "tags": ["MLOps", "deployment", "monitoring"] },
-  { "id": "m20", "order": 20, "title": "Finale: defending your project before the CTO", "subtitle": "Capstone project + final exam: you are ready for a Middle ML Engineer position", "level": "Middle", "tags": ["capstone", "exam", "certificate"] },
-  { "id": "m21", "order": 21, "title": "Advanced · Before writing code: the Design Doc", "subtitle": "From the “ML System Design” book: problem space, cost of a mistake, design doc structure and review", "level": "Middle+", "tags": ["design doc", "problem space", "Babushkin/Kravchenko book"] },
-  { "id": "m22", "order": 22, "title": "Advanced · Metrics, data, validation, baselines", "subtitle": "Hierarchy of metrics, sample-wise learning curve, adversarial validation and the baseline ladder", "level": "Middle+", "tags": ["hierarchy of metrics", "adversarial validation", "baselines"] },
-  { "id": "m23", "order": 23, "title": "Advanced · Integration, A/B, monitoring, ownership", "subtitle": "Training vs inference pipelines, debrief, drift types, fallback hierarchy and bus factor", "level": "Middle+", "tags": ["monitoring", "drift", "ownership"] }
+  {
+    "id": "m01",
+    "order": 1,
+    "title": "First day at Datacore",
+    "subtitle": "Onboarding: what ML really is, the project lifecycle and team roles",
+    "level": "Junior",
+    "tags": [
+      "basics",
+      "ML lifecycle",
+      "team"
+    ],
+    "slug": "machine-learning-vs-rules-when-to-use-ml",
+    "seo": {
+      "title": "Machine learning vs rules: when you don't need a model",
+      "h1": "Half the “ML tasks” you are handed are solved by an if-else",
+      "lead": "Four requests from a product manager. We decide which of them genuinely need a model and which are closed by a twenty-line rule — the rule wins more often than people expect.",
+      "description": "When a task needs machine learning and when rules are enough: the ML project lifecycle, the roles on a team and an honest test for choosing between them.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m02",
+    "order": 2,
+    "title": "First task: exploratory data analysis",
+    "subtitle": "Python, Pandas and EDA: the team lead wants a sales data report by Friday",
+    "level": "Junior",
+    "tags": [
+      "Python",
+      "Pandas",
+      "EDA"
+    ],
+    "slug": "exploratory-data-analysis-eda-pandas",
+    "seo": {
+      "title": "Exploratory data analysis: EDA on a real dataset",
+      "h1": "Revenue grew, profit did not. We found out why without a model",
+      "lead": "EDA is not “looking at the data”, it is an investigation. One report over 50,000 orders turns up duplicates, missing values and the real cause of the margin collapse.",
+      "description": "What EDA is and how to find why profit is falling: duplicates on the business key, missing values, outliers and distributions in pandas over 50,000 orders.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m03",
+    "order": 3,
+    "title": "Marketing argues: did the discount help?",
+    "subtitle": "Statistics and visualization: distributions, hypotheses and an A/B test of a promo",
+    "level": "Junior",
+    "tags": [
+      "statistics",
+      "A/B testing",
+      "visualization"
+    ],
+    "slug": "ab-testing-and-p-value-explained",
+    "seo": {
+      "title": "A/B testing and p-value explained on a real case",
+      "h1": "The discount lifted conversion — and brought in less money",
+      "lead": "Conversion moved from 5.8% to 6.4%. We work out whether that is a win or noise, and why the answer the business actually needs sits in revenue rather than in the p-value.",
+      "description": "How to check whether an A/B result is significant: hypotheses, p-value, confidence intervals and sample size — and why the winning group lost on money.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m04",
+    "order": 4,
+    "title": "Predicting delivery cost",
+    "subtitle": "Linear regression: your first model, gradient descent and coefficient interpretation",
+    "level": "Junior",
+    "tags": [
+      "regression",
+      "sklearn",
+      "MAE/RMSE"
+    ],
+    "slug": "linear-regression-mae-vs-rmse",
+    "seo": {
+      "title": "Linear regression in practice: MAE, RMSE, coefficients",
+      "h1": "The first model saved millions — and it was a linear regression",
+      "lead": "Predicting delivery cost instead of charging a city average. A simple model you can explain to finance coefficient by coefficient, and it beats the baseline threefold.",
+      "description": "The first working model: linear regression, gradient descent, MAE against RMSE and how to explain coefficients to the business instead of a black box.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m05",
+    "order": 5,
+    "title": "Customers are leaving: a churn model",
+    "subtitle": "Logistic regression and classification: predicting churn before the customer is gone",
+    "level": "Junior",
+    "tags": [
+      "classification",
+      "churn",
+      "logistic regression"
+    ],
+    "slug": "customer-churn-prediction-model",
+    "seo": {
+      "title": "Customer churn model: probabilities, not labels",
+      "h1": "The insight turned out to be worth more than the model",
+      "lead": "Retention cannot call 200,000 people, it needs a ranked list. That is where the real requirement comes from: not a “will churn” label but a probability.",
+      "description": "Predicting customer churn: logistic regression, the sigmoid and the threshold, why the business needs probabilities and how coefficients turn into decisions.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m06",
+    "order": 6,
+    "title": "A 99%-accurate model that doesn't work",
+    "subtitle": "Quality metrics: precision, recall, ROC-AUC and the cost of errors in anti-fraud",
+    "level": "Junior",
+    "tags": [
+      "metrics",
+      "precision/recall",
+      "ROC-AUC"
+    ],
+    "slug": "precision-recall-roc-auc-explained",
+    "seo": {
+      "title": "Precision, recall, ROC-AUC: why 99% accuracy fails",
+      "h1": "99.2% accurate — and it caught zero fraudsters",
+      "lead": "Fraud is 0.8% of the data. A model that always answers “not fraud” scores 99.2% and catches nobody. We look at what to measure instead of accuracy.",
+      "description": "Walked through an anti-fraud case: the confusion matrix, precision against recall, ROC-AUC against PR-AUC and why the threshold comes from the cost of errors.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m07",
+    "order": 7,
+    "title": "Credit scoring: data decides everything",
+    "subtitle": "Feature engineering: aggregates, categorical encoding, handling missing values",
+    "level": "Junior+",
+    "tags": [
+      "features",
+      "encoding",
+      "scoring"
+    ],
+    "slug": "feature-engineering-and-target-leakage",
+    "seo": {
+      "title": "Feature engineering: encoding, gaps and leakage",
+      "h1": "A weak model on strong features beats a strong model on weak ones",
+      "lead": "Building a feature matrix for credit scoring out of three tables, and stepping around the trap that makes a model look brilliant on history and collapse in production.",
+      "description": "How features are built: aggregates over time windows, category encoding, missing values and the trap of a feature from the future that breaks a model in production.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m08",
+    "order": 8,
+    "title": "Churn v2: boosting vs the forest",
+    "subtitle": "Decision trees, Random Forest and gradient boosting (XGBoost/LightGBM/CatBoost)",
+    "level": "Junior+",
+    "tags": [
+      "ensembles",
+      "boosting",
+      "trees"
+    ],
+    "slug": "gradient-boosting-vs-random-forest",
+    "seo": {
+      "title": "Gradient boosting vs random forest on tabular data",
+      "h1": "On tabular data, boosting beats neural networks",
+      "lead": "Logistic regression scored 0.834, the random forest 0.861, boosting 0.874. We work out where the gap comes from and why trees keep winning on tables.",
+      "description": "Trees, bagging and boosting: how a random forest differs from gradient boosting, which hyperparameters matter and why they beat neural networks on tables.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m09",
+    "order": 9,
+    "title": "Incident: the model fell apart in production",
+    "subtitle": "Validation, overfitting and data leakage — a real failure post-mortem",
+    "level": "Junior+",
+    "tags": [
+      "validation",
+      "data leakage",
+      "overfitting"
+    ],
+    "slug": "data-leakage-and-overfitting",
+    "seo": {
+      "title": "Data leakage and overfitting: a production post-mortem",
+      "h1": "0.97 on the test set, 0.61 in production",
+      "lead": "We investigate someone else's incident: a random split of time-ordered data, a scaler fitted before the split, and a feature that does not exist at decision time.",
+      "description": "Five kinds of data leakage, honest validation schemes over time and groups, and why a metric that looks too good is a warning rather than a result.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m10",
+    "order": 10,
+    "title": "Squeezing out 2% more quality",
+    "subtitle": "Hyperparameter tuning: grid search, random search and Optuna",
+    "level": "Junior+",
+    "tags": [
+      "hyperparameters",
+      "Optuna",
+      "tuning"
+    ],
+    "slug": "hyperparameter-tuning-optuna",
+    "seo": {
+      "title": "Hyperparameter tuning: grid, random search and Optuna",
+      "h1": "A gain of 0.005 against a spread of 0.004 is noise",
+      "lead": "One day and one server shared by three teams. We tune deliberately and learn to tell a real improvement from a random swing of cross-validation.",
+      "description": "How to tune a model in a day: why random search beats a grid, what Optuna does and how to tell a real gain apart from cross-validation noise.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m11",
+    "order": 11,
+    "title": "Fraud: 1 fraudster per 1000 honest users",
+    "subtitle": "Imbalanced classes: class weights, sampling, threshold selection",
+    "level": "Middle-track",
+    "tags": [
+      "imbalance",
+      "fraud",
+      "threshold"
+    ],
+    "slug": "imbalanced-classes-and-threshold",
+    "seo": {
+      "title": "Imbalanced classes: weights, sampling and thresholds",
+      "h1": "93% of the alerts are false — and the economics still work",
+      "lead": "One fraudster per thousand honest users, 500 manual checks a day and two errors with very different price tags. The threshold here is arithmetic, not 0.5 by default.",
+      "description": "A 1:1000 imbalance: class weights against SMOTE, why PR-AUC is more honest than ROC-AUC and how to derive a threshold in money rather than in metrics.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m12",
+    "order": 12,
+    "title": "Who are our customers, really?",
+    "subtitle": "Clustering and unsupervised learning: customer base segmentation",
+    "level": "Middle-track",
+    "tags": [
+      "clustering",
+      "K-Means",
+      "segmentation"
+    ],
+    "slug": "customer-segmentation-k-means-rfm",
+    "seo": {
+      "title": "Customer segmentation: K-Means, RFM and choosing k",
+      "h1": "A cluster without a name is not a result",
+      "lead": "There are no labels here and no correct answer. Segmentation quality is measured by whether marketing can do something different with each segment tomorrow.",
+      "description": "Segmenting a customer base without labels: RFM features, K-Means, the elbow method and silhouette — and why the real quality test here is a business one.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m13",
+    "order": 13,
+    "title": "\"Frequently bought together\": recommendations",
+    "subtitle": "Recommender systems: collaborative filtering and ranking metrics",
+    "level": "Middle-track",
+    "tags": [
+      "RecSys",
+      "collaborative filtering",
+      "NDCG"
+    ],
+    "slug": "recommender-systems-collaborative-filtering",
+    "seo": {
+      "title": "Recommender systems: collaborative filtering and NDCG",
+      "h1": "The model learned that phones go with cases, knowing nothing about products",
+      "lead": "Matrix factorisation splits purchase history into tastes and properties. Product affinity falls out of the numbers, not out of the descriptions.",
+      "description": "How recommendations work: matrix factorisation and embeddings, the cold start problem and the ranking metrics precision@k, recall@k and NDCG.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m14",
+    "order": 14,
+    "title": "The warehouse is overstocked: demand forecasting",
+    "subtitle": "Time series: trend, seasonality, lag features and honest validation",
+    "level": "Middle-track",
+    "tags": [
+      "time series",
+      "forecasting",
+      "lags"
+    ],
+    "slug": "demand-forecasting-time-series-validation",
+    "seo": {
+      "title": "Demand forecasting: time series, lags and validation",
+      "h1": "A naive forecast gets you 80% of the way to a complex model",
+      "lead": "In time series the order of the data is information, and the usual cross-validation quietly lies. We start from baselines that are harder to beat than they look.",
+      "description": "Forecasting demand for 2000 products: trend and seasonality, lag features, rolling validation and why MAPE is a poor metric choice in retail.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m15",
+    "order": 15,
+    "title": "Support is drowning in tickets",
+    "subtitle": "NLP: from TF-IDF to transformers — automatic ticket classification",
+    "level": "Middle-track",
+    "tags": [
+      "NLP",
+      "TF-IDF",
+      "transformers"
+    ],
+    "slug": "text-classification-tfidf-vs-transformers",
+    "seo": {
+      "title": "Text classification: TF-IDF against transformers",
+      "h1": "The bigger model is more accurate — and does not pay for itself",
+      "lead": "Five thousand tickets a day and 55 person-hours spent purely on sorting them. We choose between three options on F1 together with latency and hardware.",
+      "description": "Auto-classifying support tickets: TF-IDF with a linear model against a fine-tuned transformer, macro-F1, latency and the confidence threshold.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m16",
+    "order": 16,
+    "title": "Meet neural networks",
+    "subtitle": "Deep learning: the neuron, layers, backpropagation and your first PyTorch net",
+    "level": "Middle-track",
+    "tags": [
+      "neural networks",
+      "PyTorch",
+      "backprop"
+    ],
+    "slug": "neural-networks-backpropagation-overfitting",
+    "seo": {
+      "title": "Neural networks: backpropagation and overfitting",
+      "h1": "If you have never overfitted a network, you cannot train one",
+      "lead": "The network without any magic: neuron, layers, backpropagation. Then we overfit it on purpose to see exactly what that looks like on the training curves.",
+      "description": "How a neural network works: neurons, layers, activation functions and backpropagation, training in PyTorch and a deliberate overfitting experiment.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m17",
+    "order": 17,
+    "title": "Defects on the conveyor: computer vision",
+    "subtitle": "CV: convolutional networks, transfer learning and quality control in manufacturing",
+    "level": "Middle-track",
+    "tags": [
+      "CV",
+      "CNN",
+      "transfer learning"
+    ],
+    "slug": "computer-vision-cnn-transfer-learning",
+    "seo": {
+      "title": "Computer vision: CNNs and transfer learning",
+      "h1": "Four thousand photos. Training from scratch will not fly",
+      "lead": "Defect detection on a packing line: why convolution saves millions of weights, and how to fine-tune a pretrained network instead of starting from zero.",
+      "description": "Quality control from photos: how convolution works, why transfer learning is needed on a small dataset and how to set the threshold by the cost of a defect.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m18",
+    "order": 18,
+    "title": "The interview in reverse: ML System Design",
+    "subtitle": "Designing an ML system end-to-end: from business metric to architecture",
+    "level": "Middle",
+    "tags": [
+      "system design",
+      "architecture",
+      "business metrics"
+    ],
+    "slug": "ml-system-design-interview",
+    "seo": {
+      "title": "ML system design: how to answer at the interview",
+      "h1": "What separates a mid-level engineer is designing the whole system",
+      "lead": "A one-sentence brief, exactly as it arrives at an interview. We unpack it with a framework: from the business metric to architecture, constraints and risks.",
+      "description": "The ML system design framework: from business metric to a retrieval and ranking architecture, the latency budget, guardrail metrics and the rollout plan.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m19",
+    "order": 19,
+    "title": "The model is ready. Now — to production",
+    "subtitle": "MLOps: an API service, Docker, monitoring, data drift and retraining",
+    "level": "Middle",
+    "tags": [
+      "MLOps",
+      "deployment",
+      "monitoring"
+    ],
+    "slug": "mlops-monitoring-and-data-drift",
+    "seo": {
+      "title": "MLOps: shipping a model, monitoring and data drift",
+      "h1": "A model without monitoring is an incident that has not happened yet",
+      "lead": "A model somebody runs by hand on Mondays is not a product. We turn it into a service with an API, versions, drift monitoring and a rollback plan.",
+      "description": "How a model becomes a service: FastAPI and Docker, versioning, three layers of monitoring, PSI for drift and the shadow, canary and rollback sequence.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m20",
+    "order": 20,
+    "title": "Finale: defending your project before the CTO",
+    "subtitle": "Capstone project + final exam: you are ready for a Middle ML Engineer position",
+    "level": "Middle",
+    "tags": [
+      "capstone",
+      "exam",
+      "certificate"
+    ],
+    "slug": "end-to-end-ml-project-middle-engineer",
+    "seo": {
+      "title": "End-to-end ML project: the mid-level engineer exam",
+      "h1": "Business problem first, then the data, and only then the model",
+      "lead": "The final project end to end: from framing to an operations plan, defended in front of the CTO and the product manager. Everything before it converges here.",
+      "description": "The capstone project: framing, leak-free features, validation, a threshold from the cost matrix, an A/B test with guardrails and an operations plan.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m21",
+    "order": 21,
+    "title": "Advanced · Before writing code: the Design Doc",
+    "subtitle": "From the “ML System Design” book: problem space, cost of a mistake, design doc structure and review",
+    "level": "Middle+",
+    "tags": [
+      "design doc",
+      "problem space",
+      "Babushkin/Kravchenko book"
+    ],
+    "slug": "ml-design-doc-problem-space",
+    "seo": {
+      "title": "The ML design doc: problem space and cost of error",
+      "h1": "The best project is the one you decided not to build",
+      "lead": "A month before the first line of code. We write the design doc: where it hurts, what that costs, what we will not do and on what condition the project is closed.",
+      "description": "What goes into a design doc before any code: problem space, the cost of error both ways, anti-goals and a stopping criterion. Based on the Manning book.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m22",
+    "order": 22,
+    "title": "Advanced · Metrics, data, validation, baselines",
+    "subtitle": "Hierarchy of metrics, sample-wise learning curve, adversarial validation and the baseline ladder",
+    "level": "Middle+",
+    "tags": [
+      "hierarchy of metrics",
+      "adversarial validation",
+      "baselines"
+    ],
+    "slug": "metric-hierarchy-and-baselines",
+    "seo": {
+      "title": "Metric hierarchy, baselines and adversarial validation",
+      "h1": "Half an hour spent reading errors beats a week of tuning",
+      "lead": "Loss, offline metric, online metric and money are four different things. We stack them into a pyramid and build the ladder of baselines from the bottom up.",
+      "description": "The early stage of a project: a metric pyramid from loss to money, the baseline ladder, adversarial validation and error analysis instead of blind tuning.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  },
+  {
+    "id": "m23",
+    "order": 23,
+    "title": "Advanced · Integration, A/B, monitoring, ownership",
+    "subtitle": "Training vs inference pipelines, debrief, drift types, fallback hierarchy and bus factor",
+    "level": "Middle+",
+    "tags": [
+      "monitoring",
+      "drift",
+      "ownership"
+    ],
+    "slug": "ab-testing-ml-systems-and-ownership",
+    "seo": {
+      "title": "A/B testing ML systems, drift types and ownership",
+      "h1": "Who fixes the model at three in the morning",
+      "lead": "The model beat every baseline, so the easy part is over. Next come pipelines, an honest experiment, monitoring and the question of who is accountable for it.",
+      "description": "What turns a model into a system: training and inference pipelines, A/B design, drift types, the fallback hierarchy and accountability inside the team.",
+      "short": "",
+      "updated": "2026-09-06"
+    }
+  }
 ]
