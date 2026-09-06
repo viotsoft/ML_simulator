@@ -5,7 +5,10 @@
 > каналы, воронка, 90 дней, бюджет);
 > [youtube-channel.md](marketing/youtube-channel.md) — настройка канала и
 > сценарий трейлера;
-> [shorts-ml-track.md](marketing/shorts-ml-track.md) — 23 сценария шортсов.
+> [shorts-ml-track.md](marketing/shorts-ml-track.md) — 23 сценария шортсов (RU);
+> [shorts-ml-track-en.md](marketing/shorts-ml-track-en.md) и
+> [youtube-channel-en.md](marketing/youtube-channel-en.md) — то же для
+> английского направления.
 >
 > Эта страница — только про автопостинг в шесть сетей. YouTube в конвейер не
 > подключён, ролики заливаются руками.
