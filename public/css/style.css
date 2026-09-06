@@ -430,6 +430,38 @@ a:hover { text-decoration: underline; }
 @keyframes promoPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
 
+/* Пауза должна оставлять кадр читаемым: анимации замирают, ничего не затемняется. */
+.promo-stage.frozen * { animation-play-state: paused !important; }
+/* Раскрытая сцена: переход по главам на паузе показывает всё сразу. */
+.promo-scene.revealed * { animation: none !important; opacity: 1 !important; transform: none !important; }
+.promo-scene.revealed .sc-cert-row { display: none; }
+
+.promo-paused-chip {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 4;
+  padding: 6px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 700;
+  background: rgba(11,16,32,.82); border: 1px solid var(--border); color: var(--muted);
+  pointer-events: none;
+}
+.promo-nav {
+  flex: none; border: 1px solid var(--border); background: transparent; color: var(--muted);
+  border-radius: 8px; padding: 4px 9px; font-size: 13px; line-height: 1; cursor: pointer;
+  transition: border-color .12s, color .12s;
+}
+.promo-nav:hover { border-color: var(--accent); color: var(--text); }
+
+.promo-chapters {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px;
+  max-width: 860px; margin: 12px auto 0;
+}
+.promo-chapters-lbl { color: var(--muted); font-size: 12px; margin-right: 4px; }
+.promo-chapter {
+  width: 26px; height: 26px; border-radius: 7px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--card);
+  color: var(--muted); font-size: 12px; font-weight: 700; transition: all .12s;
+}
+.promo-chapter:hover { border-color: var(--accent); color: var(--text); }
+.promo-chapter.current { border-color: var(--accent); background: var(--accent); color: #fff; }
+
 /* появление элементов сцен */
 @keyframes scIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @keyframes scPop { 0% { transform: scale(.6); opacity: 0; } 70% { transform: scale(1.06); opacity: 1; } 100% { transform: scale(1); } }
@@ -461,38 +493,49 @@ a:hover { text-decoration: underline; }
   opacity: 0; animation: scPop .5s ease forwards;
 }
 
-/* сцена 3: цепочка агентов */
-.sc-agents {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
-  gap: 6px 8px; width: 100%;
-}
-.sc-agent-node {
-  padding: 8px 13px; border-radius: 999px; white-space: nowrap;
-  background: var(--card); border: 1px solid var(--accent); color: #dde3f5;
-  font-size: clamp(11px, 1.7vw, 14px); font-weight: 700;
-  opacity: 0; animation: scPop .45s ease forwards;
-}
-.sc-agent-node.done { border-color: var(--green); color: #a7e6cd; background: rgba(52,211,153,.12); }
-.sc-agent-arrow {
-  color: var(--muted); font-size: clamp(12px, 1.8vw, 16px);
-  opacity: 0; animation: scIn .3s ease forwards;
-}
-
-/* сцена 4: карта доменов архитектора */
-.sc-arch-title {
-  font-size: clamp(15px, 2.6vw, 22px); font-weight: 800; letter-spacing: -0.01em; text-align: center;
-  opacity: 0; animation: scIn .5s ease forwards;
-}
-.sc-arch {
-  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%;
-}
-.sc-arch-tile {
-  flex: 1 1 auto; min-width: 132px; max-width: 200px; text-align: center;
-  padding: 11px 12px; border-radius: 10px;
-  background: var(--card); border: 1px solid var(--border); color: #dde3f5;
-  font-size: clamp(10.5px, 1.6vw, 13px); font-weight: 600; line-height: 1.35;
+/* сцена 3: лог работы агента — видно, как гейт останавливает вызов */
+.sc-log { display: flex; flex-direction: column; gap: 7px; width: 100%; }
+.sc-log-row {
+  display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap;
+  padding: 9px 12px; border-radius: 9px;
+  background: var(--card); border: 1px solid var(--border);
+  font-size: clamp(10.5px, 1.6vw, 13px);
   opacity: 0; animation: scIn .45s ease forwards;
 }
+.sc-log-row.ok { border-left: 3px solid var(--green); }
+.sc-log-row.block { border-left: 3px solid var(--red); background: rgba(248,113,113,.08); }
+.sc-log-mark { flex: none; font-size: 12px; }
+.sc-log-row.ok .sc-log-mark { color: var(--green); }
+.sc-log-row.block .sc-log-mark { color: var(--red); }
+.sc-log-call { font-family: "SF Mono", ui-monospace, Menlo, monospace; color: #c7d4f5; }
+.sc-log-res { color: var(--muted); }
+.sc-log-row.block .sc-log-res { color: #f8a5a5; font-weight: 600; }
+
+/* сцена 4: панель экзамена — таймер идёт, балл растёт, полосы заполняются */
+.sc-exam-head { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; }
+.sc-exam-q { font-size: clamp(11px, 1.7vw, 13.5px); color: var(--muted); }
+.sc-exam-q b { color: var(--text); }
+.sc-exam-clock {
+  font-variant-numeric: tabular-nums; font-weight: 700; font-size: clamp(12px, 1.9vw, 15px);
+  padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card);
+}
+.sc-exam-dots { display: flex; flex-wrap: wrap; gap: 3px; width: 100%; }
+.sc-exam-dots i { width: 9px; height: 9px; border-radius: 2px; background: var(--bg); border: 1px solid var(--border); }
+.sc-exam-dots i.done { background: var(--green); border-color: var(--green); }
+.sc-exam-score { display: flex; align-items: baseline; gap: 10px; }
+.sc-exam-score-num {
+  font-size: clamp(24px, 4.4vw, 40px); font-weight: 800; letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums; color: var(--amber);
+}
+.sc-exam-score-num.pass { color: var(--green); }
+.sc-exam-score-lbl { color: var(--muted); font-size: clamp(10.5px, 1.6vw, 13px); }
+.sc-exam-domains { display: flex; flex-direction: column; gap: 5px; width: 100%; }
+.sc-exam-row { display: flex; align-items: center; gap: 9px; }
+.sc-exam-dname { flex: 1 1 140px; font-size: clamp(10px, 1.5vw, 12.5px); color: #dde3f5; }
+.sc-exam-dbar { flex: 2 1 120px; height: 8px; border-radius: 5px; background: rgba(147,160,196,.16); overflow: hidden; }
+.sc-exam-dbar i { display: block; height: 100%; width: 0; background: var(--green); border-radius: 5px; }
+.sc-exam-dbar i.weak { background: var(--red); }
+.sc-exam-dnum { flex: none; width: 40px; text-align: right; font-size: 11.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
 
 /* сцена 2: задача и код */
 .sc-code { width: min(600px, 94%); background: #0d1330; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; font-family: "SF Mono", ui-monospace, Menlo, monospace; }
@@ -505,19 +548,9 @@ a:hover { text-decoration: underline; }
   opacity: 0; animation: scIn .4s ease forwards;
 }
 .sc-code-line .ln { color: #3d4a7a; margin-right: 14px; }
-.sc-insight {
-  margin: 10px 14px 14px; padding: 10px 14px; border-radius: 9px; font-family: var(--font);
-  background: rgba(52,211,153,.12); border: 1px solid #34d399; color: #a7e6cd;
-  font-size: clamp(12px, 1.8vw, 14px); font-weight: 600; opacity: 0; animation: scPop .5s ease forwards;
-}
 
 /* сцена 5: интервью */
 .sc-iv { width: min(560px, 92%); }
-.sc-iv-intro {
-  text-align: center; margin-bottom: 14px; color: var(--muted);
-  font-size: clamp(12px, 2vw, 15px); font-weight: 600;
-  opacity: 0; animation: scIn .5s ease forwards;
-}
 .sc-iv-q, .sc-iv-think, .sc-iv-a {
   border-radius: 12px; padding: 14px 18px; margin-bottom: 12px;
   font-size: clamp(12.5px, 2vw, 15.5px); opacity: 0; animation: scIn .5s ease forwards;
@@ -525,6 +558,10 @@ a:hover { text-decoration: underline; }
 .sc-iv-q { background: var(--card); border: 1px solid var(--accent); font-weight: 700; }
 .sc-iv-think { background: transparent; color: var(--muted); border: 1px dashed var(--border); }
 .sc-iv-a { background: rgba(52,211,153,.1); border: 1px solid #34d399; color: #cfeee0; }
+.sc-iv-note {
+  text-align: center; color: var(--muted); font-size: clamp(11.5px, 1.8vw, 14px); font-weight: 600;
+  opacity: 0; animation: scIn .5s ease forwards;
+}
 
 /* сцена 7: сертификаты + CTA */
 .sc-cert { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
@@ -569,6 +606,14 @@ a:hover { text-decoration: underline; }
   .sc-cert-row { gap: 8px; }
   .sc-cert-card { padding: 10px 12px; }
   .sc-final { gap: 8px; }
+  .sc-log { gap: 5px; }
+  .sc-log-row { padding: 6px 9px; gap: 5px; line-height: 1.25; }
+  .sc-exam-head { gap: 6px; }
+  .sc-exam-score-num { font-size: clamp(20px, 4vw, 30px); }
+  .sc-exam-dots i { width: 7px; height: 7px; }
+  .sc-exam-domains { gap: 3px; }
+  .sc-exam-dname { flex-basis: 96px; }
+  .promo-chapter { width: 23px; height: 23px; font-size: 11px; }
 }
 
 .toast {
