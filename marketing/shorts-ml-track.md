@@ -78,6 +78,37 @@ YouTube показывает над заголовком только первы
 в одну строку. **Тот же идентификатор впишите в `seo.short`** нужного
 модуля в `content/ru/modules.json`, иначе показы и регистрации не сойдутся.
 
+### Готовые ссылки на все 23 урока
+
+Заменить `ID` на идентификатор ролика после загрузки — и вписать его же в
+`seo.short` нужного модуля, иначе показы страницы и регистрации не свяжутся.
+
+| № | Модуль | Фраза из видео (она же h1 страницы) | Ссылка в описание |
+| --- | --- | --- | --- |
+| 01 | m01 | Половину «задач для ML» решает обычный if-else | `https://mlsimulator.com/lesson/chto-takoe-ml-i-kogda-on-ne-nuzhen?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 02 | m02 | Выручка выросла, прибыль упала. Ответ нашли без единой модели | `https://mlsimulator.com/lesson/razvedochnyy-analiz-dannyh-eda-pandas?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 03 | m03 | Скидка подняла конверсию — и принесла меньше денег | `https://mlsimulator.com/lesson/ab-test-i-p-value-prostymi-slovami?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 04 | m04 | Первая модель сэкономила миллионы. Это была линейная регрессия | `https://mlsimulator.com/lesson/lineynaya-regressiya-i-metriki-mae-rmse?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 05 | m05 | Инсайт оказался дороже самой модели | `https://mlsimulator.com/lesson/model-ottoka-klientov-churn?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 06 | m06 | Точность 99,2% — и ноль пойманных мошенников | `https://mlsimulator.com/lesson/precision-recall-roc-auc-metriki-klassifikacii?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 07 | m07 | Слабая модель на сильных признаках бьёт сильную на слабых | `https://mlsimulator.com/lesson/feature-engineering-i-utechka-priznakov?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 08 | m08 | На таблицах бустинг обыгрывает нейросети | `https://mlsimulator.com/lesson/gradientnyy-busting-protiv-random-forest?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 09 | m09 | 0,97 на тесте, 0,61 в проде | `https://mlsimulator.com/lesson/utechka-dannyh-i-pereobuchenie?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 10 | m10 | Прирост 0,005 при разбросе 0,004 — это шум, а не результат | `https://mlsimulator.com/lesson/podbor-giperparametrov-optuna?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 11 | m11 | 93% алертов ложные — и экономика всё равно сходится | `https://mlsimulator.com/lesson/nesbalansirovannye-klassy-i-vybor-poroga?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 12 | m12 | Кластер без имени — не результат, а мусор | `https://mlsimulator.com/lesson/klasterizaciya-klientov-k-means-rfm?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 13 | m13 | Модель поняла, что к телефону берут чехол, ничего не зная о товарах | `https://mlsimulator.com/lesson/rekomendatelnye-sistemy-kollaborativnaya-filtraciya?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 14 | m14 | Наивный прогноз даёт 80% качества сложной модели | `https://mlsimulator.com/lesson/prognoz-sprosa-i-validaciya-vremennyh-ryadov?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 15 | m15 | Большая модель точнее — и не окупается | `https://mlsimulator.com/lesson/klassifikaciya-tekstov-tf-idf-i-transformery?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 16 | m16 | Кто не переобучал сеть — тот не умеет их обучать | `https://mlsimulator.com/lesson/neyroseti-pytorch-i-pereobuchenie?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 17 | m17 | Четыре тысячи фото. С нуля не взлетит — и не надо | `https://mlsimulator.com/lesson/computer-vision-cnn-i-transfer-learning?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 18 | m18 | Мидла от джуна отличает не алгоритм, а система целиком | `https://mlsimulator.com/lesson/ml-system-design-na-sobesedovanii?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 19 | m19 | Модель без мониторинга — это инцидент, который ещё не случился | `https://mlsimulator.com/lesson/mlops-monitoring-modeli-i-dreyf-dannyh?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 20 | m20 | Сначала бизнес-задача, потом данные, и только потом модель | `https://mlsimulator.com/lesson/skvoznoy-proekt-middle-ml-engineer?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 21 | m21 | Лучший проект — тот, который не стали делать | `https://mlsimulator.com/lesson/design-doc-dlya-ml-sistemy?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 22 | m22 | Полчаса чтения ошибок дают больше, чем неделя тюнинга | `https://mlsimulator.com/lesson/ierarhiya-metrik-i-lestnica-beyzlinov?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+| 23 | m23 | Кто чинит модель в три часа ночи | `https://mlsimulator.com/lesson/monitoring-dreyfa-ab-testy-i-vladenie-sistemoy?utm_source=youtube&utm_medium=shorts&utm_campaign=ml&utm_content=ID` |
+
 ---
 
 # Сценарии

@@ -79,6 +79,37 @@ The video id goes in `utm_content`: the server's allowlist drops `utm_term`, and
 Note `utm_campaign=ml_en` rather than `ml` — it keeps the two language funnels
 apart in the stats.
 
+### Ready links for all 23 lessons
+
+Replace `ID` with the video id after upload, and write the same id into
+`seo.short` for that module — otherwise page views and signups never join up.
+
+| № | Module | The line from the video (also the page h1) | Link for the description |
+| --- | --- | --- | --- |
+| 01 | m01 | Half the “ML tasks” you are handed are solved by an if-else | `https://mlsimulator.com/en/lesson/machine-learning-vs-rules-when-to-use-ml?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 02 | m02 | Revenue grew, profit did not. We found out why without a model | `https://mlsimulator.com/en/lesson/exploratory-data-analysis-eda-pandas?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 03 | m03 | The discount lifted conversion — and brought in less money | `https://mlsimulator.com/en/lesson/ab-testing-and-p-value-explained?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 04 | m04 | The first model saved millions — and it was a linear regression | `https://mlsimulator.com/en/lesson/linear-regression-mae-vs-rmse?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 05 | m05 | The insight turned out to be worth more than the model | `https://mlsimulator.com/en/lesson/customer-churn-prediction-model?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 06 | m06 | 99.2% accurate — and it caught zero fraudsters | `https://mlsimulator.com/en/lesson/precision-recall-roc-auc-explained?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 07 | m07 | A weak model on strong features beats a strong model on weak ones | `https://mlsimulator.com/en/lesson/feature-engineering-and-target-leakage?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 08 | m08 | On tabular data, boosting beats neural networks | `https://mlsimulator.com/en/lesson/gradient-boosting-vs-random-forest?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 09 | m09 | 0.97 on the test set, 0.61 in production | `https://mlsimulator.com/en/lesson/data-leakage-and-overfitting?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 10 | m10 | A gain of 0.005 against a spread of 0.004 is noise | `https://mlsimulator.com/en/lesson/hyperparameter-tuning-optuna?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 11 | m11 | 93% of the alerts are false — and the economics still work | `https://mlsimulator.com/en/lesson/imbalanced-classes-and-threshold?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 12 | m12 | A cluster without a name is not a result | `https://mlsimulator.com/en/lesson/customer-segmentation-k-means-rfm?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 13 | m13 | The model learned that phones go with cases, knowing nothing about products | `https://mlsimulator.com/en/lesson/recommender-systems-collaborative-filtering?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 14 | m14 | A naive forecast gets you 80% of the way to a complex model | `https://mlsimulator.com/en/lesson/demand-forecasting-time-series-validation?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 15 | m15 | The bigger model is more accurate — and does not pay for itself | `https://mlsimulator.com/en/lesson/text-classification-tfidf-vs-transformers?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 16 | m16 | If you have never overfitted a network, you cannot train one | `https://mlsimulator.com/en/lesson/neural-networks-backpropagation-overfitting?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 17 | m17 | Four thousand photos. Training from scratch will not fly | `https://mlsimulator.com/en/lesson/computer-vision-cnn-transfer-learning?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 18 | m18 | What separates a mid-level engineer is designing the whole system | `https://mlsimulator.com/en/lesson/ml-system-design-interview?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 19 | m19 | A model without monitoring is an incident that has not happened yet | `https://mlsimulator.com/en/lesson/mlops-monitoring-and-data-drift?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 20 | m20 | Business problem first, then the data, and only then the model | `https://mlsimulator.com/en/lesson/end-to-end-ml-project-middle-engineer?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 21 | m21 | The best project is the one you decided not to build | `https://mlsimulator.com/en/lesson/ml-design-doc-problem-space?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 22 | m22 | Half an hour spent reading errors beats a week of tuning | `https://mlsimulator.com/en/lesson/metric-hierarchy-and-baselines?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+| 23 | m23 | Who fixes the model at three in the morning | `https://mlsimulator.com/en/lesson/ab-testing-ml-systems-and-ownership?utm_source=youtube&utm_medium=shorts&utm_campaign=ml_en&utm_content=ID` |
+
 ---
 
 # The scripts
