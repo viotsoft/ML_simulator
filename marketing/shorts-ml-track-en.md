@@ -162,13 +162,13 @@ Full walkthrough → <link>
 
 - **Hook:** "The discount lifted conversion. And brought in less money."
 - **Stake:** "Twenty thousand users split in half. One group saw a fifteen per cent discount, the other didn't. Conversion six point four against five point eight. Marketing is celebrating."
-- **Explanation** *(cutaway: two overlapping distributions)*: "Run the numbers. P-value of zero point zero seven. The confidence interval on the effect covers zero, which means there may be no real difference at all. To detect an effect this small you'd need thirty thousand users per group, not ten. But here's the part that matters. Revenue per user: forty-one roubles in the discount group against forty-nine without it."
+- **Explanation** *(cutaway: two overlapping distributions)*: "Run the numbers. P-value of zero point zero seven. The confidence interval on the effect covers zero, which means there may be no real difference at all. To detect an effect this small you'd need thirty thousand users per group, not ten. But here's the part that matters. Profit per user: fifty-two cents in the discount group against sixty-one without it."
 - **Rule:** "The job isn't to report a p-value of zero point zero seven. The job is to say: the discount doesn't pay for itself, and here's what to do next."
 - **Call:** "How to compute significance and sample size properly — link in the description."
 
 **Description:**
 ```
-Conversion rose from 5.8% to 6.4% and revenue per user fell from 48.9 to 41.2. A real A/B test: what a p-value actually means, why the confidence interval matters more than the raw lift, and why you size the sample before you start.
+Conversion rose from 5.8% to 6.4%, yet profit per user was $0.52 with the discount against $0.61 without it. A real A/B test: what a p-value actually means, why the confidence interval matters more than the raw lift, and why you size the sample before you start.
 
 Full walkthrough → <link>
 
@@ -183,13 +183,13 @@ Full walkthrough → <link>
 
 - **Hook:** "The first model I shipped saved the company millions. It was a linear regression."
 - **Stake:** "Logistics was charging a city average for delivery and losing money on every long, heavy order. Eighty thousand deliveries of history."
-- **Explanation** *(cutaway: the regression line and the descent curve)*: "The city average was off by a hundred and thirty-seven roubles. The linear model, by forty-eight. And here's the part people underrate — you can read it out loud. Base rate, plus thirty-four for weight, plus fifty-nine for distance, plus a hundred and twelve for urgency. That's a fair tariff, not a black box."
+- **Explanation** *(cutaway: the regression line and the descent curve)*: "The linear model is off by sixty-four cents per delivery — the target was eighty — and the city average was almost three times worse. And here's the part people underrate — you can read it out loud. A base rate, plus about forty-five cents for every extra six kilos, plus a dollar fifty for express delivery. That's a fair tariff, not a black box."
 - **Rule:** "Start with the simple baseline. Not because neural networks are bad, but because finance signs off on what they can check."
 - **Call:** "The difference between MAE and RMSE and how to read coefficients — link in the description."
 
 **Description:**
 ```
-A city-average tariff was off by 137, a linear regression by 48. The first working model: gradient descent, standardisation, MAE against RMSE, and how to explain coefficients to a finance team so the model actually gets approved.
+A linear regression is off by $0.64 per delivery — almost three times better than a city-average tariff. The first working model: gradient descent, standardisation, MAE against RMSE, and how to explain coefficients to a finance team so the model actually gets approved.
 
 Full walkthrough → <link>
 
@@ -226,7 +226,7 @@ Full walkthrough → <link>
 - **Hook:** "This model caught zero fraudsters. Its accuracy is ninety-nine point two per cent."
 - **Stake:** "That's not a bug. Fraud is zero point eight per cent of the data. The model answers 'not fraud' every single time and is right ninety-nine times out of a hundred."
 - **Explanation** *(cutaway: confusion matrix and ROC curve)*: "Accuracy treats every answer as equal. The business doesn't. A missed fraudster is money out of an account. A blocked honest customer is a support call and an angry person. So you look at two numbers instead. Recall: of all the fraud, how much did we catch. Precision: of everything we flagged, how much was really fraud."
-- **Rule:** "And you don't take zero point five as the threshold. You derive it from the cost of each error. In this case a threshold of zero point three one is worse on precision and better on money by nearly ten million."
+- **Rule:** "And you don't take zero point five as the threshold. You derive it from the cost of each error. In this case a threshold of zero point three one is worse on precision and better on money: five thousand retention calls at two dollars cost ten thousand, and keep about a hundred and twenty-four thousand dollars of customers."
 - **Call:** "How that threshold is calculated, step by step — link in the description."
 
 **Description:**
@@ -329,9 +329,9 @@ Full walkthrough → <link>
 **Title:** 93% of the alerts are false — and that's correct | Imbalanced classes
 
 - **Hook:** "Ninety-three per cent of this anti-fraud system's alerts are false positives. And it is correctly configured."
-- **Stake:** "Four hundred thousand transactions a day, fraud at one tenth of one per cent. A missed case costs eighteen thousand roubles. A false block costs four hundred. That's a forty-five to one ratio."
+- **Stake:** "Four hundred thousand transactions a day, fraud at one tenth of one per cent. A missed case costs two hundred and twenty dollars. A false block costs five. Roughly forty-five to one."
 - **Explanation** *(cutaway: the PR curve under imbalance)*: "At that skew ROC-AUC flatters you: zero point nine seven looks magnificent, while PR-AUC is zero point four one — and PR-AUC is the one telling the truth. Class weights took recall from forty-four per cent to sixty-two. SMOTE, incidentally, did worse than plain weights."
-- **Rule:** "And the threshold doesn't come from a metric. It comes from money and from capacity. The review team handles five hundred alerts a day — that's the real constraint. Tuned that way the system is worth about fourteen and a half million a month."
+- **Rule:** "And the threshold doesn't come from a metric. It comes from money and from capacity. The review team handles five hundred alerts a day — that's the real constraint. Tuned that way the system is worth about a hundred and seventy-five thousand dollars a month."
 - **Call:** "How to derive a threshold from a cost matrix — link in the description."
 
 **Description:**
@@ -414,13 +414,13 @@ Full walkthrough → <link>
 
 - **Hook:** "The most accurate model lost. Not on quality — on economics."
 - **Stake:** "Five thousand support tickets a day. An agent spends the first forty seconds of each one working out where it belongs. That's fifty-five person-hours a day spent purely on sorting."
-- **Explanation** *(cutaway: one ticket taking two routes)*: "Three options. TF-IDF with a linear model: F1 of zero point eight six, two milliseconds, plain CPU. A small Russian transformer: zero point nine one, forty milliseconds, still CPU. A large BERT: zero point nine two five, but three hundred milliseconds and a GPU. Fifteen thousandths of F1 is not worth a GPU. The gap between the first two, though, is about two hundred and fifty tickets a day landing in the right queue immediately."
+- **Explanation** *(cutaway: one ticket taking two routes)*: "Three options. TF-IDF with a linear model: F1 of zero point eight six, two milliseconds, plain CPU. A fine-tuned DistilBERT: zero point nine one, forty milliseconds, still CPU. A large BERT: zero point nine two five, but three hundred milliseconds and a GPU. Fifteen thousandths of F1 is not worth a GPU. The gap between the first two, though, is about two hundred and fifty tickets a day landing in the right queue immediately."
 - **Rule:** "And don't automate everything. Where the model isn't confident, the ticket goes to a human. We automate the confident eighty-five per cent."
 - **Call:** "How to pick the confidence threshold — link in the description."
 
 **Description:**
 ```
-TF-IDF: F1 0.86 at 2 ms. A small transformer: 0.91 at 40 ms. A large BERT: 0.925, but 300 ms and a GPU. How production models are chosen on quality together with latency, and why a confidence threshold beats automating everything.
+TF-IDF: F1 0.86 at 2 ms. A fine-tuned DistilBERT: 0.91 at 40 ms. A large BERT: 0.925, but 300 ms and a GPU. How production models are chosen on quality together with latency, and why a confidence threshold beats automating everything.
 
 Full walkthrough → <link>
 
