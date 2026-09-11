@@ -270,7 +270,7 @@ function metaHead (o) {
   <meta name="description" content="${esc(o.description)}">
   <link rel="canonical" href="${esc(o.canonical)}">
   <meta name="robots" content="${o.noindex ? 'noindex,follow' : 'index,follow,max-image-preview:large,max-snippet:-1'}">${alt}
-  <meta name="theme-color" content="#0b1020">
+  <meta name="theme-color" content="#111110">
   <meta property="og:type" content="${esc(o.ogType || 'website')}">
   <meta property="og:site_name" content="${SITE_NAME}">
   <meta property="og:locale" content="${esc(o.loc.ogLocale)}">

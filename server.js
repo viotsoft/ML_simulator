@@ -1106,12 +1106,12 @@ app.get('/api/tiktok/callback', (req, res) => {
   const code = req.query.code ? esc(req.query.code) : '';
   const err = req.query.error ? esc(req.query.error_description || req.query.error) : '';
   res.type('html').send(`<!DOCTYPE html><meta charset="utf-8">
-<body style="font-family:sans-serif;background:#0b1020;color:#e8ecf8;display:grid;place-items:center;min-height:90vh">
+<body style="font-family:sans-serif;background:#111110;color:#eeebe4;display:grid;place-items:center;min-height:90vh">
 <div style="max-width:640px;text-align:center">
 ${code
     ? `<h2>Код авторизации TikTok</h2>
        <p>Скопируйте и вставьте в терминал (auth-helper):</p>
-       <code style="display:block;word-break:break-all;background:#161d38;border:1px solid #263056;border-radius:12px;padding:16px;margin-top:12px">${code}</code>`
+       <code style="display:block;word-break:break-all;background:#1c1b19;border:1px solid #2e2c28;border-radius:12px;padding:16px;margin-top:12px">${code}</code>`
     : `<h2>Ошибка авторизации TikTok</h2><p>${err || 'код не получен'}</p>`}
 </div></body>`);
 });

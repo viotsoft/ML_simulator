@@ -12,8 +12,8 @@ const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
 
-const C = { bg: '#0b1020', bgSoft: '#11172e', border: '#263056',
-  text: '#e8ecf8', muted: '#93a0c4', accent: '#6c8cff' };
+const C = { bg: '#111110', bgSoft: '#161614', border: '#2e2c28',
+  text: '#eeebe4', muted: '#a39e93', accent: '#d4ae54' };
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 

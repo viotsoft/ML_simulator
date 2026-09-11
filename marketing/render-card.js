@@ -7,14 +7,14 @@ const H = 1200;
 const PAD = 90;
 
 const C = {
-  bg: '#0b1020',
-  bgSoft: '#11172e',
-  card: '#161d38',
-  border: '#263056',
-  text: '#e8ecf8',
-  muted: '#93a0c4',
-  accent: '#6c8cff',
-  green: '#34d399',
+  bg: '#111110',
+  bgSoft: '#161614',
+  card: '#1c1b19',
+  border: '#2e2c28',
+  text: '#eeebe4',
+  muted: '#a39e93',
+  accent: '#d4ae54',
+  green: '#3ecf8e',
 };
 
 function esc(s) {
@@ -139,7 +139,7 @@ function buildSlideSvg(type, card) {
   <text x="${SW / 2}" y="850" text-anchor="middle" font-family="${font}" font-size="88" font-weight="700" fill="${C.text}">Middle ML Engineer</text>
   <text x="${SW / 2}" y="980" text-anchor="middle" font-family="${font}" font-size="48" fill="${C.muted}">20 real business cases · certificate</text>
   <rect x="${SW / 2 - 300}" y="1070" width="600" height="120" rx="60" fill="${C.accent}"/>
-  <text x="${SW / 2}" y="1147" text-anchor="middle" font-family="${font}" font-size="52" font-weight="700" fill="#0b1020">Start free — link in bio</text>`;
+  <text x="${SW / 2}" y="1147" text-anchor="middle" font-family="${font}" font-size="52" font-weight="700" fill="#111110">Start free — link in bio</text>`;
   }
   return slideChrome(inner);
 }

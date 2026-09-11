@@ -297,10 +297,10 @@ function oauthResultPage(ok, message) {
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   return `<!DOCTYPE html><meta charset="utf-8">
-<body style="font-family:sans-serif;background:#0b1020;color:#e8ecf8;display:grid;place-items:center;min-height:90vh">
+<body style="font-family:sans-serif;background:#111110;color:#eeebe4;display:grid;place-items:center;min-height:90vh">
 <div style="max-width:640px;text-align:center">
 <h2>${ok ? '✅' : '❌'} ${esc(message)}</h2>
-<p style="color:#93a0c4">Вкладку можно закрыть — вернитесь в панель и обновите раздел «Подключения».</p>
+<p style="color:#a39e93">Вкладку можно закрыть — вернитесь в панель и обновите раздел «Подключения».</p>
 </div></body>`;
 }
 
