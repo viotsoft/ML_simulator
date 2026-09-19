@@ -568,5 +568,233 @@
       "answer": 3,
       "explanation": "The spike bought certainty in three weeks and freed a quarter, which is a win — but only if the memo says so. A team that learns an honest negative gets punished will bring you positive results for ever, and you will not be able to tell which are real."
     }
+  ],
+  "p11": [
+    {
+      "question": "Of the four questions to ask about any evaluation, which one catches the most disasters?",
+      "options": [
+        "Which algorithm produced the number",
+        "How many features the model uses",
+        "How the data was split into training and test",
+        "How long the training run took"
+      ],
+      "answer": 2,
+      "explanation": "The split is where optimistic numbers are manufactured, and it takes no expertise to ask about. The other three questions matter, but this is the one whose wrong answer makes every other number on the slide meaningless."
+    },
+    {
+      "question": "Eighteen months of transactions, split randomly 80/20. What is wrong with that?",
+      "options": [
+        "Test cases sit surrounded by training data from the same week, so the model effectively sees the future — while production is always a split by time",
+        "A random split leaves the test set too small to be reliable",
+        "Nothing: random splitting is the standard approach for tabular data",
+        "The split should be 90/10 whenever the data is ordered in time"
+      ],
+      "answer": 0,
+      "explanation": "Fraud, delays, churn and demand all arrive in waves, and a random split puts the same wave on both sides. In production the model is always asked about a day it has never seen, so an evaluation arranged any other way measures a situation that will never occur."
+    },
+    {
+      "question": "The top features include “number of chargeback disputes for this customer”. What do you ask?",
+      "options": [
+        "Whether more features like this one can be added",
+        "Whether this feature is correlated with the transaction amount",
+        "How much this feature contributes to the AUC",
+        "Whether, at the moment we score the payment, a dispute has been filed yet"
+      ],
+      "answer": 3,
+      "explanation": "A dispute is filed days after the transaction, and for fraudulent transactions it is exactly what later gets disputed — so the model has been handed the answer. This is module P4's point-in-time rule applied to a feature-importance list, and asking it costs nothing."
+    },
+    {
+      "question": "Why is “AUC 0.97” not a product statement?",
+      "options": [
+        "Because AUC is only valid on balanced datasets",
+        "Because it averages over thresholds you will never use, while you ship exactly one — and the product needs precision and recall there, with the confusion matrix",
+        "Because AUC cannot be compared between two models",
+        "Because executives do not understand what it means"
+      ],
+      "answer": 1,
+      "explanation": "“0.97 AUC” and “at our threshold it flags 500 a day, 60 of them real” describe the same model, and only the second can be used for anything — module P6's arithmetic cannot consume an AUC at all."
+    },
+    {
+      "question": "The model is strong overall, and the feature will launch for mobile orders in three cities. What do you ask for?",
+      "options": [
+        "Whether the model will be retrained after launch",
+        "Whether mobile orders were excluded from the training data",
+        "The same metric computed on mobile orders in those three cities",
+        "Whether the three cities carry enough traffic for an A/B test"
+      ],
+      "answer": 2,
+      "explanation": "A model trained and evaluated on everything can be strong on average and weak exactly where you ship it. The number that matters is the number on the population that will actually meet the feature."
+    }
+  ],
+  "p12": [
+    {
+      "question": "What is the correct unit of randomisation for this experiment?",
+      "options": [
+        "The prediction, because it yields the largest sample",
+        "The customer, held for the whole duration of the test",
+        "The session, so that behaviour is measured freshly each visit",
+        "The city, to keep the two groups geographically clean"
+      ],
+      "answer": 1,
+      "explanation": "Randomising by session shows the same person the feature on Tuesday and not on Thursday; randomising per prediction means the groups are not groups. Both contaminate the comparison towards “no effect”, which is the worst kind of wrong because it looks like a clean negative."
+    },
+    {
+      "question": "Group B loses the experiment. What have you actually learned?",
+      "options": [
+        "That the model is not good enough and needs more training data",
+        "That the offline evaluation must have been wrong",
+        "That this bundle — model, threshold, copy and placement — is worse; which part is at fault is the next question, and it is usually not the model",
+        "That the feature should be abandoned"
+      ],
+      "answer": 2,
+      "explanation": "The A/B compares experiences, not models. Treating a lost experiment as a verdict on the model is how a placement problem or a badly worded banner gets mistaken for a dead end."
+    },
+    {
+      "question": "Slot changes are up 6%, revenue per visitor is down 2.1%, and both are outside their confidence intervals. Which do you believe?",
+      "options": [
+        "Revenue — the proxy only ever existed as a hypothesis about revenue, and the experiment has just refuted the hypothesis",
+        "The proxy — it is measured more precisely and sits closer to the feature",
+        "Neither: the test is inconclusive and has to be re-run",
+        "Whichever of the two has the narrower confidence interval"
+      ],
+      "answer": 0,
+      "explanation": "Clicks are not a small revenue. They were a claim that engagement with this feature would produce value, and the experiment tested that claim and rejected it. The proxy has no standing of its own once it stops predicting the thing that matters."
+    },
+    {
+      "question": "The deciding number was met and a guardrail was broken. What do you do?",
+      "options": [
+        "Ship — the primary metric is what everyone agreed would decide",
+        "Ship, and watch the guardrail closely after launch",
+        "Re-run the experiment with the guardrail set wider",
+        "Do not ship: the guardrail was written for exactly this case, a win that is hiding damage"
+      ],
+      "answer": 3,
+      "explanation": "The whole value of a guardrail is that it was agreed before anyone had a result to defend. A breach outranks a hit on the primary metric — otherwise the guardrail was decoration and the pre-registration was theatre."
+    },
+    {
+      "question": "Why fix the experiment's runtime in advance and then leave it alone?",
+      "options": [
+        "Because the analytics platform charges per day of test",
+        "Because stopping when a number happens to look good promotes noise to a launch, and the opening days are distorted by novelty anyway",
+        "Because the model degrades if the test runs too long",
+        "Because longer tests reliably produce larger effects"
+      ],
+      "answer": 1,
+      "explanation": "Peeking until something is significant guarantees that eventually something will be. And people react to anything new, so an effect measured in week one is partly a reaction to change rather than to value."
+    }
+  ],
+  "p13": [
+    {
+      "question": "What can shadow mode catch that offline evaluation structurally cannot?",
+      "options": [
+        "A model that has overfitted its training data",
+        "A threshold set too low for the review team's capacity",
+        "Leakage from a feature that only exists after the decision",
+        "The live pipeline computing a feature differently from the way training computed it"
+      ],
+      "answer": 3,
+      "explanation": "Offline evaluation uses the training pipeline's version of the inputs, so a mismatch between that and the live pipeline is invisible in every offline number. It is also the most common reason a model that scored well behaves oddly in production."
+    },
+    {
+      "question": "What is the actual requirement for rollback?",
+      "options": [
+        "A flag anyone on call can flip without an engineer, taking effect within a minute",
+        "A documented deploy procedure that completes in under an hour",
+        "A second model that can be swapped in as a replacement",
+        "The product manager's approval before the feature is switched off"
+      ],
+      "answer": 0,
+      "explanation": "If switching the feature off needs a build and a deploy, your worst hour lasts forty minutes. And an off switch nobody at 3 a.m. feels authorised to use is not an off switch, so who may flip it is written down too."
+    },
+    {
+      "question": "Which omission is cheap to fix today and impossible to fix in retrospect?",
+      "options": [
+        "The hardcoded threshold that should be configurable",
+        "The shadow run that was skipped",
+        "Logging each prediction together with its inputs and the model version",
+        "The missing alert on the prediction rate"
+      ],
+      "answer": 2,
+      "explanation": "Everything else on a launch checklist can be added later. Log lines cannot be back-filled: if the inputs and the version were never written down, the first serious complaint six weeks from now has no answer and never will."
+    },
+    {
+      "question": "Why does the support team have to be briefed before the launch rather than after it?",
+      "options": [
+        "Because support has to formally approve the feature",
+        "Because the people who will receive the complaints must know an automated decision exists before an angry customer tells them about it",
+        "Because support then explains the model's architecture to customers",
+        "Because the runbook requires a signature from every team"
+      ],
+      "answer": 1,
+      "explanation": "One page and thirty minutes prevents an entirely self-inflicted incident. What it needs to contain is what the feature does, what it looks like when it is wrong, how a customer appeals, and the exact sentence to say."
+    },
+    {
+      "question": "The experiment already ran three weeks on live traffic through the real serving pipeline. Does a shadow stage still add anything?",
+      "options": [
+        "No — that stage's question has already been answered, and naming which step answered it is part of the decision",
+        "Yes — every launch has to pass all three stages in order",
+        "Yes — shadow mode is the only way to measure accuracy in production",
+        "No — shadow mode stops being useful once an A/B test has been designed"
+      ],
+      "answer": 0,
+      "explanation": "Demanding the stage here is ceremony. But the reason has to be said out loud, or somebody concludes the stage is optional in general — and the next model that goes live without an experiment genuinely needs it."
+    }
+  ],
+  "p14": [
+    {
+      "question": "Why can production monitoring not be built on accuracy?",
+      "options": [
+        "Because accuracy is not a business metric",
+        "Because accuracy requires a labelled test set and production has none",
+        "Because the outcome arrives days or months later, so accuracy is blind during exactly the window when something is going wrong",
+        "Because accuracy is too noisy to read at daily granularity"
+      ],
+      "answer": 2,
+      "explanation": "Two days for a delivery, forty-five for a chargeback, ninety for churn. Accuracy is the truest signal and always the latest one, which makes it good for confirming a diagnosis and useless as an alarm."
+    },
+    {
+      "question": "Which number is the fastest warning that the world has moved?",
+      "options": [
+        "The weekly business metric",
+        "Service error rate and latency",
+        "Accuracy computed on matured labels",
+        "The share of cases the model acts on, daily — if it moves with no release, the world moved"
+      ],
+      "answer": 3,
+      "explanation": "It is visible the same minute, costs nothing to compute, and needs no labels. In the situation this module opens with, it was the missing line: a third of orders quietly losing the feature moved it by a third, in week six."
+    },
+    {
+      "question": "A courier identifier that never appeared in the training data arrives in production. What should the system do?",
+      "options": [
+        "Predict using the average, which is the safest available estimate",
+        "Produce no prediction — the silent band — and raise the input-health number",
+        "Retrain automatically as soon as the new value is seen",
+        "Reject the order until somebody maps the new value"
+      ],
+      "answer": 1,
+      "explanation": "A model that answers confidently with the average looks healthy on every dashboard while doing nothing, which is how eleven weeks pass unnoticed. A feature that fails visibly is worth far more than one that fails quietly."
+    },
+    {
+      "question": "What is wrong with retraining weekly as a default?",
+      "options": [
+        "Every retrain produces a new model that can be worse and needs the same gate — automated retraining without a gate can ship a regression every Monday",
+        "Weekly retraining is too expensive for most teams to afford",
+        "Frequent retraining makes the model forget older patterns",
+        "Nothing: more frequent retraining is always safer"
+      ],
+      "answer": 0,
+      "explanation": "Cadence should follow the drift you actually measured, not diligence. And the gate stays: a newer model that does not beat the one in production is not promoted for being newer."
+    },
+    {
+      "question": "When is switching the feature off the right product decision?",
+      "options": [
+        "Never — a launched feature should be improved rather than removed",
+        "When the team that built it moves on to another project",
+        "When a competitor launches something similar",
+        "When the increment no longer covers the monthly cost of owning the model, or the decision it fed no longer exists"
+      ],
+      "answer": 3,
+      "explanation": "The cost of owning a model is monthly and permanent while the value can fade. Removing a feature whose increment has stopped paying for its machinery is the same arithmetic as module P10's gate, applied a year later."
+    }
   ]
 }

@@ -142,7 +142,7 @@
       "утечка",
       "ревью"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p12",
@@ -155,7 +155,7 @@
       "guardrail",
       "решения"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p13",
@@ -168,7 +168,7 @@
       "канарейка",
       "runbook"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p14",
@@ -181,7 +181,7 @@
       "дрейф",
       "переобучение"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p15",

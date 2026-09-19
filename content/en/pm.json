@@ -142,7 +142,7 @@
       "leakage",
       "review"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p12",
@@ -155,7 +155,7 @@
       "guardrails",
       "decisions"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p13",
@@ -168,7 +168,7 @@
       "canary",
       "runbook"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p14",
@@ -181,7 +181,7 @@
       "drift",
       "retraining"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p15",
