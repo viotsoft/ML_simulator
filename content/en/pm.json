@@ -3,7 +3,7 @@
     "id": "p01",
     "order": 1,
     "title": "First week on an ML team",
-    "subtitle": "What a model can and cannot promise: a probability instead of a guarantee, and why a normal spec does not fit",
+    "subtitle": "Prediction, decision, action and the cost of an error: why “94.7% accuracy” promises the business nothing",
     "level": "PM Foundations",
     "tags": [
       "ML literacy",

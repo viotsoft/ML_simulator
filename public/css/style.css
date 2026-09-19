@@ -291,6 +291,9 @@ a:hover { text-decoration: underline; }
 }
 .quiz-opt:hover { border-color: var(--accent); }
 .quiz-opt input { margin-top: 3px; accent-color: var(--accent-strong); }
+/* инертные строки выбора в контенте урока: выглядят как варианты квиза, но не кликаются */
+.quiz-opt.static { cursor: default; }
+.quiz-opt.static:not(.correct):not(.wrong):hover { border-color: var(--border); }
 .quiz-opt.correct { border-color: var(--green); background: rgb(var(--green-rgb) / .08); }
 .quiz-opt.wrong { border-color: var(--red); background: rgb(var(--red-rgb) / .08); }
 .quiz-explanation {

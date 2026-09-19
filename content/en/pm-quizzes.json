@@ -1,59 +1,92 @@
 {
   "p01": [
     {
-      "question": "A slide reads “94.7% accuracy, ready for launch”. What is the most useful question to ask?",
+      "question": "A fraud model returned a score of 0.83. What does that mean for a product manager?",
       "options": [
-        "Which algorithm produced that number, and can we try a stronger one",
-        "What decision does this prediction drive, and what does each kind of mistake cost us",
-        "How long did training take and how much did the compute cost",
-        "Can the team get it above 97% before we commit to a date"
-      ],
-      "answer": 1,
-      "explanation": "Accuracy alone says nothing about the product. The decision and the cost of each error direction are what determine the threshold, the metric to optimise and whether the feature is worth shipping — and they are the product manager's to supply, not the team's."
-    },
-    {
-      "question": "Why is “the model must not make mistakes” an acceptance criterion no team can satisfy?",
-      "options": [
-        "Because models are new technology and will improve later",
-        "Because the training data always contains errors",
-        "Because a working model is wrong on a known share of cases by design, so the criterion has to name how often and in which direction",
-        "Because mistakes can only be counted after a full year of operation"
+        "The payment has to be blocked.",
+        "The default threshold should be 0.5.",
+        "The model rated the risk, and the product still has to choose a rule and an action.",
+        "The transaction is fraudulent with 83% certainty."
       ],
       "answer": 2,
-      "explanation": "Being wrong is not a defect to be removed; it is a property of a probabilistic system. A criterion that forbids it can never be met, so the team will quietly reinterpret it instead of telling you — which is worse than an honest error budget."
+      "explanation": "A score is an estimate of risk from the transaction's features. Which threshold to use, what happens above it and what that costs are all product decisions — and they were exactly what the slide did not contain."
     },
     {
-      "question": "Fraud is 0.8% of transactions. A model answers “not fraud” every single time. What does accuracy report?",
+      "question": "Fraud is 0.8% of all transactions. A model always answers “not fraud”. What accuracy does it get?",
       "options": [
-        "99.2%, and it catches nothing — accuracy hides how rare the event is",
-        "0.8%, because it misses every fraud case",
-        "50%, because there are two possible answers",
-        "It cannot be computed without a threshold"
+        "99.2%",
+        "0.8%",
+        "50%",
+        "Accuracy cannot be computed."
       ],
       "answer": 0,
-      "explanation": "With a rare event the majority answer scores brilliantly while being useless. This is the single most common way an impressive number survives a review it should not have survived."
+      "explanation": "It is right about all 9,920 honest transactions and misses all 80 fraudulent ones. This is why accuracy without the base rate, and without the other metrics, can be dangerously convincing."
     },
     {
-      "question": "A model outputs 0.83 that a transaction is fraud. Who decides whether 0.83 blocks the payment?",
+      "question": "A recommendation model improved NDCG@10 by 12%. What can you claim?",
       "options": [
-        "The model — the threshold is part of its training",
-        "The ML engineer, since it is a technical parameter",
-        "Nobody: 0.5 is the industry standard and is used as is",
-        "The product manager, because moving it trades one cost against another"
+        "Revenue will rise by roughly 12%.",
+        "The model is ready to roll out to 100% of users.",
+        "Customers will buy more.",
+        "The model looks like a promising candidate for an online experiment."
       ],
       "answer": 3,
-      "explanation": "The threshold decides how many honest customers you block in order to catch how much fraud. That is a business trade with money on both sides, not a technical default — and 0.5 is a default nobody chose."
+      "explanation": "An offline metric answers one question: is this worth taking into an experiment? Whether it creates business value is a different question, and only a live test answers it."
     },
     {
-      "question": "The team reports a strong offline metric. What does that entitle you to say?",
+      "question": "The model recommends an item with a high score, but the item is out of stock. What is the better fix?",
       "options": [
-        "That the feature is ready for release",
-        "That the candidate is worth an experiment on live traffic",
-        "That the business metric will improve by a similar margin",
-        "That the model will hold its quality for at least a year"
+        "Retrain the model until it stops surfacing the item by itself.",
+        "Add a hard business rule that filters out items with no stock.",
+        "Lower the learning rate.",
+        "Raise the threshold."
       ],
       "answer": 1,
-      "explanation": "Offline numbers filter candidates; only an experiment on real traffic tells you what the feature does to the business. Treating the filter as the verdict is how features ship that look good and change nothing."
+      "explanation": "Prediction belongs to ML, hard constraints belong to rules. Turning a constraint into a training problem is more expensive, less reliable, and can never guarantee the item stays hidden."
+    },
+    {
+      "question": "What is the best baseline for a new recommendation model?",
+      "options": [
+        "A random ordering of products.",
+        "A competitor's newest model.",
+        "The recommendation mechanism running today, which the new system is meant to replace.",
+        "Any model with lower accuracy."
+      ],
+      "answer": 2,
+      "explanation": "The model competes against what is already running, not against perfection or against somebody else's product. Without that comparison there is no way to tell whether the new model is worth what it costs."
+    },
+    {
+      "question": "An ETA model systematically promises delivery faster than it actually happens. Why should a product manager care about the direction of the error specifically?",
+      "options": [
+        "Because different directions of error can cost the business different amounts.",
+        "Because every model is required to be unbiased.",
+        "Because RMSE cannot be applied to a time forecast.",
+        "Because a regression model should return a probability."
+      ],
+      "answer": 0,
+      "explanation": "An optimistic promise costs a disappointed customer, a support contact and cancellations. A conservative one costs an order that never happened. Which is worse is a product answer, and it shapes the loss function and the decision rule."
+    },
+    {
+      "question": "Which best describes the product manager's responsibility on an ML feature?",
+      "options": [
+        "Choosing the algorithm personally.",
+        "Deciding the model's architecture.",
+        "Setting the threshold without involving the ML team.",
+        "Establishing, together with ML and the business, an explicit link between the prediction, the decision, the errors, the baseline and the business outcome."
+      ],
+      "answer": 3,
+      "explanation": "The mechanisms belong to the team. The chain from prediction to consequence, and the price of each error in it, is what nobody else in the room will supply."
+    },
+    {
+      "question": "Which question is most useful at a first meeting about a new ML feature?",
+      "options": [
+        "Did you use a neural network?",
+        "What decision is made from the prediction, what happens when it is wrong, and what are we comparing the result against?",
+        "Can accuracy go up another 2%?",
+        "How many GPUs went into training?"
+      ],
+      "answer": 1,
+      "explanation": "It moves the conversation from the model to the product, prices the errors while the feature can still be changed, and tells the team what to optimise — because which errors are more expensive is exactly the information optimisation needs."
     }
   ],
   "p02": [
