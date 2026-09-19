@@ -90,7 +90,7 @@
       "baseline",
       "kill criteria"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p08",
@@ -103,7 +103,7 @@
       "requirements",
       "fallback"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p09",
@@ -116,7 +116,7 @@
       "uncertainty",
       "human-in-the-loop"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p10",
@@ -129,7 +129,7 @@
       "lift",
       "gating"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p11",

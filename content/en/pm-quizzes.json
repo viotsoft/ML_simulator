@@ -340,5 +340,233 @@
       "answer": 1,
       "explanation": "An invented figure looks like analysis and can be renegotiated by anyone with a spreadsheet. A stated limit cannot: it says this is a constraint, not a variable. Module P18 works through how to document that."
     }
+  ],
+  "p07": [
+    {
+      "question": "Why does estimating an ML feature differ from estimating an ordinary one?",
+      "options": [
+        "Because ML teams work less predictably than other engineers",
+        "Because the central question — whether the data holds enough signal to change a decision — cannot be answered without doing part of the work",
+        "Because the time a model takes to train is impossible to measure",
+        "Because ML projects always overrun their plan"
+      ],
+      "answer": 1,
+      "explanation": "On a normal feature the work is known and the risk is in execution. Here the answer does not exist yet, and nobody is withholding it. An estimate that ignores that is not an estimate — it is a promise somebody will be held to in November."
+    },
+    {
+      "question": "Of the four stages of a typical ML project, which one is genuinely unbounded?",
+      "options": [
+        "The data audit",
+        "Shipping the rule as a baseline",
+        "Productionisation — serving, monitoring, the fallback",
+        "The modelling"
+      ],
+      "answer": 3,
+      "explanation": "The audit, the baseline and the productionisation estimate like ordinary engineering. Only the search for signal can eat a quarter, which is why it is the one stage that gets a cap instead of a date."
+    },
+    {
+      "question": "What does a time-boxed spike deliver?",
+      "options": [
+        "A decision by a fixed date, for a fixed budget",
+        "A trained model ready for production",
+        "An accuracy figure the team commits to",
+        "A complete PRD for the feature"
+      ],
+      "answer": 0,
+      "explanation": "That is what makes a spike fundable: the CTO is not buying a model, he is buying an answer by a date, and he knows the price of the answer before it starts."
+    },
+    {
+      "question": "Why must the stopping criterion be written before the work begins?",
+      "options": [
+        "Because the team needs a target to optimise against",
+        "Because the budget has to be approved in advance",
+        "Because afterwards it stops being a criterion and becomes a negotiation — and the negotiation ends in two more weeks, every two weeks",
+        "Because it cannot be computed once a model exists"
+      ],
+      "answer": 2,
+      "explanation": "Written early, it is a rule agreed by people with no attachment to the outcome. Written late, everyone in the room has three weeks invested in the answer, and the number moves to fit the work already done."
+    },
+    {
+      "question": "Which kind of date can you always commit to the business?",
+      "options": [
+        "The date the model reaches the target accuracy",
+        "The date the model goes to production",
+        "The date the project ends, with a buffer added for safety",
+        "The date on which you will know whether it works"
+      ],
+      "answer": 3,
+      "explanation": "A decision date does not depend on the result, so it is always safe to promise. Delivery dates are safe only for the parts that do not depend on the search — the rule, the interface, the instrumentation."
+    }
+  ],
+  "p08": [
+    {
+      "question": "Why should the PRD not name the model family and the feature list?",
+      "options": [
+        "Because the team will ignore that section anyway",
+        "Because it makes the document too long for executives",
+        "Because it locks the team out of anything better they find later, and leaves you defending a choice you have no way to defend",
+        "Because that information is commercially confidential"
+      ],
+      "answer": 2,
+      "explanation": "The cost is paid twice: an amendment is needed before the team can adopt a better approach, and at the launch review the architecture is yours to justify. Neither is a trade a product manager should want."
+    },
+    {
+      "question": "Which section does an ordinary PRD not have, while an ML PRD must?",
+      "options": [
+        "A list of user stories",
+        "What the product does when the model is unsure, wrong, or unavailable",
+        "A competitive analysis",
+        "A target release date"
+      ],
+      "answer": 1,
+      "explanation": "A model unsure about one case in six needs a defined behaviour for those cases, and every ML feature has a no-model mode whether or not anyone designed it. Leaving both out does not avoid the decision, it just makes it by default."
+    },
+    {
+      "question": "What is wrong with “at least 90% accuracy” as an acceptance criterion?",
+      "options": [
+        "90% is too low a bar for a production feature",
+        "Accuracy cannot be measured before launch",
+        "It should be stated as precision and recall instead",
+        "It cannot be checked against anything a user sees, and a model that always predicts the common case can reach it while the feature does nothing"
+      ],
+      "answer": 3,
+      "explanation": "Acceptance criteria have to be testable by someone who knows no machine learning. “No blocking error on timeout” and “every rejection is appealable in one click” qualify; a number that rises when the feature stays silent does not."
+    },
+    {
+      "question": "Every ML feature has a mode in which no model is available. What decides what that mode looks like?",
+      "options": [
+        "Whether you designed it — undesigned, it is an error page",
+        "The uptime guarantee of the serving infrastructure",
+        "How well the model's confidence is calibrated",
+        "Whether the model was trained on enough data"
+      ],
+      "answer": 0,
+      "explanation": "Timeouts, rollbacks and outages are certainties, not risks. The only question is whether the product has a defined behaviour for them, and that behaviour is a product decision that belongs in your half of the document."
+    },
+    {
+      "question": "The data exists only for mobile orders. Where does that belong in the PRD?",
+      "options": [
+        "In the risks section, as something that might become a problem",
+        "Nowhere — it is an implementation detail for the team",
+        "In scope, as a stated coverage limit: mobile is in, web keeps the current behaviour",
+        "In the metrics section, as a caveat attached to the numbers"
+      ],
+      "answer": 2,
+      "explanation": "Written as scope, it is a decision with a stated reason and a clear path to extending it. Left out, it becomes a broken promise discovered at launch by whoever expected the feature to cover their channel."
+    }
+  ],
+  "p09": [
+    {
+      "question": "A model returns a confidence value with every prediction. A feature that ignores that value —",
+      "options": [
+        "treats a 0.51 exactly like a 0.99",
+        "is simpler, and therefore usually the better product decision",
+        "will be more accurate, because it acts on every case",
+        "cannot be A/B tested"
+      ],
+      "answer": 0,
+      "explanation": "The confidence is the model's own admission of doubt, and it is the most valuable thing it produces beyond the answer itself. Throwing it away means the least reliable predictions reach the user dressed exactly like the most reliable ones."
+    },
+    {
+      "question": "In the three-band design, which behaviour do product managers most often leave out?",
+      "options": [
+        "Acting automatically on high confidence",
+        "Logging the prediction for later analysis",
+        "Routing the middle band to a human reviewer",
+        "Showing nothing at all"
+      ],
+      "answer": 3,
+      "explanation": "Silence feels like a non-feature, so it gets dropped — and it is the band that saves you. Showing nothing returns the user to the experience that was acceptable last quarter, at the cases where the model is least worth trusting."
+    },
+    {
+      "question": "Which wording is right for a delay advisory?",
+      "options": [
+        "“Your order will be late.”",
+        "“Orders like this arrive late about 1 time in 4.”",
+        "“Our model predicts a delay with 78% confidence.”",
+        "“Warning: a delivery problem has been detected.”"
+      ],
+      "answer": 1,
+      "explanation": "Describe the population, not the individual: a rate stays true when this particular order arrives on time. The confidence score is worse than it looks — it exposes an internal number the customer cannot act on, and still makes a claim about their order."
+    },
+    {
+      "question": "What does a human reviewer need in order to be more than a rubber stamp?",
+      "options": [
+        "The model's confidence score on every item",
+        "A monthly report on how often they agreed with the model",
+        "The evidence behind the flag, and a one-click way to disagree",
+        "Training in how the model works internally"
+      ],
+      "answer": 2,
+      "explanation": "Given only a score, a reviewer has nothing to reason with and starts approving, which buys you an expensive random number generator. And if disagreeing is expensive, the queue quietly converges on whatever the model said."
+    },
+    {
+      "question": "What rule follows from “a wrong prediction should cost the user a click, not a sale”?",
+      "options": [
+        "No silent irreversible actions: either a human goes in front of it, or the reversal takes one click",
+        "The model must be retrained whenever a user complains",
+        "Automation is acceptable only for decisions with no user impact",
+        "The confidence threshold should be set as high as possible"
+      ],
+      "answer": 0,
+      "explanation": "You will be wrong at a known rate, so the design question is what being wrong costs the person affected. An automated decision they cannot undo is not acceptable at any accuracy — and telling them a decision was made, and how to contest it, is often a legal duty as well."
+    }
+  ],
+  "p10": [
+    {
+      "question": "The team reports macro-F1 0.91. What makes that number meaningful?",
+      "options": [
+        "Comparing it against accuracy figures published for similar tasks",
+        "Confirming it was computed on a properly held-out month",
+        "Asking whether it will hold up after the next retraining",
+        "Putting the other baselines next to it: do nothing, the shipped rule, a human"
+      ],
+      "answer": 3,
+      "explanation": "Alone it is a number with no units. With the other bars the meeting changes question, from “is 0.91 good” to “are 7 points over the rule worth what the model costs to run” — which is answerable."
+    },
+    {
+      "question": "Why is the already-shipped rule the most honest competitor for a model?",
+      "options": [
+        "Because stakeholders find it easier to understand",
+        "Because rules are more robust to data drift",
+        "Because it already exists, costs nothing extra to run, and already delivers part of the value",
+        "Because it was built by the same team"
+      ],
+      "answer": 2,
+      "explanation": "The model is not competing against perfection but against what is running today. Anything the rule already achieves is not a benefit of the model, which is why the increment — not the absolute score — is what is on trial."
+    },
+    {
+      "question": "The model clears the spike's criterion by a comfortable margin. What follows?",
+      "options": [
+        "It is a candidate; the decision still depends on what the increment is worth against what it costs to run",
+        "It should be productionised — the criterion was agreed in advance and met",
+        "The criterion was set too low and should be raised before deciding",
+        "The project can be declared a success and closed"
+      ],
+      "answer": 0,
+      "explanation": "Clearing the criterion is the necessary condition. The sufficient one is money, including the cost of owning the model — and a model can beat its offline target, hit the PRD's business number, and still lose money every month."
+    },
+    {
+      "question": "What is usually missing from “the model costs $1,900 a month in inference”?",
+      "options": [
+        "The cost of the original training runs",
+        "Retraining, monitoring, on-call and the engineer-days for a new failure mode — together usually larger than inference",
+        "The product manager's own time",
+        "The discount available for committing to annual capacity"
+      ],
+      "answer": 1,
+      "explanation": "Inference is the visible line on a cloud bill, so it is the one that gets quoted. The bill that decides the gate is the all-in cost of owning a model that must keep working, which module P15 prices properly."
+    },
+    {
+      "question": "The spike ends with “we ship the rule and close the project”. How should that be written up?",
+      "options": [
+        "As a failure, honestly, so that the organisation learns from it",
+        "Briefly and without numbers, so as not to draw attention to it",
+        "As a success, leaving out the model's numbers so nobody blames the team",
+        "As a success, with all four baselines shown and the specific number that would reopen the case"
+      ],
+      "answer": 3,
+      "explanation": "The spike bought certainty in three weeks and freed a quarter, which is a win — but only if the memo says so. A team that learns an honest negative gets punished will bring you positive results for ever, and you will not be able to tell which are real."
+    }
   ]
 }
