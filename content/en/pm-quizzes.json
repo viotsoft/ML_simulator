@@ -112,5 +112,233 @@
       "answer": 2,
       "explanation": "A comparison gives the requester something now; a named trigger shows the decision is reversible on evidence rather than on rank; taking the watch yourself means they do not have to keep pushing. Capacity is true but sounds like a queue."
     }
+  ],
+  "p03": [
+    {
+      "question": "A stakeholder asks for “a model that makes our search smarter”. What has to be filled in before this can enter a roadmap?",
+      "options": [
+        "A budget and a target launch date",
+        "A decision on which model architecture to use",
+        "The four slots: what the prediction is about, at what moment it is made, which decision it changes, and who acts on it",
+        "A benchmark taken from a competitor's search"
+      ],
+      "answer": 2,
+      "explanation": "“Smarter” is a wish, not a specification. Until the object, the moment, the decision and the actor are named, there is nothing for a team to build and nothing for you to measure — and no way to tell whether the result was worth the quarter."
+    },
+    {
+      "question": "Which of these is stated as a decision rather than a wish?",
+      "options": [
+        "When the results page renders, we re-rank the top 50 candidates, and the customer sees a different order",
+        "Search should understand what the customer means",
+        "Search relevance should improve quarter over quarter",
+        "We should use embeddings to represent queries"
+      ],
+      "answer": 0,
+      "explanation": "A decision says what changes, for whom, and at what moment. The second and third options describe a desirable state with no action attached; the fourth is an implementation choice, which is the team's to make, not the brief's."
+    },
+    {
+      "question": "A team ships a model whose output appears only on an internal dashboard that nobody has the authority to act on. What has gone wrong?",
+      "options": [
+        "The model is not accurate enough to be trusted",
+        "The dashboard needs better visual design",
+        "The predictions should have been written to a database instead",
+        "No decision was attached to the prediction, so the model changes nothing however good it is"
+      ],
+      "answer": 3,
+      "explanation": "This is the dashboard failure mode. A prediction with no decision behind it produces a number somebody looks at, not an outcome. Accuracy is irrelevant here: at 99% it would still change nothing."
+    },
+    {
+      "question": "Why does “at what moment” matter as much as “what do we predict”?",
+      "options": [
+        "Because the model has to be retrained on that schedule",
+        "Because the moment fixes which data exists yet and how much latency the prediction is allowed",
+        "Because it determines which team owns the feature",
+        "Because predictions made at the wrong time of day are less accurate"
+      ],
+      "answer": 1,
+      "explanation": "The moment is a hard constraint on both sides. It decides which features are legitimately available (module P4's point-in-time trap) and what the latency budget is — a prediction that needs 400 ms cannot sit in a path that has 50."
+    },
+    {
+      "question": "Three framings of “make search smarter” are on the table and one of them can be shipped as a rule. Why start there?",
+      "options": [
+        "It delivers the decision and the interface change immediately, and it becomes the baseline the model has to beat",
+        "Because rules are always more accurate than models on search problems",
+        "Because the ML team is busy with other work this quarter",
+        "Because rules need no data"
+      ],
+      "answer": 0,
+      "explanation": "Shipping the rule first tests the part most likely to be wrong — that anyone acts differently because of the prediction — at a fraction of the cost. It also produces the number the model will be judged against, which is the subject of module P10."
+    }
+  ],
+  "p04": [
+    {
+      "question": "A feature is about to enter the roadmap. Which unanswered data question most often kills it later?",
+      "options": [
+        "Whether the data is stored in the same format across systems",
+        "Whether the label — the thing you want to predict — is recorded anywhere at all",
+        "Whether the warehouse has enough disk space",
+        "Whether the data is refreshed daily or hourly"
+      ],
+      "answer": 1,
+      "explanation": "Features are usually plentiful and labels are not. A project with inputs but no recorded outcome has no way to learn, and discovering that after the commitment turns a quarter into a data-collection project nobody scheduled."
+    },
+    {
+      "question": "At checkout you want to predict whether a delivery will be late. Which of these fields may NOT be used as a feature?",
+      "options": [
+        "The customer's city, taken from the order",
+        "The courier's average delay over the previous month",
+        "The number of items in the basket",
+        "The warehouse dispatch time, which is recorded two hours after the order is placed"
+      ],
+      "answer": 3,
+      "explanation": "The dispatch time does not exist at checkout, so the live model would never have it. Training on it produces an excellent offline score and a useless production model — the point-in-time trap, and the most common cause of a result that does not survive launch."
+    },
+    {
+      "question": "What does “the label may come from the future, but the features may not” mean in practice?",
+      "options": [
+        "You learn the answer after the fact, which is fine; but every input must have existed at the moment the prediction is made",
+        "Labels should be collected before any features are engineered",
+        "Historical data is unusable for training and only live data counts",
+        "Features have to be recomputed every time a new label arrives"
+      ],
+      "answer": 0,
+      "explanation": "That asymmetry is the whole rule. The outcome is by definition known later — that is what makes it a label. The inputs are bound to the moment of the decision, and any that are not leak information the model will not have in production."
+    },
+    {
+      "question": "Which label source is usually the cheapest and the most trustworthy, when it exists?",
+      "options": [
+        "Manual annotation by a contracted team",
+        "A label inferred by another model",
+        "An outcome the product already records as a side effect of normal operation",
+        "A survey sent to customers after the fact"
+      ],
+      "answer": 2,
+      "explanation": "A refund, a cancellation, a click, a chargeback — the product writes these down anyway, at full volume and without anyone's opinion in the middle. Annotation costs money per item and carries the annotator's judgement; a model-inferred label teaches the new model the old model's mistakes."
+    },
+    {
+      "question": "The data exists for 30% of orders — the ones placed through the mobile app. What follows?",
+      "options": [
+        "The project is impossible and should be cancelled",
+        "You can safely extrapolate the model to the other 70%",
+        "Coverage does not matter as long as the sample is large enough",
+        "The feature can launch for mobile orders only, and that limit belongs in the brief rather than in a post-launch surprise"
+      ],
+      "answer": 3,
+      "explanation": "Partial coverage is a scope statement, not a blocker. What makes it dangerous is discovering it after the promise: the model has simply never seen the other channel, so its numbers there are unknown rather than merely worse."
+    }
+  ],
+  "p05": [
+    {
+      "question": "What is the three-metric chain?",
+      "options": [
+        "A business metric, an online proxy you can move within a test, and an offline metric the team optimises — each linked to the one above it",
+        "Accuracy, precision and recall, always reported together",
+        "A daily, a weekly and a monthly dashboard",
+        "One metric per team: product, engineering and finance"
+      ],
+      "answer": 0,
+      "explanation": "The chain exists because the metric that matters moves too slowly to steer by and the metric the team can optimise means nothing to the business. The proxy in the middle is what connects a model improvement to a result somebody cares about."
+    },
+    {
+      "question": "Why is accuracy a poor KPI for a product review?",
+      "options": [
+        "Because it is hard to compute reliably",
+        "Because executives do not understand percentages",
+        "Because nobody outside the team can act on it, and it can rise while the business metric falls",
+        "Because it changes every time the model is retrained"
+      ],
+      "answer": 2,
+      "explanation": "Accuracy is an internal instrument, useful to the team tuning the model. As a KPI it hides which error got better, and a model can gain a point of accuracy by becoming more cautious in exactly the cases that made money."
+    },
+    {
+      "question": "Treating the chain as “a testable claim” means what?",
+      "options": [
+        "The chain is validated by asking more stakeholders whether they agree",
+        "You are asserting that moving the offline metric moves the proxy, and the proxy moves the business metric — and an experiment can prove you wrong",
+        "Each metric has to be tested by a separate team",
+        "The chain should be rewritten every quarter regardless of results"
+      ],
+      "answer": 1,
+      "explanation": "Written down as a claim, the chain becomes falsifiable: if the offline metric improves and the proxy does not, the link is wrong and you have learned something real. Written down as a list of metrics, it just decorates the document."
+    },
+    {
+      "question": "Why name one deciding number before the experiment runs?",
+      "options": [
+        "Because finance requires a single figure for forecasting",
+        "Because more than one metric cannot be measured in the same test",
+        "Because a model can only be optimised against a single objective",
+        "Because deciding afterwards lets you pick whichever metric happened to move, which is how a failed test becomes a launch"
+      ],
+      "answer": 3,
+      "explanation": "Naming it in advance is what makes the result binding. With five metrics and no commitment, something will always be up, and the review turns into a search for the friendliest chart rather than a decision."
+    },
+    {
+      "question": "What is a guardrail metric for?",
+      "options": [
+        "To replace the primary metric if that one does not move",
+        "To give every stakeholder a metric they own",
+        "To catch the damage a win might be hiding — it does not need to improve, it must not get worse",
+        "To measure the model's technical performance in production"
+      ],
+      "answer": 2,
+      "explanation": "Guardrails exist because a feature can win on its own metric and lose overall: clicks up, revenue flat, complaints up. They are set as limits, not targets, and one of them breaking is a reason not to ship even when the primary number is good."
+    }
+  ],
+  "p06": [
+    {
+      "question": "Risk wants an aggressive fraud threshold, Support wants a conservative one. What settles the argument?",
+      "options": [
+        "Whichever side escalates to the CTO first",
+        "Splitting the difference between the two proposals",
+        "A more accurate model, which removes the trade-off",
+        "A number on each of the two errors, so the trade can be calculated instead of argued"
+      ],
+      "answer": 3,
+      "explanation": "Both sides are describing a real cost, so neither can win on conviction. A better model shifts the whole curve but never removes the choice: at any accuracy, some threshold still has to be picked, and that is a product decision made of two prices."
+    },
+    {
+      "question": "What does moving the threshold actually do?",
+      "options": [
+        "It makes the model more accurate at the cost of latency",
+        "It trades misses for false alarms — it cannot reduce both",
+        "It changes how often the model is retrained",
+        "It removes the need to price the errors"
+      ],
+      "answer": 1,
+      "explanation": "The threshold does not touch the model's quality. It slides along a fixed trade-off, choosing which of the two mistakes you would rather make and how often — which is why it belongs to whoever owns the consequences, not to whoever trained the model."
+    },
+    {
+      "question": "A threshold produces 900 alerts a day and the review team can handle 500. What is the effect?",
+      "options": [
+        "The model catches 80% more fraud than it would at 500 alerts",
+        "The extra alerts are processed more slowly but remain useful",
+        "A backlog forms and the oldest alerts age past usefulness, so the extra 400 catch almost nothing",
+        "The review team's accuracy improves with volume"
+      ],
+      "answer": 2,
+      "explanation": "Detection only counts once somebody acts on it. Past the team's capacity the queue grows without limit and alerts are reviewed after the money has moved, so the threshold is set by the cost ratio and the capacity to act together."
+    },
+    {
+      "question": "How precise do the two error costs need to be?",
+      "options": [
+        "An order of magnitude is usually enough — what matters is which way the asymmetry runs and roughly by how much",
+        "Accurate to the cent, or the threshold will be wrong",
+        "They need no numbers at all; a qualitative ranking is sufficient",
+        "They must be recalculated for every individual transaction"
+      ],
+      "answer": 0,
+      "explanation": "When one error costs forty times the other, the second decimal place changes nothing and the ratio changes everything. A rough, written-down estimate also has a property that a qualitative ranking lacks: somebody can disagree with it and bring a better number."
+    },
+    {
+      "question": "An error carries a serious safety or reputational consequence that cannot honestly be priced. What do you do?",
+      "options": [
+        "Estimate a figure large enough to dominate the arithmetic",
+        "State that this error is not being traded against money, set a floor you will not ship above, and record it as a policy decision",
+        "Leave the threshold to the ML team, since it is no longer a product question",
+        "Drop the feature, because the trade-off cannot be computed"
+      ],
+      "answer": 1,
+      "explanation": "An invented figure looks like analysis and can be renegotiated by anyone with a spreadsheet. A stated limit cannot: it says this is a constraint, not a variable. Module P18 works through how to document that."
+    }
   ]
 }

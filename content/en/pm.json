@@ -38,7 +38,7 @@
       "decision design",
       "discovery"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p04",
@@ -51,7 +51,7 @@
       "labelling",
       "ownership"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p05",
@@ -64,7 +64,7 @@
       "KPI",
       "proxy metrics"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p06",
@@ -77,7 +77,7 @@
       "threshold",
       "tradeoffs"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p07",
