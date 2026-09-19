@@ -1024,5 +1024,290 @@
       "answer": 0,
       "explanation": "An appeals-only remedy reproduces the original unfairness, because the people least able to navigate the process were disproportionately harmed in the first place. Restoring proactively is both the right outcome and the cheaper one to explain."
     }
+  ],
+  "p19": [
+    {
+      "question": "What are the two sections of an honest ML roadmap?",
+      "options": [
+        "Confident and stretch",
+        "Must-have and nice-to-have",
+        "Committed work with dates, and bets funded to a decision",
+        "Model work and platform work"
+      ],
+      "answer": 2,
+      "explanation": "The labels matter. “Stretch” invites everyone to read it as a soft promise; “funded to a decision” states exactly what has been bought — an answer by a date, not an outcome."
+    },
+    {
+      "question": "What does funding an uncertain bet in tranches actually buy you?",
+      "options": [
+        "It turns “we might waste two quarters” into “we might waste two weeks, several times over”",
+        "It reduces the total cost of the project",
+        "It lets the team work on several bets at the same time",
+        "It removes the need for a stopping criterion"
+      ],
+      "answer": 0,
+      "explanation": "The mechanism is that the next tranche is not approved in advance. The total cost of a successful bet is unchanged; what changes is the cost of the ones that were never going to work."
+    },
+    {
+      "question": "Why write down the probability you are assuming for each bet?",
+      "options": [
+        "Because the board requires a formal risk register",
+        "It makes the portfolio comparable, and over a year of bets it measures your own calibration",
+        "Because it protects you if the bet fails",
+        "Because the model's confidence should match the plan"
+      ],
+      "answer": 1,
+      "explanation": "You cannot see that $6M at 30% deserves a cheaper first step than $900K at 50% without the numbers. And a product manager whose 70%s come true roughly 70% of the time is worth far more than one who is always confident."
+    },
+    {
+      "question": "A bet is worth $6M a year, you put it at 30%, and full funding is two quarters for four people. What do you fund?",
+      "options": [
+        "Two quarters: it has the highest expected value on the page",
+        "Nothing: 30% is too low to justify the work",
+        "One quarter, as a compromise between the value and the odds",
+        "Two weeks, to answer the single question the odds depend on — and nothing beyond that"
+      ],
+      "answer": 3,
+      "explanation": "The highest expected value often belongs to the least likely bet, and that is an argument for a cheap first tranche rather than a big commitment. Two weeks answers whether the data can be joined; after that the bet is re-priced with evidence."
+    },
+    {
+      "question": "You cannot promise an outcome. What does leadership actually need instead?",
+      "options": [
+        "A padded date you are confident of hitting",
+        "The best case, so that the budget is approved",
+        "A calendar of when you will know, and what each date produces",
+        "A range running from best case to worst case"
+      ],
+      "answer": 2,
+      "explanation": "A board can plan a conversation, a hire and a budget around a date of knowing. It can plan nothing around an accuracy target — and a decision date is a commitment you can actually keep."
+    }
+  ],
+  "p20": [
+    {
+      "question": "The defence contains a block on the money. What form does that block have to take?",
+      "options": [
+        "The annual value of the feature",
+        "The increment over what happens today, with the baseline measured the same way",
+        "The cost of building the model, amortised over the first year",
+        "The saving in agent time, before error costs"
+      ],
+      "answer": 1,
+      "explanation": "A number with no baseline is not a result, and a baseline measured differently is not a comparison. Both halves are needed before the saving means anything to a finance lead."
+    },
+    {
+      "question": "The case claims the model wrongly approves 3.1% against the agents' 4.4%. What makes that comparison legitimate?",
+      "options": [
+        "Agent error rates for refund handling are published industry-wide",
+        "The agents' rate is higher, which is the normal expectation",
+        "The model's rate was measured on a larger sample",
+        "The agents' rate was measured the same way — a blind re-review of the same slice of requests"
+      ],
+      "answer": 3,
+      "explanation": "“Better than the humans” is the claim most often made without evidence. It only holds when both numbers come from the same instrument on the same cases, which here is a blind re-review."
+    },
+    {
+      "question": "Why does the refund model approve automatically but never deny?",
+      "options": [
+        "The two errors differ in kind: a wrong approval costs the company $28, while a wrong denial takes money from someone who was entitled to it",
+        "Because denial would require more accuracy than the model has",
+        "Because regulators prohibit automated denials in every jurisdiction",
+        "Because denials are rarer and so not worth automating"
+      ],
+      "answer": 0,
+      "explanation": "When errors differ in kind rather than only in price, the answer is usually not a cleverer threshold but automating one direction. You give up some saving and remove a harm you could not have priced honestly."
+    },
+    {
+      "question": "Every proposal has one number that will not survive scrutiny. What do you do with it?",
+      "options": [
+        "Leave it out — the defence is one page",
+        "Present it at the end, once the case has been made",
+        "Name it in the first two minutes, together with what you are doing about it",
+        "Replace it with a conservative estimate so that nobody queries it"
+      ],
+      "answer": 2,
+      "explanation": "A finance lead who finds the soft number themselves stops believing the other five. One who hears it from you starts helping you firm it up, which is a much better use of the same forty minutes."
+    },
+    {
+      "question": "What form should “what would change my mind” take?",
+      "options": [
+        "A commitment to revisit the decision every quarter",
+        "A number somebody could go and measure: this stops paying at about 10.7%, and we are at 3.1%",
+        "A list of the assumptions the case rests on",
+        "A promise to stop if the team loses confidence in the model"
+      ],
+      "answer": 1,
+      "explanation": "A break-even number converts a debate about confidence into a measurement with a distance attached. It also tells the room exactly what the hold-out is for, and why paying for it is not optional."
+    }
+  ],
+  "p21": [
+    {
+      "question": "What is an eval?",
+      "options": [
+        "A benchmark score published by the model provider",
+        "A held-out test set with labels and a single metric",
+        "A survey asking users whether the output was good",
+        "A frozen case set, explicit criteria and a grader — closer to a QA test suite than to a machine-learning metric"
+      ],
+      "answer": 3,
+      "explanation": "And it belongs to the product manager rather than the ML team, because every criterion in it is a decision about what “good” means for this product."
+    },
+    {
+      "question": "Version 1 scores 71% overall, and 6.1% of its drafts promise something the company cannot deliver. What does that demonstrate?",
+      "options": [
+        "That 71% is too low a bar for anything customer-facing",
+        "That one overall number hides the failure you care most about, so criteria have to be scored separately",
+        "That the rubric's weights need adjusting",
+        "That human graders are unreliable at this sample size"
+      ],
+      "answer": 1,
+      "explanation": "71% is a respectable-looking score that concealed 366 false promises a day. Averaging a hard requirement into a rubric is how a gate quietly becomes a weight."
+    },
+    {
+      "question": "How should a prompt be treated?",
+      "options": [
+        "As configuration, editable by whoever owns the feature",
+        "As documentation describing the model's intended behaviour",
+        "As a release: versioned, reviewed and gated by the eval — a wording change is a production deploy",
+        "As an internal implementation detail belonging to the ML team"
+      ],
+      "answer": 2,
+      "explanation": "A prompt encodes policy: what the system may promise, what tone it uses, what it refuses. One edited sentence changes the product for every customer instantly and with no build, which is exactly why it needs the ceremony of a release."
+    },
+    {
+      "question": "The same input produces different outputs each run. What follows for the acceptance criteria?",
+      "options": [
+        "They have to be properties that hold across samples, and each case is run several times",
+        "They have to be relaxed until the observed variation fits inside them",
+        "They cannot be automated and must be checked by hand every release",
+        "The model must be made deterministic before any testing happens"
+      ],
+      "answer": 0,
+      "explanation": "“Never promises a delivery date” is testable across a thousand samples; “produces this exact paragraph” is a coincidence rather than a criterion. And a failure appearing one time in three is a real failure, not noise."
+    },
+    {
+      "question": "Which failure modes belong in the PRD for an LLM feature?",
+      "options": [
+        "Overfitting to the training data",
+        "Point-in-time leakage from a feature that exists only after the decision",
+        "Class imbalance in the evaluation set",
+        "Confident fabrication, instructions hidden in user-supplied content, and context leaking between customers"
+      ],
+      "answer": 3,
+      "explanation": "All three are product problems with product defences: grounding in the order record, treating anything a user supplied as data rather than instructions, and a launch check on isolation between customers."
+    }
+  ],
+  "p22": [
+    {
+      "question": "What actually changes as a feature moves up the autonomy ladder?",
+      "options": [
+        "Accountability for the outcome moves away from a person who read it",
+        "The accuracy the model needs rises proportionally with each rung",
+        "The cost per action falls, because no human time is spent",
+        "The feature becomes easier to evaluate"
+      ],
+      "answer": 0,
+      "explanation": "At rung 2 a named employee read the message and sent it. Remove the click and the company is talking to its customers by itself — which is a transfer of responsibility, not a quality improvement."
+    },
+    {
+      "question": "What sets the right rung for a feature?",
+      "options": [
+        "The model's measured accuracy",
+        "The number of actions it performs per day",
+        "The blast radius: what the worst single run can do, and how many runs happen before a person looks",
+        "Whether the team can monitor it in real time"
+      ],
+      "answer": 2,
+      "explanation": "A 99%-accurate agent with unbounded reach is a worse product than a 90%-accurate one that can only affect one customer per run. Accuracy describes the model; blast radius describes what happens when it is wrong."
+    },
+    {
+      "question": "Why is gating on the model's confidence the wrong design?",
+      "options": [
+        "Because most models do not expose a confidence score",
+        "Because confidence varies too much between runs to be a stable gate",
+        "Because a confidence gate needs labels that arrive too late to be useful",
+        "Because the model is often most fluent exactly where it is inventing — gate on irreversibility, magnitude and bulk instead"
+      ],
+      "answer": 3,
+      "explanation": "Gate on properties of the action, not of the prediction: can the affected person undo it, does it move money or data outside the company, is it irreversible in practice, is it a bulk action."
+    },
+    {
+      "question": "A four-step agent chain is right 95% of the time at each step. What is the success rate, and what follows?",
+      "options": [
+        "95%: the steps are independent, so the overall rate is unchanged",
+        "81%: one run in five goes wrong somewhere, so the answer is short chains with a cheap verification after each step",
+        "99%: errors in separate steps tend to cancel each other out",
+        "38%: each step multiplies the error rate rather than the success rate"
+      ],
+      "answer": 1,
+      "explanation": "And the failures are not spread evenly — they cluster in the unusual cases that most needed a human. A verified step resets the multiplication, which is why the fix is the chain's shape rather than a better model."
+    },
+    {
+      "question": "A four-step agent issued a refund incorrectly. What makes the incident explainable?",
+      "options": [
+        "The full trajectory: every step, tool call and intermediate result, because the real question is which step went wrong",
+        "The model version and the final output",
+        "The confidence score attached to the decision",
+        "The eval suite's score on that ticket type"
+      ],
+      "answer": 0,
+      "explanation": "Module P13's inputs-and-version logging is not enough once a system takes several steps. Without the trajectory the first serious incident is unexplainable, and an unexplainable incident gets the feature switched off permanently."
+    }
+  ],
+  "p23": [
+    {
+      "question": "In an ML strategy, where does a durable advantage come from?",
+      "options": [
+        "Training a larger model than competitors can afford",
+        "Owning a large volume of data",
+        "The loop: a competitor can call the same model this afternoon, and cannot buy your recorded outcomes",
+        "Hiring the strongest ML team on the market"
+      ],
+      "answer": 2,
+      "explanation": "Volume is not an advantage; data that arises only from running this particular business is. And it compounds only if every automated decision records its own outcome, which is what makes the loop rather than the model the asset."
+    },
+    {
+      "question": "When should shared platform capability be built?",
+      "options": [
+        "Before the first feature, so that it does not have to be retrofitted",
+        "When the third feature needs the same thing — by then there is enough variation to fit it and enough consumers to call it a platform",
+        "Once the ML team is large enough to maintain it",
+        "After a vendor's tooling turns out to be too expensive"
+      ],
+      "answer": 1,
+      "explanation": "Built for the first feature it is an abstraction over one example; built for the third it fits three real cases. A feature store with no second consumer is not infrastructure, it is a hobby with a budget."
+    },
+    {
+      "question": "Which section do people most often leave out of a twelve-month ML plan?",
+      "options": [
+        "The money attached to each decision",
+        "The platform investments",
+        "The decision dates for the uncertain bets",
+        "What you will not do, and why"
+      ],
+      "answer": 3,
+      "explanation": "A strategy that excludes nothing has chosen nothing. Naming what you are declining — and the reasoning, such as “both are utilities we would spend a year to catch up on” — is what makes the rest of the page credible."
+    },
+    {
+      "question": "What is wrong with building a capability first and finding the decision it serves later?",
+      "options": [
+        "A capability nobody is waiting for is a sophisticated cost centre, and it takes about two years to admit it",
+        "It takes longer than doing it in the other order",
+        "It cannot be funded in tranches",
+        "Nothing: platform investment has to precede the features that use it"
+      ],
+      "answer": 0,
+      "explanation": "Every strategy item should be traceable to a decision somebody makes and a cost of getting it wrong. Reversed, the work looks impressive for long enough that nobody wants to be the person who stops it."
+    },
+    {
+      "question": "The delivery advisory earns about $14,000 a year and appears on the strategy page anyway. Why include it?",
+      "options": [
+        "Because every shipped feature has to be listed for completeness",
+        "Because listing it justifies continuing to invest in it",
+        "Because a strategy that cannot name its smallest result is hiding something",
+        "Because small numbers make the large ones look more credible"
+      ],
+      "answer": 2,
+      "explanation": "It is also being stopped on the same page, which is the point: naming a fourteen-thousand-dollar result and declining to spend another quarter on it is what tells a board that the other numbers were not chosen for effect."
+    }
   ]
 }

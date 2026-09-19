@@ -246,7 +246,7 @@
       "portfolio",
       "stakeholders"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p20",
@@ -259,7 +259,7 @@
       "defence",
       "end-to-end"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p21",
@@ -272,7 +272,7 @@
       "evals",
       "latency"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p22",
@@ -285,7 +285,7 @@
       "autonomy",
       "accountability"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p23",
@@ -298,6 +298,6 @@
       "platform",
       "org"
     ],
-    "status": "soon"
+    "status": "ready"
   }
 ]
