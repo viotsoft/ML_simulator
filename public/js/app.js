@@ -52,6 +52,20 @@ const I18N = {
     agentCertHint: (n) => `Сертификат откроется после всех ${n} модулей трека`,
     agentCertHeader: 'ML Career Simulator · Сертификат AI Agent Engineer',
     agentCertBody: (n) => `успешно прошёл(ла) ${n} модулей трека агентной инженерии и подтвердил(а) уровень <b>AI Agent Engineer</b>: проектирование, запуск и вывод на рынок агентных систем.`,
+    navPm: '\U0001F4CA ML Product',
+    pmTitle: '\U0001F4CA ML Product Manager',
+    pmIntro: 'The fourth track, in English. You join Datacore as the product manager for its ML features: twenty-three cases on deciding what is worth building, what a model may promise, what a wrong prediction costs \u2014 and how to defend the call to the business.',
+    pmRoadmap: (ready, total) => `${ready} of ${total} modules are live. The rest ship as they are written \u2014 at no extra cost.`,
+    pmModuleN: (n) => `Module P${n}`,
+    pmSoonTag: 'Soon',
+    pmSoonToast: 'This module is still being written \u2014 it will appear here automatically.',
+    pmQuizTitle: (n) => `\U0001F4DD Module P${n} quiz`,
+    pmBackModules: '\u2190 All ML Product modules',
+    pmGrades: { start: 'New to ML products', associate: 'Associate ML PM', pm: 'ML Product Manager', senior: 'Senior ML PM \U0001F3C6' },
+    pmCertBtn: '\U0001F393 ML Product Manager certificate',
+    pmCertHint: (n) => `The certificate unlocks after the first ${n} modules of the track`,
+    pmCertHeader: 'ML Career Simulator \u00b7 ML Product Manager Certificate',
+    pmCertBody: (n) => `has successfully completed ${n} modules of the ML product management track and demonstrated the level of an <b>ML Product Manager</b>: framing ML problems, choosing metrics that survive a product review, weighing the cost of a wrong prediction and defending the decision to the business.`,
     navCca: '🏛 Claude Architect',
     ccaTitle: '🏛 Подготовка к Claude Certified Architect',
     ccaIntro: 'Третий трек: подготовка к экзамену CCAR-F (Claude Certified Architect – Foundations). Двадцать модулей закрывают все 30 официальных целей экзамена, распределение — по весам доменов. В конце — пробный экзамен: 60 вопросов за 120 минут и отчёт по доменам, как в настоящем.',
@@ -202,6 +216,20 @@ const I18N = {
     agentCertHint: (n) => `The certificate unlocks after all ${n} track modules`,
     agentCertHeader: 'ML Career Simulator · AI Agent Engineer Certificate',
     agentCertBody: (n) => `has successfully completed ${n} modules of the agentic engineering track and demonstrated the level of an <b>AI Agent Engineer</b>: designing, shipping and commercializing agentic systems.`,
+    navPm: '\U0001F4CA ML Product',
+    pmTitle: '\U0001F4CA ML Product Manager',
+    pmIntro: 'The fourth track, in English. You join Datacore as the product manager for its ML features: twenty-three cases on deciding what is worth building, what a model may promise, what a wrong prediction costs \u2014 and how to defend the call to the business.',
+    pmRoadmap: (ready, total) => `${ready} of ${total} modules are live. The rest ship as they are written \u2014 at no extra cost.`,
+    pmModuleN: (n) => `Module P${n}`,
+    pmSoonTag: 'Soon',
+    pmSoonToast: 'This module is still being written \u2014 it will appear here automatically.',
+    pmQuizTitle: (n) => `\U0001F4DD Module P${n} quiz`,
+    pmBackModules: '\u2190 All ML Product modules',
+    pmGrades: { start: 'New to ML products', associate: 'Associate ML PM', pm: 'ML Product Manager', senior: 'Senior ML PM \U0001F3C6' },
+    pmCertBtn: '\U0001F393 ML Product Manager certificate',
+    pmCertHint: (n) => `The certificate unlocks after the first ${n} modules of the track`,
+    pmCertHeader: 'ML Career Simulator \u00b7 ML Product Manager Certificate',
+    pmCertBody: (n) => `has successfully completed ${n} modules of the ML product management track and demonstrated the level of an <b>ML Product Manager</b>: framing ML problems, choosing metrics that survive a product review, weighing the cost of a wrong prediction and defending the decision to the business.`,
     navCca: '🏛 Claude Architect',
     ccaTitle: '🏛 Claude Certified Architect prep',
     ccaIntro: 'The third track: preparation for the CCAR-F exam (Claude Certified Architect – Foundations). Twenty modules cover all 30 official exam objectives, weighted the way the domains are. It ends with a mock exam: 60 questions in 120 minutes and a per-domain report, just like the real one.',
@@ -467,9 +495,12 @@ const SECTIONS = [
   { key: 'interviews', id: 'navInterviews', label: 'navInterviews', render: () => renderInterviews() },
   { key: 'agents', id: 'navAgents', label: 'navAgents', render: () => renderAgents() },
   { key: 'cca', id: 'navCca', label: 'navCca', render: () => renderCca() },
+  // langs — раздел существует только в этой локали; трек PM написан по-английски
+  { key: 'pm', id: 'navPm', label: 'navPm', langs: ['en'], render: () => renderPm() },
 ];
+const visibleSections = () => SECTIONS.filter((sec) => !sec.langs || sec.langs.includes(LANG));
 function sectionTabs(active) {
-  const buttons = SECTIONS.map((sec) =>
+  const buttons = visibleSections().map((sec) =>
     `<button class="${active === sec.key ? 'active' : ''}" id="${sec.id}">${t(sec.label)}</button>`
   ).join('\n      ');
   return `
@@ -478,7 +509,7 @@ function sectionTabs(active) {
     </div>`;
 }
 function bindSectionTabs() {
-  for (const sec of SECTIONS) {
+  for (const sec of visibleSections()) {
     const el = document.getElementById(sec.id);
     if (el) el.onclick = sec.render;
   }
@@ -704,6 +735,75 @@ function renderPaywall() {
   document.getElementById('backDash').onclick = (e) => { e.preventDefault(); renderDashboard(); };
 }
 
+// ------------------------------------------------- трек «ML Product Manager»
+// Экзамена нет, поэтому раздел проще, чем у трека сертификации.
+async function renderPm() {
+  const { modules, certRequired } = await api('/api/pm-modules');
+  state.pmModules = modules;
+  const u = state.user;
+  const tr = (u.tracks && u.tracks.pm) || { certificateReady: false };
+  const passed = modules.filter((m) => m.progress && m.progress.passed).length;
+  const ready = modules.filter((m) => m.status !== 'soon').length;
+  const pct = modules.length ? Math.round((passed / modules.length) * 100) : 0;
+
+  const g = I18N[LANG].pmGrades || I18N.ru.pmGrades;
+  const grade = passed >= certRequired ? g.senior
+    : passed >= Math.ceil(modules.length * 0.6) ? g.pm
+    : passed >= Math.ceil(modules.length * 0.25) ? g.associate
+    : g.start;
+
+  view.innerHTML = `
+    ${sectionTabs('pm')}
+    <div class="interview-intro" style="margin-bottom:22px">
+      <h2 style="font-size:22px;margin-bottom:8px">${t('pmTitle')}</h2>
+      <p style="color:var(--muted);font-size:15px;max-width:760px">${t('pmIntro')}</p>
+    </div>
+    <div class="progress-panel">
+      <div class="info">
+        <div style="font-weight:700;font-size:18px">${t('grade', grade)}</div>
+        <div style="color:var(--muted);font-size:14px;margin:4px 0 8px">${t('passedOf', passed, modules.length)} · ${t('pmRoadmap', ready, modules.length)}</div>
+        <div class="progress-bar"><div style="width:${pct}%"></div></div>
+      </div>
+      ${tr.certificateReady
+        ? `<button class="btn btn-primary" id="pmCertBtn">${t('pmCertBtn')}</button>`
+        : `<div style="color:var(--muted);font-size:13.5px;max-width:240px">${t('pmCertHint', certRequired)}</div>`}
+      ${!u.subscribed ? `<button class="btn btn-ghost" id="subBtn">${t('subBtn')}</button>` : ''}
+    </div>
+    <div class="module-list">
+      ${modules.map((m) => {
+        const soon = m.status === 'soon';
+        const done = m.progress && m.progress.passed;
+        const icon = done ? '✅' : soon ? '🕓' : m.unlocked ? '📂' : '🔒';
+        const status = done
+          ? t('quizScore', m.progress.score, m.progress.total)
+          : soon ? t('pmSoonTag')
+          : m.unlocked ? (m.free ? t('freeTag') : t('availableTag')) : t('proTag');
+        return `
+        <div class="module-card ${m.unlocked ? '' : 'locked'}" data-id="${m.id}" data-unlocked="${m.unlocked}" data-soon="${soon}">
+          <div class="module-status">${icon}</div>
+          <div>
+            <div class="m-title">${t('pmModuleN', m.order)}. ${esc(m.title)}</div>
+            <div class="m-sub">${esc(m.subtitle)}</div>
+          </div>
+          <div class="module-meta">${esc(m.level)}<br>${status}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  view.querySelectorAll('.module-card').forEach((card) => {
+    card.onclick = () => {
+      if (card.dataset.soon === 'true') return toast(t('pmSoonToast'));
+      if (card.dataset.unlocked === 'true') renderModule(card.dataset.id, 'pm');
+      else renderPaywall();
+    };
+  });
+  const certBtn = document.getElementById('pmCertBtn');
+  if (certBtn) certBtn.onclick = renderPmCertificate;
+  const subBtn = document.getElementById('subBtn');
+  if (subBtn) subBtn.onclick = renderPaywall;
+  bindSectionTabs();
+}
+
 // ---------------------------------------------------------------- модуль + квиз
 // Различия треков в одном месте: пути API, возврат, список для «следующего модуля»
 // и сертификат. Сама механика модуля и квиза — общая.
@@ -740,6 +840,17 @@ const TRACK_UI = {
     backLabel: () => t('ccaBackModules'),
     quizTitle: (n) => t('ccaQuizTitle', n),
     soonToast: 'ccaSoonToast',
+  },
+  pm: {
+    modulePath: (id) => `/api/pm-module/${id}`,
+    quizPath: (id) => `/api/pm-quiz/${id}`,
+    back: () => renderPm(),
+    list: () => state.pmModules,
+    certReady: (u) => !!(u.tracks && u.tracks.pm && u.tracks.pm.certificateReady),
+    cert: () => renderPmCertificate(),
+    backLabel: () => t('pmBackModules'),
+    quizTitle: (n) => t('pmQuizTitle', n),
+    soonToast: 'pmSoonToast',
   },
 };
 
@@ -1265,6 +1376,11 @@ async function renderAgentCertificate() {
 async function renderCcaCertificate() {
   return renderCertificateView({ endpoint: '/api/cca-certificate', backKey: 'ccaBackModules',
     headerKey: 'ccaCertHeader', bodyKey: 'ccaCertBody', back: renderCca });
+}
+
+async function renderPmCertificate() {
+  return renderCertificateView({ endpoint: '/api/pm-certificate', backKey: 'pmBackModules',
+    headerKey: 'pmCertHeader', bodyKey: 'pmCertBody', back: renderPm });
 }
 
 // ---------------------------------------------------------------- старт

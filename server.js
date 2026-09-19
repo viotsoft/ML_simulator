@@ -79,7 +79,10 @@ function readContent(p, fallback) {
     return JSON.parse(fs.readFileSync(p, 'utf8'));
   } catch (e) {
     if (fallback === undefined) throw e;
-    console.warn(`[content] ${p}: ${e.message} — используем пустой фолбэк`);
+    // Ненайденный файл с фолбэком — штатная ситуация: так выглядит одноязычный
+    // трек в чужой локали и трек, у которого ещё нет квизов. Предупреждаем
+    // только о сломанном файле, иначе лог перестают читать.
+    if (e.code !== 'ENOENT') console.warn(`[content] ${p}: ${e.message} — используем пустой фолбэк`);
     return fallback;
   }
 }
@@ -95,6 +98,8 @@ for (const loc of LOCALES) {
     ccaQuizzes: readContent(path.join(dir, 'cca-quizzes.json'), {}),
     ccaScenarios: readContent(path.join(dir, 'cca-scenarios.json'), []),
     ccaExam: readContent(path.join(dir, 'cca-exam.json'), []),
+    pm: readContent(path.join(dir, 'pm.json'), []),
+    pmQuizzes: readContent(path.join(dir, 'pm-quizzes.json'), {}),
   };
 }
 const MODULES = CONTENT[DEFAULT_LOCALE].modules;   // структура/порядок общие для локалей
@@ -114,7 +119,12 @@ function localeCca(lang) { return CONTENT[lang].cca; }
 function localeCcaQuizzes(lang) { return CONTENT[lang].ccaQuizzes; }
 function localeCcaScenarios(lang) { return CONTENT[lang].ccaScenarios; }
 function localeCcaExam(lang) { return CONTENT[lang].ccaExam; }
-function moduleMarkdownPath(lang, id) {
+function localePm(lang) { return CONTENT[lang].pm; }
+function localePmQuizzes(lang) { return CONTENT[lang].pmQuizzes; }
+// fixedLocale — для одноязычного трека: фолбэк на русский увёл бы на
+// несуществующий файл, а это 500 вместо честного «модуля нет».
+function moduleMarkdownPath(lang, id, fixedLocale) {
+  if (fixedLocale) return path.join(CONTENT_DIR, fixedLocale, `${id}.md`);
   const p = path.join(CONTENT_DIR, lang, `${id}.md`);
   return fs.existsSync(p) ? p : path.join(CONTENT_DIR, DEFAULT_LOCALE, `${id}.md`);
 }
@@ -128,6 +138,8 @@ const CCA_EXAM_ITEMS = 60;       // как на настоящем экзаме�
 const CCA_EXAM_MINUTES = 120;
 const CCA_EXAM_SCENARIOS = 4;    // 4 сценария из 6
 const CCA_PASS_SCALED = 720;     // порог по шкале 100–1000
+const PM_CERT_REQUIRED = 20;     // сертификат ML Product Manager: p21–p23 — бонус
+const PM_LANG = 'en';            // трек продакт-менеджера существует только на английском
 
 // Один список треков вместо попарных проверок: четвёртый трек добавляется
 // строкой здесь, а не новой веткой в каждой проверке ниже.
@@ -135,6 +147,8 @@ const TRACK_DEFS = [
   { key: 'ml', content: 'modules', prefix: /^m\d{2}$/, required: CERT_REQUIRED, salt: '|ml-simulator-cert', file: 'modules.json', soonable: false },
   { key: 'agent', content: 'agents', prefix: /^a\d{2}$/, required: AGENT_CERT_REQUIRED, salt: '|ai-agent-cert', file: 'agents.json', soonable: true },
   { key: 'cca', content: 'cca', prefix: /^c\d{2}$/, required: CCA_CERT_REQUIRED, salt: '|cca-architect-cert', file: 'cca.json', soonable: true },
+  // locale — трек одноязычный: и markdown, и список модулей берутся только из него
+  { key: 'pm', content: 'pm', prefix: /^p\d{2}$/, required: PM_CERT_REQUIRED, salt: '|ml-pm-cert', file: 'pm.json', soonable: true, locale: PM_LANG },
 ];
 
 // Модуль без markdown не должен доходить до readFileSync: помечаем «скоро» на старте.
@@ -142,7 +156,7 @@ for (const loc of LOCALES) {
   for (const def of TRACK_DEFS) {
     if (!def.soonable) continue;
     for (const m of CONTENT[loc][def.content]) {
-      if (m.status !== 'soon' && !fs.existsSync(path.join(CONTENT_DIR, DEFAULT_LOCALE, `${m.id}.md`))) {
+      if (m.status !== 'soon' && !fs.existsSync(path.join(CONTENT_DIR, def.locale || DEFAULT_LOCALE, `${m.id}.md`))) {
         console.warn(`[content] ${loc}/${m.id}: нет markdown — статус переключён на "soon"`);
         m.status = 'soon';
       }
@@ -155,7 +169,7 @@ for (const loc of LOCALES) {
 const TRACKS = {};
 const SEEN_IDS = new Map();  // id → ключ трека, который его занял
 for (const def of TRACK_DEFS) {
-  const list = CONTENT[DEFAULT_LOCALE][def.content];
+  const list = CONTENT[def.locale || DEFAULT_LOCALE][def.content];
   const ids = new Set(list.map((m) => m.id));
   if (ids.size !== list.length) throw new Error(`${def.file}: повторяющиеся id`);
   for (const id of ids) {
@@ -167,6 +181,7 @@ for (const def of TRACK_DEFS) {
   TRACKS[def.key] = { key: def.key, ids, required: def.required, salt: def.salt, modules: list };
 }
 const AGENT_MODULES = TRACKS.agent.modules;
+const PM_MODULES = TRACKS.pm.modules;
 const CCA_MODULES = TRACKS.cca.modules;
 const ML_MODULE_IDS = TRACKS.ml.ids;
 const AGENT_MODULE_IDS = TRACKS.agent.ids;
@@ -767,6 +782,82 @@ app.get('/api/agent-certificate', requireAuth, (req, res) => {
     date: new Date().toISOString().slice(0, 10),
     modules: AGENT_CERT_REQUIRED,
     track: 'agent'
+  });
+});
+
+// ---------------------------------------------------------------- трек «ML Product Manager»
+// Четвёртый трек, только на английском: контент берём из PM_LANG независимо от
+// языка интерфейса, а из русского UI вкладка скрыта (SECTIONS в app.js).
+// Порядок проверок, как у остальных треков: 404 → 409 «скоро» → 402 подписка.
+app.get('/api/pm-modules', (req, res) => {
+  const ctx = currentUser(req);
+  const user = ctx ? ctx.user : null;
+  res.json({
+    modules: localePm(PM_LANG).map((m) => ({
+      id: m.id, order: m.order, title: m.title, subtitle: m.subtitle,
+      level: m.level, tags: m.tags, free: !!m.free,
+      status: m.status || 'ready',
+      unlocked: m.status !== 'soon' && trackAccess(user, m),
+      progress: user ? user.progress[m.id] || null : null
+    })),
+    total: PM_MODULES.length,
+    certRequired: PM_CERT_REQUIRED
+  });
+});
+
+app.get('/api/pm-module/:id', requireAuth, (req, res) => {
+  const mod = localePm(PM_LANG).find((m) => m.id === req.params.id);
+  if (!mod) return res.status(404).json({ error: 'Модуль не найден' });
+  if (mod.status === 'soon') {
+    return res.status(409).json({ error: 'Модуль ещё готовится', comingSoon: true });
+  }
+  if (!trackAccess(req.ctx.user, mod)) {
+    return res.status(402).json({ error: 'Модуль доступен по подписке', needSubscription: true });
+  }
+  const markdown = fs.readFileSync(moduleMarkdownPath(PM_LANG, mod.id, PM_LANG), 'utf8');
+  const quiz = (localePmQuizzes(PM_LANG)[mod.id] || []).map((q, i) => ({ index: i, question: q.question, options: q.options }));
+  res.json({
+    module: { id: mod.id, order: mod.order, title: mod.title, subtitle: mod.subtitle, level: mod.level, tags: mod.tags },
+    html: marked.parse(markdown),
+    quiz
+  });
+});
+
+app.post('/api/pm-quiz/:id', requireAuth, (req, res) => {
+  const mod = PM_MODULES.find((m) => m.id === req.params.id);
+  if (!mod) return res.status(404).json({ error: 'Модуль не найден' });
+  if (mod.status === 'soon') return res.status(409).json({ error: 'Модуль ещё готовится', comingSoon: true });
+  if (!trackAccess(req.ctx.user, mod)) return res.status(402).json({ error: 'Модуль доступен по подписке' });
+
+  const quiz = localePmQuizzes(PM_LANG)[mod.id] || [];
+  if (!quiz.length) return res.status(409).json({ error: 'Квиз ещё готовится', comingSoon: true });
+  const answers = (req.body || {}).answers;
+  if (!Array.isArray(answers) || answers.length !== quiz.length) {
+    return res.status(400).json({ error: 'Ответьте на все вопросы' });
+  }
+
+  const r = gradeQuiz(quiz, answers);
+  const { db, user } = req.ctx;
+  recordProgress(user, mod.id, r, quiz.length);
+  saveDB(db);
+
+  res.json({ correct: r.correct, total: quiz.length, passed: r.passed, review: r.review, user: publicUser(user) });
+});
+
+app.get('/api/pm-certificate', requireAuth, (req, res) => {
+  const user = req.ctx.user;
+  const passed = countPassed(user.progress, TRACKS.pm.ids);
+  if (passed < PM_CERT_REQUIRED) {
+    return res.status(403).json({ error: `Сертификат доступен после прохождения ${PM_CERT_REQUIRED} модулей трека. Пройдено: ${passed}.` });
+  }
+  const certId = crypto.createHash('sha256').update(user.email + TRACKS.pm.salt).digest('hex').slice(0, 12).toUpperCase();
+  res.json({
+    name: user.name,
+    email: user.email,
+    certId,
+    date: new Date().toISOString().slice(0, 10),
+    modules: PM_CERT_REQUIRED,
+    track: 'pm'
   });
 });
 

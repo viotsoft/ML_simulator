@@ -1,0 +1,303 @@
+[
+  {
+    "id": "p01",
+    "order": 1,
+    "title": "First week on an ML team",
+    "subtitle": "What a model can and cannot promise: a probability instead of a guarantee, and why a normal spec does not fit",
+    "level": "PM Foundations",
+    "tags": [
+      "ML literacy",
+      "expectations",
+      "scoping"
+    ],
+    "free": true,
+    "status": "soon"
+  },
+  {
+    "id": "p02",
+    "order": 2,
+    "title": "Should this be ML at all?",
+    "subtitle": "Four requests from the business, triaged: which genuinely need a model and which are closed by a rule",
+    "level": "PM Foundations",
+    "tags": [
+      "rules vs ML",
+      "cost of a model",
+      "triage"
+    ],
+    "free": true,
+    "status": "soon"
+  },
+  {
+    "id": "p03",
+    "order": 3,
+    "title": "From “make it smarter” to a decision",
+    "subtitle": "The unit of decision: who acts on the prediction, and what actually changes on the screen",
+    "level": "PM Foundations",
+    "tags": [
+      "problem framing",
+      "decision design",
+      "discovery"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p04",
+    "order": 4,
+    "title": "Does the data even exist?",
+    "subtitle": "The questions to ask before the feature reaches the roadmap: does the data exist, is it labelled, who owns it, what it costs",
+    "level": "PM Foundations",
+    "tags": [
+      "data discovery",
+      "labelling",
+      "ownership"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p05",
+    "order": 5,
+    "title": "Metrics that survive a product review",
+    "subtitle": "The chain from business metric to online proxy to offline metric — and why accuracy is not a KPI",
+    "level": "PM Foundations",
+    "tags": [
+      "metrics",
+      "KPI",
+      "proxy metrics"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p06",
+    "order": 6,
+    "title": "What a wrong prediction costs",
+    "subtitle": "False positives against false negatives in product terms: who pays for each, and who gets to decide",
+    "level": "PM Foundations",
+    "tags": [
+      "cost of error",
+      "threshold",
+      "tradeoffs"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p07",
+    "order": 7,
+    "title": "Sizing an ML project",
+    "subtitle": "Why the estimate differs from a normal feature: the baseline first, and a stopping criterion written into the brief",
+    "level": "ML PM",
+    "tags": [
+      "estimation",
+      "baseline",
+      "kill criteria"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p08",
+    "order": 8,
+    "title": "The PRD for an ML feature",
+    "subtitle": "What belongs in it — the decision, the metric, the fallback, the cost of an error — and what does not",
+    "level": "ML PM",
+    "tags": [
+      "PRD",
+      "requirements",
+      "fallback"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p09",
+    "order": 9,
+    "title": "Designing for a model that is wrong",
+    "subtitle": "Interfaces for uncertainty: confidence thresholds, a human in the loop, and failing gracefully",
+    "level": "ML PM",
+    "tags": [
+      "UX",
+      "uncertainty",
+      "human-in-the-loop"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p10",
+    "order": 10,
+    "title": "Baselines and the “is it worth it” gate",
+    "subtitle": "Heuristic first, measure the lift it has to beat, and agree up front on when the project stops",
+    "level": "ML PM",
+    "tags": [
+      "baseline",
+      "lift",
+      "gating"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p11",
+    "order": 11,
+    "title": "Reading an evaluation without being fooled",
+    "subtitle": "What to ask when the team reports 0.97, and the signs of leakage a product manager can spot unaided",
+    "level": "ML PM",
+    "tags": [
+      "evaluation",
+      "leakage",
+      "review"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p12",
+    "order": 12,
+    "title": "The experiment",
+    "subtitle": "Designing the A/B for an ML feature: guardrail metrics, and why you believe revenue when it disagrees with clicks",
+    "level": "ML PM",
+    "tags": [
+      "A/B testing",
+      "guardrails",
+      "decisions"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p13",
+    "order": 13,
+    "title": "Launch readiness",
+    "subtitle": "Shadow mode, canary, rollback: what “done” means for a model, and the runbook to demand before launch",
+    "level": "ML PM",
+    "tags": [
+      "launch",
+      "canary",
+      "runbook"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p14",
+    "order": 14,
+    "title": "Life after launch",
+    "subtitle": "Drift, retraining cadence and the dashboard a product manager actually reads — plus when to switch the feature off",
+    "level": "ML PM",
+    "tags": [
+      "monitoring",
+      "drift",
+      "retraining"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p15",
+    "order": 15,
+    "title": "Unit economics of an ML feature",
+    "subtitle": "Inference, labelling and operations: when the cheaper model is the better product decision",
+    "level": "Senior ML PM",
+    "tags": [
+      "unit economics",
+      "cost",
+      "tradeoffs"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p16",
+    "order": 16,
+    "title": "Build, buy, or call an API",
+    "subtitle": "The decision frame, vendor lock-in, and what a foundation-model API changes about the arithmetic",
+    "level": "Senior ML PM",
+    "tags": [
+      "build vs buy",
+      "vendors",
+      "API"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p17",
+    "order": 17,
+    "title": "Data as a product decision",
+    "subtitle": "Collection, consent, retention — and the feedback loop that improves the model or quietly poisons it",
+    "level": "Senior ML PM",
+    "tags": [
+      "data strategy",
+      "consent",
+      "feedback loop"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p18",
+    "order": 18,
+    "title": "Risk, fairness and compliance",
+    "subtitle": "Harms, disparate impact, risk tiers, and the paperwork that has to exist before anything ships",
+    "level": "Senior ML PM",
+    "tags": [
+      "risk",
+      "fairness",
+      "compliance"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p19",
+    "order": 19,
+    "title": "Roadmapping under uncertainty",
+    "subtitle": "A portfolio of bets, staged funding, and how to tell leadership “we do not know yet”",
+    "level": "Senior ML PM",
+    "tags": [
+      "roadmap",
+      "portfolio",
+      "stakeholders"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p20",
+    "order": 20,
+    "title": "Capstone: the review board",
+    "subtitle": "One Datacore case end to end, defended in front of the CTO, finance and legal",
+    "level": "Senior ML PM",
+    "tags": [
+      "capstone",
+      "defence",
+      "end-to-end"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p21",
+    "order": 21,
+    "title": "Product management for LLM features",
+    "subtitle": "Evals instead of accuracy, the prompt as a product surface, and cost and latency as requirements",
+    "level": "Advanced",
+    "tags": [
+      "LLM",
+      "evals",
+      "latency"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p22",
+    "order": 22,
+    "title": "Agentic products",
+    "subtitle": "The autonomy ladder as a product decision, approval gates, and what you own when the agent acts",
+    "level": "Advanced",
+    "tags": [
+      "agents",
+      "autonomy",
+      "accountability"
+    ],
+    "status": "soon"
+  },
+  {
+    "id": "p23",
+    "order": 23,
+    "title": "The ML product strategy",
+    "subtitle": "Platform against feature, data as an advantage, and the product manager’s twelve-month plan",
+    "level": "Advanced",
+    "tags": [
+      "strategy",
+      "platform",
+      "org"
+    ],
+    "status": "soon"
+  }
+]
