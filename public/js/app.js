@@ -52,21 +52,21 @@ const I18N = {
     agentCertHint: (n) => `Сертификат откроется после всех ${n} модулей трека`,
     agentCertHeader: 'ML Career Simulator · Сертификат AI Agent Engineer',
     agentCertBody: (n) => `успешно прошёл(ла) ${n} модулей трека агентной инженерии и подтвердил(а) уровень <b>AI Agent Engineer</b>: проектирование, запуск и вывод на рынок агентных систем.`,
-    navPm: '\U0001F4CA ML Product',
-    pmTitle: '\U0001F4CA ML Product Manager',
-    pmIntro: 'The fourth track, in English. You join Datacore as the product manager for its ML features: twenty-three cases on deciding what is worth building, what a model may promise, what a wrong prediction costs \u2014 and how to defend the call to the business.',
-    pmRoadmap: (ready, total) => `${ready} of ${total} modules are live. The rest ship as they are written \u2014 at no extra cost.`,
-    pmModuleN: (n) => `Module P${n}`,
-    pmSoonTag: 'Soon',
-    pmSoonToast: 'This module is still being written \u2014 it will appear here automatically.',
-    pmQuizTitle: (n) => `\U0001F4DD Module P${n} quiz`,
-    pmBackModules: '\u2190 All ML Product modules',
-    pmGrades: { start: 'New to ML products', associate: 'Associate ML PM', pm: 'ML Product Manager', senior: 'Senior ML PM \U0001F3C6' },
-    pmCertBtn: '\U0001F393 ML Product Manager certificate',
-    pmCertHint: (n) => `The certificate unlocks after the first ${n} modules of the track`,
-    pmCertHeader: 'ML Career Simulator \u00b7 ML Product Manager Certificate',
-    pmCertBody: (n) => `has successfully completed ${n} modules of the ML product management track and demonstrated the level of an <b>ML Product Manager</b>: framing ML problems, choosing metrics that survive a product review, weighing the cost of a wrong prediction and defending the decision to the business.`,
-    navCca: '🏛 Claude Architect',
+    navPm: '📊 Продукт',
+    pmTitle: '📊 ML Product Manager',
+    pmIntro: 'Четвёртый трек: продуктовая сторона ML. Вас нанимают продакт-менеджером ML-направления Datacore. Двадцать три кейса о том, как решать, что вообще стоит строить, что модель может обещать, сколько стоит неверное предсказание — и как защитить это решение перед бизнесом.',
+    pmRoadmap: (ready, total) => `Открыто ${ready} из ${total} модулей. Остальные выходят по мере готовности — без доплат.`,
+    pmModuleN: (n) => `Модуль P${n}`,
+    pmSoonTag: 'Скоро',
+    pmSoonToast: 'Модуль ещё готовится — он появится здесь автоматически.',
+    pmQuizTitle: (n) => `📝 Квиз модуля P${n}`,
+    pmBackModules: '← Все модули трека «Продукт»',
+    pmGrades: { start: 'Начинающий в ML-продуктах', associate: 'Associate ML PM', pm: 'ML Product Manager', senior: 'Senior ML PM 🏆' },
+    pmCertBtn: '🎓 Сертификат ML Product Manager',
+    pmCertHint: (n) => `Сертификат откроется после первых ${n} модулей трека`,
+    pmCertHeader: 'ML Career Simulator · Сертификат ML Product Manager',
+    pmCertBody: (n) => `успешно прошёл(ла) ${n} модулей трека продуктового управления ML и подтвердил(а) уровень <b>ML Product Manager</b>: постановка ML-задач, выбор метрик, оценка цены неверного предсказания и защита решения перед бизнесом.`,
+        navCca: '🏛 Claude Architect',
     ccaTitle: '🏛 Подготовка к Claude Certified Architect',
     ccaIntro: 'Третий трек: подготовка к экзамену CCAR-F (Claude Certified Architect – Foundations). Двадцать модулей закрывают все 30 официальных целей экзамена, распределение — по весам доменов. В конце — пробный экзамен: 60 вопросов за 120 минут и отчёт по доменам, как в настоящем.',
     ccaDisclaimer: 'Независимая подготовка. Курс не аффилирован с Anthropic и не является официальной сертификацией; сам экзамен сдаётся отдельно.',
@@ -216,19 +216,19 @@ const I18N = {
     agentCertHint: (n) => `The certificate unlocks after all ${n} track modules`,
     agentCertHeader: 'ML Career Simulator · AI Agent Engineer Certificate',
     agentCertBody: (n) => `has successfully completed ${n} modules of the agentic engineering track and demonstrated the level of an <b>AI Agent Engineer</b>: designing, shipping and commercializing agentic systems.`,
-    navPm: '\U0001F4CA ML Product',
-    pmTitle: '\U0001F4CA ML Product Manager',
-    pmIntro: 'The fourth track, in English. You join Datacore as the product manager for its ML features: twenty-three cases on deciding what is worth building, what a model may promise, what a wrong prediction costs \u2014 and how to defend the call to the business.',
-    pmRoadmap: (ready, total) => `${ready} of ${total} modules are live. The rest ship as they are written \u2014 at no extra cost.`,
+    navPm: '📊 ML Product',
+    pmTitle: '📊 ML Product Manager',
+    pmIntro: 'The fourth track: the product side of ML. You join Datacore as the product manager for its ML features — twenty-three cases on deciding what is worth building, what a model may promise, what a wrong prediction costs, and how to defend the call to the business.',
+    pmRoadmap: (ready, total) => `${ready} of ${total} modules are live. The rest ship as they are written — at no extra cost.`,
     pmModuleN: (n) => `Module P${n}`,
     pmSoonTag: 'Soon',
-    pmSoonToast: 'This module is still being written \u2014 it will appear here automatically.',
-    pmQuizTitle: (n) => `\U0001F4DD Module P${n} quiz`,
-    pmBackModules: '\u2190 All ML Product modules',
-    pmGrades: { start: 'New to ML products', associate: 'Associate ML PM', pm: 'ML Product Manager', senior: 'Senior ML PM \U0001F3C6' },
-    pmCertBtn: '\U0001F393 ML Product Manager certificate',
+    pmSoonToast: 'This module is still being written — it will appear here automatically.',
+    pmQuizTitle: (n) => `📝 Module P${n} quiz`,
+    pmBackModules: '← All ML Product modules',
+    pmGrades: { start: 'New to ML products', associate: 'Associate ML PM', pm: 'ML Product Manager', senior: 'Senior ML PM 🏆' },
+    pmCertBtn: '🎓 ML Product Manager certificate',
     pmCertHint: (n) => `The certificate unlocks after the first ${n} modules of the track`,
-    pmCertHeader: 'ML Career Simulator \u00b7 ML Product Manager Certificate',
+    pmCertHeader: 'ML Career Simulator · ML Product Manager Certificate',
     pmCertBody: (n) => `has successfully completed ${n} modules of the ML product management track and demonstrated the level of an <b>ML Product Manager</b>: framing ML problems, choosing metrics that survive a product review, weighing the cost of a wrong prediction and defending the decision to the business.`,
     navCca: '🏛 Claude Architect',
     ccaTitle: '🏛 Claude Certified Architect prep',
@@ -495,12 +495,10 @@ const SECTIONS = [
   { key: 'interviews', id: 'navInterviews', label: 'navInterviews', render: () => renderInterviews() },
   { key: 'agents', id: 'navAgents', label: 'navAgents', render: () => renderAgents() },
   { key: 'cca', id: 'navCca', label: 'navCca', render: () => renderCca() },
-  // langs — раздел существует только в этой локали; трек PM написан по-английски
-  { key: 'pm', id: 'navPm', label: 'navPm', langs: ['en'], render: () => renderPm() },
+  { key: 'pm', id: 'navPm', label: 'navPm', render: () => renderPm() },
 ];
-const visibleSections = () => SECTIONS.filter((sec) => !sec.langs || sec.langs.includes(LANG));
 function sectionTabs(active) {
-  const buttons = visibleSections().map((sec) =>
+  const buttons = SECTIONS.map((sec) =>
     `<button class="${active === sec.key ? 'active' : ''}" id="${sec.id}">${t(sec.label)}</button>`
   ).join('\n      ');
   return `
@@ -509,7 +507,7 @@ function sectionTabs(active) {
     </div>`;
 }
 function bindSectionTabs() {
-  for (const sec of visibleSections()) {
+  for (const sec of SECTIONS) {
     const el = document.getElementById(sec.id);
     if (el) el.onclick = sec.render;
   }

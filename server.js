@@ -121,10 +121,7 @@ function localeCcaScenarios(lang) { return CONTENT[lang].ccaScenarios; }
 function localeCcaExam(lang) { return CONTENT[lang].ccaExam; }
 function localePm(lang) { return CONTENT[lang].pm; }
 function localePmQuizzes(lang) { return CONTENT[lang].pmQuizzes; }
-// fixedLocale — для одноязычного трека: фолбэк на русский увёл бы на
-// несуществующий файл, а это 500 вместо честного «модуля нет».
-function moduleMarkdownPath(lang, id, fixedLocale) {
-  if (fixedLocale) return path.join(CONTENT_DIR, fixedLocale, `${id}.md`);
+function moduleMarkdownPath(lang, id) {
   const p = path.join(CONTENT_DIR, lang, `${id}.md`);
   return fs.existsSync(p) ? p : path.join(CONTENT_DIR, DEFAULT_LOCALE, `${id}.md`);
 }
@@ -139,7 +136,6 @@ const CCA_EXAM_MINUTES = 120;
 const CCA_EXAM_SCENARIOS = 4;    // 4 сценария из 6
 const CCA_PASS_SCALED = 720;     // порог по шкале 100–1000
 const PM_CERT_REQUIRED = 20;     // сертификат ML Product Manager: p21–p23 — бонус
-const PM_LANG = 'en';            // трек продакт-менеджера существует только на английском
 
 // Один список треков вместо попарных проверок: четвёртый трек добавляется
 // строкой здесь, а не новой веткой в каждой проверке ниже.
@@ -147,8 +143,7 @@ const TRACK_DEFS = [
   { key: 'ml', content: 'modules', prefix: /^m\d{2}$/, required: CERT_REQUIRED, salt: '|ml-simulator-cert', file: 'modules.json', soonable: false },
   { key: 'agent', content: 'agents', prefix: /^a\d{2}$/, required: AGENT_CERT_REQUIRED, salt: '|ai-agent-cert', file: 'agents.json', soonable: true },
   { key: 'cca', content: 'cca', prefix: /^c\d{2}$/, required: CCA_CERT_REQUIRED, salt: '|cca-architect-cert', file: 'cca.json', soonable: true },
-  // locale — трек одноязычный: и markdown, и список модулей берутся только из него
-  { key: 'pm', content: 'pm', prefix: /^p\d{2}$/, required: PM_CERT_REQUIRED, salt: '|ml-pm-cert', file: 'pm.json', soonable: true, locale: PM_LANG },
+  { key: 'pm', content: 'pm', prefix: /^p\d{2}$/, required: PM_CERT_REQUIRED, salt: '|ml-pm-cert', file: 'pm.json', soonable: true },
 ];
 
 // Модуль без markdown не должен доходить до readFileSync: помечаем «скоро» на старте.
@@ -786,14 +781,13 @@ app.get('/api/agent-certificate', requireAuth, (req, res) => {
 });
 
 // ---------------------------------------------------------------- трек «ML Product Manager»
-// Четвёртый трек, только на английском: контент берём из PM_LANG независимо от
-// языка интерфейса, а из русского UI вкладка скрыта (SECTIONS в app.js).
+// Четвёртый трек: продуктовая сторона ML. Двуязычный, как и остальные.
 // Порядок проверок, как у остальных треков: 404 → 409 «скоро» → 402 подписка.
 app.get('/api/pm-modules', (req, res) => {
   const ctx = currentUser(req);
   const user = ctx ? ctx.user : null;
   res.json({
-    modules: localePm(PM_LANG).map((m) => ({
+    modules: localePm(getLang(req)).map((m) => ({
       id: m.id, order: m.order, title: m.title, subtitle: m.subtitle,
       level: m.level, tags: m.tags, free: !!m.free,
       status: m.status || 'ready',
@@ -806,7 +800,8 @@ app.get('/api/pm-modules', (req, res) => {
 });
 
 app.get('/api/pm-module/:id', requireAuth, (req, res) => {
-  const mod = localePm(PM_LANG).find((m) => m.id === req.params.id);
+  const lang = getLang(req);
+  const mod = localePm(lang).find((m) => m.id === req.params.id);
   if (!mod) return res.status(404).json({ error: 'Модуль не найден' });
   if (mod.status === 'soon') {
     return res.status(409).json({ error: 'Модуль ещё готовится', comingSoon: true });
@@ -814,8 +809,8 @@ app.get('/api/pm-module/:id', requireAuth, (req, res) => {
   if (!trackAccess(req.ctx.user, mod)) {
     return res.status(402).json({ error: 'Модуль доступен по подписке', needSubscription: true });
   }
-  const markdown = fs.readFileSync(moduleMarkdownPath(PM_LANG, mod.id, PM_LANG), 'utf8');
-  const quiz = (localePmQuizzes(PM_LANG)[mod.id] || []).map((q, i) => ({ index: i, question: q.question, options: q.options }));
+  const markdown = fs.readFileSync(moduleMarkdownPath(lang, mod.id), 'utf8');
+  const quiz = (localePmQuizzes(lang)[mod.id] || []).map((q, i) => ({ index: i, question: q.question, options: q.options }));
   res.json({
     module: { id: mod.id, order: mod.order, title: mod.title, subtitle: mod.subtitle, level: mod.level, tags: mod.tags },
     html: marked.parse(markdown),
@@ -824,12 +819,13 @@ app.get('/api/pm-module/:id', requireAuth, (req, res) => {
 });
 
 app.post('/api/pm-quiz/:id', requireAuth, (req, res) => {
+  const lang = getLang(req);
   const mod = PM_MODULES.find((m) => m.id === req.params.id);
   if (!mod) return res.status(404).json({ error: 'Модуль не найден' });
   if (mod.status === 'soon') return res.status(409).json({ error: 'Модуль ещё готовится', comingSoon: true });
   if (!trackAccess(req.ctx.user, mod)) return res.status(402).json({ error: 'Модуль доступен по подписке' });
 
-  const quiz = localePmQuizzes(PM_LANG)[mod.id] || [];
+  const quiz = localePmQuizzes(lang)[mod.id] || [];
   if (!quiz.length) return res.status(409).json({ error: 'Квиз ещё готовится', comingSoon: true });
   const answers = (req.body || {}).answers;
   if (!Array.isArray(answers) || answers.length !== quiz.length) {
