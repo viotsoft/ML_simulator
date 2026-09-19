@@ -796,5 +796,233 @@
       "answer": 3,
       "explanation": "The cost of owning a model is monthly and permanent while the value can fade. Removing a feature whose increment has stopped paying for its machinery is the same arithmetic as module P10's gate, applied a year later."
     }
+  ],
+  "p15": [
+    {
+      "question": "Among an ML feature's four cost lines, which is frequently the largest and scales with volume in the worst way?",
+      "options": [
+        "Inference, because it is charged per call",
+        "Human review of the uncertain band, at a real hourly rate",
+        "Storage of the training data",
+        "The original training run"
+      ],
+      "answer": 1,
+      "explanation": "Every case routed to a person costs a person's time, and that cost grows linearly with volume with no economy of scale whatsoever. Inference is the line everyone names first and is often an order of magnitude smaller."
+    },
+    {
+      "question": "Why work in cost per decision rather than cost per month?",
+      "options": [
+        "Because finance reports monthly figures anyway",
+        "Because cloud providers bill per request",
+        "Because it makes the number smaller and easier to get approved",
+        "Because it can be set against the value per decision, survives a change in volume, and makes two architectures comparable in a single line"
+      ],
+      "answer": 3,
+      "explanation": "A monthly lump sum cannot be compared to anything, forecast when volume triples, or defended in a budget review. Per-decision cost does all three, and it is the form in which the expensive-model trap becomes visible."
+    },
+    {
+      "question": "A model is four points better and twenty-five times more expensive per call. What structure usually beats both it and the cheap model?",
+      "options": [
+        "Running both models and averaging their outputs",
+        "Using the expensive model only during business hours",
+        "A cascade: the cheap model on everything, the expensive one only on the cases the cheap model is unsure about",
+        "Negotiating a volume discount on the expensive model"
+      ],
+      "answer": 2,
+      "explanation": "The cascade reuses module P9's three bands — the middle band can go to a better model before it goes to a human. It typically keeps almost all of the quality for a small fraction of the per-call bill."
+    },
+    {
+      "question": "In the worked photo-moderation example, which block was the largest cost in every one of the three options?",
+      "options": [
+        "The violations that still got through",
+        "Inference on the large vision model",
+        "Human review of the flagged items",
+        "Labelling and the data pipelines"
+      ],
+      "answer": 0,
+      "explanation": "Between $13,000 and $32,000 a month, against an inference line of $108 to $10,800. That is the finding: the leverage was in catch rate, and the cheap-versus-expensive argument was about the smallest number on the page."
+    },
+    {
+      "question": "Which two cost lines deserve a forecast at ten times today's volume before you commit?",
+      "options": [
+        "Storage and training compute",
+        "Per-call model pricing and human review",
+        "Labelling and monitoring",
+        "The on-call rotation and incident response"
+      ],
+      "answer": 1,
+      "explanation": "Both grow faster than the business and neither improves with scale. A feature that is comfortable at 9,000 items a day and impossible at 90,000 is not a strategy, and now is when that is cheap to discover."
+    }
+  ],
+  "p16": [
+    {
+      "question": "What is the first question in a build-buy-or-call decision, before any price is compared?",
+      "options": [
+        "Whether the vendor's API latency fits our budget",
+        "Whether our team has the skills to build it",
+        "Whether the capability is a utility the whole industry needs in the same form, or a differentiator whose value comes from our own data",
+        "Whether the vendor will commit to a two-year contract"
+      ],
+      "answer": 2,
+      "explanation": "Getting this axis wrong is expensive in both directions: a year spent building transcription you could have called, or a differentiator handed to a supplier who then sells the same capability to a competitor."
+    },
+    {
+      "question": "Which cost of buying never appears in the quote and limits you permanently?",
+      "options": [
+        "The per-call price once you reach full volume",
+        "The ceiling: when the vendor is wrong in a way specific to your business, you cannot fix it — you can only file a request",
+        "The engineering time the integration takes",
+        "The training your team needs in order to use the API"
+      ],
+      "answer": 1,
+      "explanation": "Integration and switching costs are painful but finite. The ceiling is permanent: a false-block pattern costing you $30,000 a month becomes an item in somebody else's backlog, prioritised against their other customers."
+    },
+    {
+      "question": "What did general-purpose model APIs change about this decision?",
+      "options": [
+        "They make building in-house obsolete for every capability",
+        "They remove the need to measure a baseline",
+        "They make buying cheaper than building at any volume",
+        "They add a third option — fast, priced per call, and with no moat: excellent for finding out whether the decision matters, poor as a permanent home for a differentiator at scale"
+      ],
+      "answer": 3,
+      "explanation": "It is module P7's spike with the search removed: you can have the decision live in days and learn whether anyone acts on it. What you do not get is an advantage, because a competitor can call the same model tomorrow."
+    },
+    {
+      "question": "The vendor's deck claims 75% of fraud caught. What is that number?",
+      "options": [
+        "A hypothesis about your data, measured on somebody else's traffic by someone with an interest in the result",
+        "A contractual commitment you can hold them to",
+        "A lie until proven otherwise",
+        "Evidence, as long as a third party audited it"
+      ],
+      "answer": 0,
+      "explanation": "It is neither a lie nor evidence. Their fraud mix, devices and geography are not yours, and it is entirely normal for a vendor model to land well below its headline on a new customer's traffic — which is what shadow mode is for."
+    },
+    {
+      "question": "When is buying a capability that is genuinely a differentiator an acceptable decision?",
+      "options": [
+        "Never: a differentiator has to be built in-house",
+        "When a long contract fixes the price for the whole term",
+        "When the arithmetic is large enough to justify it, and your own capability stays alive while your exit stays priced",
+        "When the vendor agrees not to serve your competitors"
+      ],
+      "answer": 2,
+      "explanation": "“It is our differentiator” is not on its own an argument worth hundreds of thousands a year. What makes the trade safe is that it remains reversible — and it stops being safe the moment the in-house model or the priced exit quietly lapses."
+    }
+  ],
+  "p17": [
+    {
+      "question": "Why is “we already have the data” not a sufficient reason to train on it?",
+      "options": [
+        "Because purpose limitation means data gathered for one purpose does not automatically become training data for another",
+        "Because older data is usually too stale to be useful",
+        "Because the data team has to approve every new use",
+        "Because storage costs grow with every model trained"
+      ],
+      "answer": 0,
+      "explanation": "Data collected so a delivery could be completed is not automatically available for pricing. Writing the purpose into the PRD is what makes a later request for a different use a decision rather than a default."
+    },
+    {
+      "question": "The fraud model's measured precision keeps improving month after month. Why is that suspicious?",
+      "options": [
+        "Because precision always degrades in production, so a rise indicates a bug",
+        "Because label lag makes any recent measurement unreliable",
+        "Because blocked transactions never produce an outcome, so the model is only ever graded on the cases it let through",
+        "Because precision cannot be measured without a control group of honest customers"
+      ],
+      "answer": 2,
+      "explanation": "Rejected applicants never default. The model is being evaluated on a slice of the world it already judged safe, and that slice narrows as the model grows more confident — so the number rises while meaning less."
+    },
+    {
+      "question": "What is the standard instrument for measuring a decision you actually act on?",
+      "options": [
+        "Ask the model for a calibrated confidence and trust it",
+        "Survey the affected customers after the fact",
+        "Compare against a vendor's benchmark on similar data",
+        "Hold out a small random sample from the model's action, let those cases through, and observe what happens"
+      ],
+      "answer": 3,
+      "explanation": "You cannot reason your way out of missing data. The hold-out costs real money in fraud let through, and that cost is the price of knowing whether the system works — typically a few per cent of what the errors already cost."
+    },
+    {
+      "question": "A thumbs-up widget produces labels for free. What has to be recorded next to that data?",
+      "options": [
+        "The exact time each rating was submitted",
+        "That only a particular kind of person presses it, so it is usable for finding patterns and never as a rate",
+        "That ratings should be weighted by the customer's lifetime value",
+        "That the widget will be removed once enough labels are collected"
+      ],
+      "answer": 1,
+      "explanation": "Appeals come from sellers who know the process; ratings come from people with a strong opinion. Such labels are genuinely useful for spotting a device type or a city, and dangerous the moment they become the sole measure of anything."
+    },
+    {
+      "question": "Precision will now be computed on the hold-out sample only. What happens to the old series?",
+      "options": [
+        "Delete it, since it was measuring the wrong thing",
+        "Recompute it retroactively under the new definition",
+        "Report both numbers side by side indefinitely",
+        "Leave it on the chart with a line marking the change — a metric that silently changes definition is worse than either version of it"
+      ],
+      "answer": 3,
+      "explanation": "Anyone reading the chart in six months needs to see that the definition moved and when. Silently swapping the meaning of a line is how an organisation loses the ability to trust its own history."
+    }
+  ],
+  "p18": [
+    {
+      "question": "Sellers in one region have photos rejected three times more often. What does that fact establish?",
+      "options": [
+        "That the model is biased against that region",
+        "Nothing on its own — a group that genuinely breaks a rule more often will legitimately be rejected more often",
+        "That the threshold should be lowered for that region",
+        "That the region should be excluded from automation permanently"
+      ],
+      "answer": 1,
+      "explanation": "Outcome rates and error rates are different questions. The distinction protects you in both directions: it stops a real harm being dismissed as a base-rate difference, and stops a legitimate difference being “fixed” by lowering the bar for one group."
+    },
+    {
+      "question": "How do you actually obtain the wrongful-rejection rate for each group?",
+      "options": [
+        "Take a sample of decisions from each group, strip the group marker, and have senior humans re-review them blind",
+        "Compute it from production logs by comparing rejections against appeals",
+        "Ask the model for its confidence on each rejected item",
+        "Compare the rejection rates and subtract each group's base rate of violations"
+      ],
+      "answer": 0,
+      "explanation": "Production data does not know which rejections were wrong, so the error rate cannot be computed from it. A blind re-review of a couple of hundred cases per group costs about two days, and there is no way around it."
+    },
+    {
+      "question": "What sets a model's risk tier?",
+      "options": [
+        "The size of the model and how much data it was trained on",
+        "Whether the capability was built in-house or bought",
+        "The consequence for the person affected — money, access, employment, health",
+        "Whether the feature is customer-facing or internal"
+      ],
+      "answer": 2,
+      "explanation": "The same technique is unremarkable in ranking and heavily regulated in credit. Work the tier out at the PRD stage: its cost is entirely front-loaded, and discovering it at the launch review turns two weeks into a quarter."
+    },
+    {
+      "question": "The disparity is real and traces to an unusual photo background common in that region. Why is a lower threshold for the region the wrong fix?",
+      "options": [
+        "Because per-segment thresholds are difficult to maintain",
+        "Because it would push review volume past the team's capacity",
+        "Because regulators forbid treating regions differently under any circumstances",
+        "Because it hides the error-rate gap by letting genuine violations through there — harming local buyers and the honest sellers who compete with those violations"
+      ],
+      "answer": 3,
+      "explanation": "The mechanism was the background, not the region. A per-region threshold targets the symptom, calls itself fairness, and quietly transfers the harm to the people in that region who were doing nothing wrong."
+    },
+    {
+      "question": "Rejections in the affected window were wrong. How should the remedy be delivered?",
+      "options": [
+        "Proactively re-review and restore them — waiting for appeals reaches only the sellers who knew how to complain",
+        "Through the standard appeal process, which exists precisely for this",
+        "By notifying every seller in the region and inviting them to resubmit",
+        "By compensating the affected sellers rather than restoring their listings"
+      ],
+      "answer": 0,
+      "explanation": "An appeals-only remedy reproduces the original unfairness, because the people least able to navigate the process were disproportionately harmed in the first place. Restoring proactively is both the right outcome and the cheaper one to explain."
+    }
   ]
 }

@@ -194,7 +194,7 @@
       "cost",
       "tradeoffs"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p16",
@@ -207,7 +207,7 @@
       "vendors",
       "API"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p17",
@@ -220,7 +220,7 @@
       "consent",
       "feedback loop"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p18",
@@ -233,7 +233,7 @@
       "fairness",
       "compliance"
     ],
-    "status": "soon"
+    "status": "ready"
   },
   {
     "id": "p19",
